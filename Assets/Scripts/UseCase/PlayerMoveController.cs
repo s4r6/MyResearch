@@ -9,10 +9,10 @@ namespace UseCase.Player
         PlayerEntity model;
         PlayerView view;
 
-        public PlayerMoveController(PlayerView view)
+        public PlayerMoveController(PlayerView view, PlayerEntity model)
         {
             this.view = view;
-            model = new PlayerEntity(view.Position, view.Rotation);
+            this.model = model;
         }
 
         void TryMove(Vector2 inputDirection)
@@ -23,6 +23,9 @@ namespace UseCase.Player
 
         public void OnMoveInput(Vector2 direction)
         {
+            if (!model.isMovable)
+                return;
+
             TryMove(direction);
         }
 
@@ -34,6 +37,9 @@ namespace UseCase.Player
 
         public void OnLookInput(Vector2 delta)
         {
+            if (!model.isLookable)
+                return;
+
             float yaw = delta.x * model.lookSensitivity.x;
             float pitch = delta.y * model.lookSensitivity.y;
             

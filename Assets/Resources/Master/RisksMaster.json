@@ -1,0 +1,39 @@
+{
+    "PasswordLeak": {
+      "RiskId": "PasswordLeak",
+      "DisplayName": "パスワード漏洩のリスク"
+    },
+    "PhysicalTheft": {
+      "RiskId": "PhysicalTheft",
+      "DisplayName": "物理盗難のリスク"
+    },
+    "PowerLoss": {
+      "RiskId": "PowerLoss",
+      "DisplayName": "停電による業務停止のリスク"
+    },
+    "BackupLoss": {
+      "RiskId": "BackupLoss",
+      "DisplayName": "バックアップデータの消失リスク"
+    },
+    "EscapeFailure": {
+      "RiskId": "EscapeFailure",
+      "DisplayName": "扉が壊れて脱出不能になるリスク"
+    },
+    "KeyLoss": {
+      "RiskId": "KeyLoss",
+      "DisplayName": "鍵を紛失して開錠不能になるリスク"
+    },
+    "InfoFade": {
+      "RiskId": "InfoFade",
+      "DisplayName": "記載内容が時間経過で読めなくなるリスク"
+    },
+    "DocumentLoss": {
+      "RiskId": "DocumentLoss",
+      "DisplayName": "重要書類の紛失による業務支障リスク"
+    },
+    "NoRisk": {
+      "RiskId": "NoRisk",
+      "DisplayName": "リスクは特に存在しない"
+    }
+}
+  
