@@ -14,6 +14,7 @@ namespace View.Player
 
         public Subject<Unit> OnInspectButtonPressed = new Subject<Unit>();
 
+
         //public PlayerMoveController usecase;
 
         void Start()
@@ -42,6 +43,16 @@ namespace View.Player
         {
             if (!context.performed) return;
             OnInspectButtonPressed.OnNext(default);
+        }
+
+        public void SwitchActionMapToUI()
+        {
+            input.SwitchCurrentActionMap("UI");
+        }
+
+        public void SwitchActionMapToPlayer()
+        {
+            input.SwitchCurrentActionMap("Player");
         }
     }
 

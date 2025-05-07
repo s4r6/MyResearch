@@ -15,7 +15,6 @@ namespace View.Player
         public Vector3 Position => transform.position;
         public Quaternion Rotation => transform.rotation;
 
-        Vector2 moveVelocity;
         float pitchAngle = 0f;
         float SpeedChangeRate = 10.0f;
 

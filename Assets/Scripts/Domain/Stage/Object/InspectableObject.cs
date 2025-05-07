@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Domain.Stage.Object
@@ -24,8 +25,14 @@ namespace Domain.Stage.Object
             this.choices = choices;
         }
 
-        public void SelectChoice(Choice choice)
+        public void SelectChoice(string choiceText)
         {
+            if (selectedChoice != null)
+                return;
+
+            var choice = choices.Values.ToList()
+                                .Find(x => x.label == choiceText);
+            
             selectedChoice = choice;
         }
     }

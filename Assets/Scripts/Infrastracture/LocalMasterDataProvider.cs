@@ -53,6 +53,8 @@ namespace Infrastructure.Master
         Dictionary<string, InspectableObject> InspectableObjectMap;
         Dictionary<string, string> ActionLabels;    //ActionLabelをActionIdから取得するためのDictionary
         Dictionary<string, string> RiskNames;
+        HashSet<string> CarriableObjects;
+
         public LocalMasterDataProvider() 
         { 
             FetchAllMasterData();
@@ -71,9 +73,33 @@ namespace Infrastructure.Master
 
         void FetchAllMasterData()
         {
+            LoadCarriableObjectData();
             LoadRiskMaster();
             LoadActionMaster();
             LoadStageObjectData();
+        }
+
+        void LoadCarriableObjectData(string fileName = "CarriableObjects.json")
+        {
+            string fullPath = Path.Combine(filePath, fileName);
+            if (!File.Exists(fullPath))
+            {
+                Console.WriteLine($"[ActionLabelLoader] File not found: {fullPath}");
+                ActionLabels = new Dictionary<string, string>();
+            }
+
+            try
+            {
+                var json = File.ReadAllText(fullPath);
+                var objectIds = JsonConvert.DeserializeObject<List<string>>(json);
+                CarriableObjects = new HashSet<string>(objectIds); // 判定が高速になる
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ActionLabelLoader] Failed to load or parse: {ex.Message}");
+                ActionLabels = new Dictionary<string, string>();
+            }
         }
 
         //指定したファイル名をfilePathから取得して、Actionのidと表示名で保管
@@ -210,7 +236,6 @@ namespace Infrastructure.Master
             }
         }
     
-       
     }
 }
 
