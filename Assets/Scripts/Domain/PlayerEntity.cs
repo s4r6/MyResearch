@@ -12,6 +12,9 @@ namespace Domain.Player
 
         public Vector2 lookSensitivity = new Vector2(0.2f, 0.2f);
 
+        public string currentLookingObject = string.Empty;
+        public string currentCarringObject = string.Empty;
+
         public PlayerEntity(Vector3 position, Quaternion rotation)
         {
             this.position = position;

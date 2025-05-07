@@ -9,10 +9,10 @@ namespace UseCase.Player
         PlayerEntity model;
         PlayerView view;
 
-        public PlayerMoveController(PlayerView view)
+        public PlayerMoveController(PlayerView view, PlayerEntity model)
         {
             this.view = view;
-            model = new PlayerEntity(view.Position, view.Rotation);
+            this.model = model;
         }
 
         void TryMove(Vector2 inputDirection)

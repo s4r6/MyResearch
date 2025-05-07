@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UseCase.Player;
+using UniRx;
 
 namespace View.Player
 {
@@ -11,7 +12,10 @@ namespace View.Player
         InputAction move;
         InputAction look;
 
-        public PlayerMoveController usecase;
+        public Subject<Unit> OnInspectButtonPressed = new Subject<Unit>();
+
+
+        //public PlayerMoveController usecase;
 
         void Start()
         {
@@ -19,20 +23,36 @@ namespace View.Player
             look = input.actions["Look"];
         }
 
-        void Update()
+        public Vector2 GetMoveInput()
         {
-            if (input == null || move == null) return;
+            if (input == null || move == null) return Vector2.zero;
 
             Vector2 direction = move.ReadValue<Vector2>();
-            usecase.OnMoveInput(direction);
+            return direction;
         }
 
-        void LateUpdate()
+        public Vector2 GetLookInput()
         {
-            if(input == null || look == null) return;
+            if (input == null || look == null) return Vector2.zero;
 
             Vector2 delta = look.ReadValue<Vector2>();
-            usecase.OnLookInput(delta);
+            return delta;
+        }
+
+        public void OnInspect(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
+            OnInspectButtonPressed.OnNext(default);
+        }
+
+        public void SwitchActionMapToUI()
+        {
+            input.SwitchCurrentActionMap("UI");
+        }
+
+        public void SwitchActionMapToPlayer()
+        {
+            input.SwitchCurrentActionMap("Player");
         }
     }
 
