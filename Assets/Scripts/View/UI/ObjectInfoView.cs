@@ -164,7 +164,9 @@ namespace View.UI
 
             OnSubmitEvent -= OnChoiceSelected;
             OnBackEvent -= OnCancelInspect;
-            OnScrollEvent -= MoveSelection; 
+            OnScrollEvent -= MoveSelection;
+
+            OnEndInspectView = null;
         }
 
         void EnableUIInput()

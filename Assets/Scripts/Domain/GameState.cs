@@ -7,6 +7,8 @@ namespace Domain.Game
     {
         Moving,
         Inspecting,
+        Carrying,
+        SelectAction,
         Settings,
         Result,
     }
@@ -21,12 +23,14 @@ namespace Domain.Game
 
         public bool IsMoving => Phase == GamePhase.Moving;
         public bool IsInspecting => Phase == GamePhase.Inspecting;
+        public bool IsCarrying => Phase == GamePhase.Carrying;
+        public bool IsSelectingAction => Phase == GamePhase.SelectAction;
         public bool IsSettings => Phase == GamePhase.Settings;
         public bool IsResult => Phase == GamePhase.Result;
 
         public GameState WithPhase(GamePhase newPhase) => new GameState(newPhase);
 
-        // Equals‚ÆGetHashCode‚ÌŽÀ‘•
+        // Equalsï¿½ï¿½GetHashCodeï¿½ÌŽï¿½ï¿½ï¿½
         public override bool Equals(object obj) => obj is GameState other && Equals(other);
 
         public bool Equals(GameState other) => Phase == other.Phase;

@@ -2,24 +2,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using Domain.Stage.Object;
 using Infrastructure.Master;
+using Domain.Action;
 
 namespace Infrastructure.Stage.Object
 {
     public class InspectableObjectRepository
     {
-        IMasterDataProvider provider;
+        //一度取得したデータはキャッシュする
+        //接続時にステージのデータを一括で受け取る
 
-        public InspectableObjectRepository(IMasterDataProvider provider) 
+        IObjectDataProvider provider;
+        List<List<ActionEntity>> AvailableActions = new();
+        public InspectableObjectRepository(IObjectDataProvider provider) 
         {
             this.provider = provider;
         }
-
         public InspectableObject TryGetInspectableObject(string id)
         {
             var obj = provider.GetInspectableObject(id);
 
             return obj;
         }
+
+        public InspectableObject TryGetCarryableObject(string id)
+        {
+            var obj = provider.GetCarryableObject(id);
+
+            return obj;
+        }
+
+
     }
 }
 

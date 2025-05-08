@@ -4,10 +4,8 @@ using UnityEngine;
 
 namespace Domain.Stage.Object
 {
-
-
     /// <summary>
-    /// ’²¸‰Â”\‚ÈƒIƒuƒWƒFƒNƒg‚ğ•\‚·
+    /// ï¿½ï¿½ï¿½ï¿½ï¿½Â”\ï¿½ÈƒIï¿½uï¿½Wï¿½Fï¿½Nï¿½gï¿½ï¿½\ï¿½ï¿½
     /// </summary>
     public class InspectableObject
     {
@@ -33,7 +31,10 @@ namespace Domain.Stage.Object
             var choice = choices.Values.ToList()
                                 .Find(x => x.label == choiceText);
             
+            Debug.Log(choice.availableActions.Count);
+
             selectedChoice = choice;
+            Debug.Log(selectedChoice);
         }
     }
 }

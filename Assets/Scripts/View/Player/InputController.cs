@@ -12,8 +12,9 @@ namespace View.Player
         InputAction move;
         InputAction look;
 
-        public Subject<Unit> OnInspectButtonPressed = new Subject<Unit>();
-
+        public Subject<Unit> OnInspectButtonPressed = new();
+        public Subject<Unit> OnPickUpButtonPressed = new();
+        public Subject<Unit> OnActionButtonPressed = new();
 
         //public PlayerMoveController usecase;
 
@@ -22,6 +23,7 @@ namespace View.Player
             move = input.actions["Move"];
             look = input.actions["Look"];
         }
+
 
         public Vector2 GetMoveInput()
         {
@@ -45,6 +47,18 @@ namespace View.Player
             OnInspectButtonPressed.OnNext(default);
         }
 
+        public void OnPickUp(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
+            OnPickUpButtonPressed.OnNext(default);
+        }
+
+        public void OnAction(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
+            OnActionButtonPressed.OnNext(default);
+        }
+
         public void SwitchActionMapToUI()
         {
             input.SwitchCurrentActionMap("UI");
@@ -52,6 +66,7 @@ namespace View.Player
 
         public void SwitchActionMapToPlayer()
         {
+            Debug.Log("[InputController] ActionMapをPlayerに切り替え");
             input.SwitchCurrentActionMap("Player");
         }
     }
