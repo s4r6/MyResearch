@@ -468,7 +468,7 @@
           },
           {
             "Label": "放置PCからの情報漏洩リスク",
-            "RiskId": "IdleLeak",
+            "RiskId": "PasswordLeak",
             "IsCorrect": true,
             "OverrideActions": [
               {

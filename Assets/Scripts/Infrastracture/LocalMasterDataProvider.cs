@@ -6,6 +6,7 @@ using System;
 using System.IO;
 using Domain.Action;
 using UnityEngine;
+using System.Linq;
 
 namespace Infrastructure.Master
 {
@@ -31,12 +32,20 @@ namespace Infrastructure.Master
         public int RiskChange;
         public int ActionPointCost;
         public bool IsSuccess;
+        public string TargetObjectId;
+        public string ExecuteOnObjectId;
     }
 
     public class ActionLabelData
     {
         public string ActionId { get; set; }
+        public bool IsOnly { get; set; }
         public string Label { get; set; }
+
+        public override string ToString()
+        {
+            return $"ActionLabelData: {ActionId}, {IsOnly}, {Label}";
+        }
     }
 
     public class RiskLabelData
@@ -45,15 +54,15 @@ namespace Infrastructure.Master
         public string DisplayName { get; set; }
     }
 
-    //ƒ[ƒJƒ‹‚ÅƒT[ƒo[‚©‚ç‚ÌFetch‚ğÄŒ»‚·‚é‚½‚ß‚Ìƒ[ƒJƒ‹«‘ƒNƒ‰ƒX
-    public class LocalMasterDataProvider : IMasterDataProvider
+    public class LocalMasterDataProvider : IObjectDataProvider, IActionDataProvider
     {
 
         string filePath = "C:/Users/kouta/Desktop/UnityProjects/MyResearch/Assets/Resources/Master/";
         Dictionary<string, InspectableObject> InspectableObjectMap;
-        Dictionary<string, string> ActionLabels;    //ActionLabel‚ğActionId‚©‚çæ“¾‚·‚é‚½‚ß‚ÌDictionary
+        Dictionary<string, ActionLabelData> ActionLabels;    //ActionLabelActionIdæ“¾é‚½ß‚Dictionary
         Dictionary<string, string> RiskNames;
         HashSet<string> CarriableObjects;
+        Dictionary<string, List<string>> ActionTargets;
 
         public LocalMasterDataProvider() 
         { 
@@ -70,6 +79,87 @@ namespace Infrastructure.Master
             return null;
         }
 
+        public InspectableObject GetCarryableObject(string id)
+        {
+            if(CarriableObjects.Contains(id))
+            {
+                return InspectableObjectMap[id];
+            }
+
+            return null;
+        }
+
+        //ObjectãŒãƒ‡ãƒ¼ã‚¿ä¸Šå¯èƒ½ãªã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã®ãƒªã‚¹ãƒˆã‚’å–å¾—
+        public List<string> GetAvailableActionIds(string id)
+        {
+            //ObjectIdã‚’è¦ç´ ã«å«ã‚€ã™ã¹ã¦ã®Actionã‚’å–å¾—
+            var actionTargetKeys = GetActionTargetKeysByObjectId(id);
+            if(actionTargetKeys.Count == 0)
+            {
+                return null;
+            }
+
+            return actionTargetKeys;
+        }
+
+        public List<ActionEntity> GetActionEntities(string objectId)
+        {
+            if(InspectableObjectMap.TryGetValue(objectId, out InspectableObject obj))
+            {
+                return obj.selectedChoice.availableActions;
+            }
+
+            return null;
+        }
+
+        public List<InspectableObject> GetActionableObjectsByObjectId(string id)
+        {
+            Debug.Log($"[LocalMasterDataProvider] GetActionableObjectsByObjectIdé–‹å§‹: id={id}");
+            var result = new List<InspectableObject>();
+            
+            Debug.Log($"[LocalMasterDataProvider] æ¤œç´¢å¯¾è±¡ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆæ•°: {InspectableObjectMap.Count}");
+            foreach (var obj in InspectableObjectMap.Values)
+            {
+                Debug.Log($"[LocalMasterDataProvider] ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‡¦ç†ä¸­: id={obj.id}, selectedChoice={obj.selectedChoice}");
+                
+                // selectedChoiceãŒå­˜åœ¨ã—ãªã„å ´åˆã¯ã‚¹ã‚­ãƒƒãƒ—
+                if (obj.selectedChoice == null)
+                {
+                    Debug.Log($"[LocalMasterDataProvider] selectedChoiceãŒå­˜åœ¨ã—ãªã„ãŸã‚ã‚¹ã‚­ãƒƒãƒ—: id={obj.id}");
+                    continue;
+                }
+                
+                Debug.Log($"[LocalMasterDataProvider] åˆ©ç”¨å¯èƒ½ãªã‚¢ã‚¯ã‚·ãƒ§ãƒ³æ•°: {obj.selectedChoice.availableActions.Count}");
+                
+                // selectedChoiceã®availableActionsã®ä¸­ã‹ã‚‰ã€executeOnObjectIdãŒä¸€è‡´ã™ã‚‹ActionEntityãŒã‚ã‚‹ã‹ãƒã‚§ãƒƒã‚¯
+                bool hasMatchingAction = obj.selectedChoice.availableActions
+                    .Any(action => action.executeOnObjectId == id);
+                
+                if (hasMatchingAction)
+                {
+                    Debug.Log($"[LocalMasterDataProvider] ãƒãƒƒãƒã™ã‚‹ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ã‚’ç™ºè¦‹: objectId={obj.id}");
+                    result.Add(obj);
+                }
+                else
+                {
+                    Debug.Log($"[LocalMasterDataProvider] ãƒãƒƒãƒã™ã‚‹ã‚¢ã‚¯ã‚·ãƒ§ãƒ³ãªã—: objectId={obj.id}");
+                }
+            }
+            
+            Debug.Log($"[LocalMasterDataProvider] æ¤œç´¢çµæœ: {result.Count}ä»¶ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆãŒè¦‹ã¤ã‹ã‚Šã¾ã—ãŸ");
+            return result;
+        }
+
+        public string GetActionId(string label)
+        {
+            var actionData = ActionLabels.Values.ToList()
+                                                .Find(x => x.Label == label);
+
+            if(actionData == null)
+                return null;
+
+            return actionData.ActionId;
+        }
 
         void FetchAllMasterData()
         {
@@ -77,6 +167,7 @@ namespace Infrastructure.Master
             LoadRiskMaster();
             LoadActionMaster();
             LoadStageObjectData();
+            LoadActionTargets();
         }
 
         void LoadCarriableObjectData(string fileName = "CarriableObjects.json")
@@ -85,61 +176,68 @@ namespace Infrastructure.Master
             if (!File.Exists(fullPath))
             {
                 Console.WriteLine($"[ActionLabelLoader] File not found: {fullPath}");
-                ActionLabels = new Dictionary<string, string>();
+                CarriableObjects = new HashSet<string>();
             }
 
             try
             {
                 var json = File.ReadAllText(fullPath);
                 var objectIds = JsonConvert.DeserializeObject<List<string>>(json);
-                CarriableObjects = new HashSet<string>(objectIds); // ”»’è‚ª‚‘¬‚É‚È‚é
+                CarriableObjects = new HashSet<string>(objectIds); // è‚ªÉ‚È‚
 
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[ActionLabelLoader] Failed to load or parse: {ex.Message}");
-                ActionLabels = new Dictionary<string, string>();
+                CarriableObjects = new HashSet<string>();
             }
         }
 
-        //w’è‚µ‚½ƒtƒ@ƒCƒ‹–¼‚ğfilePath‚©‚çæ“¾‚µ‚ÄAAction‚Ìid‚Æ•\¦–¼‚Å•ÛŠÇ
+        //ï¿½wï¿½è‚µï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½filePathï¿½ï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ÄAActionï¿½ï¿½idï¿½Æ•\ï¿½ï¿½ï¿½ï¿½ï¿½Å•ÛŠï¿½
         void LoadActionMaster(string fileName = "ActionMaster.json")
         {
             string fullPath = Path.Combine(filePath, fileName);
             if (!File.Exists(fullPath))
             {
                 Console.WriteLine($"[ActionLabelLoader] File not found: {fullPath}");
-                ActionLabels = new Dictionary<string, string>();
+                Debug.Log($"[ActionLabelLoader] File not found: {fullPath}");
+                ActionLabels = new Dictionary<string, ActionLabelData>();
             }
 
             try
             {
                 var json = File.ReadAllText(fullPath);
-                var labelMap = JsonConvert.DeserializeObject<Dictionary<string, ActionLabelData>>(json);
+                Debug.Log($"[ActionLabelLoader] Read JSON: {json}");
 
-                var result = new Dictionary<string, string>();
+                var labelMap = JsonConvert.DeserializeObject<Dictionary<string, ActionLabelData>>(json);
+                Debug.Log($"[ActionLabelLoader] Deserialized labelMap. Count: {labelMap.Count}");
+
+                var result = new Dictionary<string, ActionLabelData>();
                 foreach (var pair in labelMap)
                 {
-                    result[pair.Key] = pair.Value.Label;
+                    result[pair.Key] = pair.Value;
+                    Debug.Log($"[ActionLabelLoader] {pair.Value}");
                 }
 
                 Console.WriteLine($"[ActionLabelLoader] Loaded {result.Count} action labels.");
+                Debug.Log($"[ActionLabelLoader] Loaded {result.Count} action labels.");
                 ActionLabels = result;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"[ActionLabelLoader] Failed to load or parse: {ex.Message}");
-                ActionLabels = new Dictionary<string, string>();
+                Debug.Log($"[ActionLabelLoader] Failed to load or parse: {ex.Message}");
+                ActionLabels = new Dictionary<string, ActionLabelData>();
             }
         }
 
-        //w’è‚µ‚½ƒtƒ@ƒCƒ‹–¼‚ğfilePath‚©‚çæ“¾‚µ‚ÄARisk‚Ìid‚Æ•\¦–¼‚Å•ÛŠÇ
+        //ï¿½wï¿½è‚µï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½filePathï¿½ï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ÄARiskï¿½ï¿½idï¿½Æ•\ï¿½ï¿½ï¿½ï¿½ï¿½Å•ÛŠï¿½
         void LoadRiskMaster(string fileName = "RiskMaster.json")
         {
             string fullPath = Path.Combine(filePath, fileName);
             if (!File.Exists(fullPath))
             {
-                Console.WriteLine($"[RiskLabelLoader] ƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ: {fullPath}");
+                Console.WriteLine($"[RiskLabelLoader] ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â‚ï¿½ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½: {fullPath}");
                 RiskNames = new Dictionary<string, string>();
             }
 
@@ -155,25 +253,25 @@ namespace Infrastructure.Master
                     result[pair.Key] = pair.Value.DisplayName;
                 }
 
-                Console.WriteLine($"[RiskLabelLoader] {result.Count} Œ‚ÌƒŠƒXƒNƒ‰ƒxƒ‹‚ğ“Ç‚İ‚İ‚Ü‚µ‚½B");
+                Console.WriteLine($"[RiskLabelLoader] {result.Count} ï¿½ï¿½ï¿½Ìƒï¿½ï¿½Xï¿½Nï¿½ï¿½ï¿½xï¿½ï¿½ï¿½ï¿½Ç‚İï¿½ï¿½İ‚Ü‚ï¿½ï¿½ï¿½ï¿½B");
                 RiskNames = result;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[RiskLabelLoader] “Ç‚İ‚İ¸”s: {ex.Message}");
+                Console.WriteLine($"[RiskLabelLoader] ï¿½Ç‚İï¿½ï¿½İï¿½ï¿½s: {ex.Message}");
                 RiskNames = new Dictionary<string, string>();
             }
         }
 
-        //w’è‚µ‚½ƒtƒ@ƒCƒ‹–¼‚ğfilePath‚©‚çæ“¾‚µ‚ÄAInspectableObject‚Ìid‚ÆƒCƒ“ƒXƒ^ƒ“ƒX‚Å•ÛŠÇ
-        void LoadStageObjectData(string fileName = "StageObjects.json")
+        //ï¿½wï¿½è‚µï¿½ï¿½ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½filePathï¿½ï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ÄAInspectableObjectï¿½ï¿½idï¿½ÆƒCï¿½ï¿½ï¿½Xï¿½^ï¿½ï¿½ï¿½Xï¿½Å•ÛŠï¿½
+        void LoadStageObjectData(string fileName = "StageObjects_re.json")
         {
             string fullPath = Path.Combine(filePath, fileName);
             if (!File.Exists(fullPath))
             {
-                Console.WriteLine($"[StageObjectLoader] ƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ: {fullPath}");
-                Debug.Log($"[StageObjectLoader] ƒtƒ@ƒCƒ‹‚ªŒ©‚Â‚©‚è‚Ü‚¹‚ñ: {fullPath}");
-                InspectableObjectMap =  new Dictionary<string, InspectableObject>();
+                Console.WriteLine($"[StageObjectLoader] ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“: {fullPath}");
+                Debug.Log($"[StageObjectLoader] ãƒ•ã‚¡ã‚¤ãƒ«ãŒè¦‹ã¤ã‹ã‚Šã¾ã›ã‚“: {fullPath}");
+                InspectableObjectMap = new Dictionary<string, InspectableObject>();
             }
 
             try
@@ -194,13 +292,18 @@ namespace Infrastructure.Master
                         {
                             foreach (var action in choiceData.OverrideActions)
                             {
+                                Debug.Log("[LocalMasterDataProvider] ActionLabelData: " + ActionLabels[action.Id]);
                                 var entity = new ActionEntity(
                                     action.Id,
+                                    ActionLabels[action.Id].Label,
                                     action.RiskChange,
                                     action.ActionPointCost,
-                                    action.IsSuccess
+                                    action.IsSuccess,
+                                    action.TargetObjectId,
+                                    action.ExecuteOnObjectId
                                 );
                                 actionList.Add(entity);
+                                Debug.Log("[LocalMasterDataProvider] ã‚¢ã‚¯ã‚·ãƒ§ãƒ³è¿½åŠ : " + entity.ToString());
                             }
                         }
 
@@ -224,18 +327,60 @@ namespace Infrastructure.Master
                     result[objData.ObjectId] = inspectable;
                 }
 
-                Console.WriteLine($"[StageObjectLoader] {result.Count} ŒÂ‚ÌƒIƒuƒWƒFƒNƒg‚ğ“Ç‚İ‚İ‚Ü‚µ‚½B");
-                Debug.Log($"[StageObjectLoader] {result.Count} ŒÂ‚ÌƒIƒuƒWƒFƒNƒg‚ğ“Ç‚İ‚İ‚Ü‚µ‚½B");
-                InspectableObjectMap =  result;
+                Console.WriteLine($"[StageObjectLoader] {result.Count} ä»¶ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’èª­ã¿è¾¼ã¿ã¾ã—ãŸã€‚");
+                Debug.Log($"[StageObjectLoader] {result.Count} ä»¶ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’èª­ã¿è¾¼ã¿ã¾ã—ãŸã€‚");
+                InspectableObjectMap = result;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[StageObjectLoader] “Ç‚İ‚İ¸”s: {ex.Message}");
-                Debug.Log($"[StageObjectLoader] “Ç‚İ‚İ¸”s: {ex.Message}");
+                Console.WriteLine($"[StageObjectLoader] èª­ã¿è¾¼ã¿å¤±æ•—: {ex.Message}");
+                Debug.Log($"[StageObjectLoader] èª­ã¿è¾¼ã¿å¤±æ•—: {ex.Message}");
                 InspectableObjectMap = new Dictionary<string, InspectableObject>();
             }
         }
+
+        void LoadActionTargets(string fileName = "ActionTargets.json")
+        {
+            string fullPath = Path.Combine(filePath, fileName);
+            if (!File.Exists(fullPath))
+            {
+                Console.WriteLine($"[ActionTargetsLoader] File not found: {fullPath}");
+                ActionTargets = new Dictionary<string, List<string>>();
+                return;
+            }
+
+            try
+            {
+                var json = File.ReadAllText(fullPath);
+                var rawDict = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(json);
+
+                Console.WriteLine($"[ActionTargetsLoader] {rawDict.Count} ä»¶ã®ActionTargetã‚’èª­ã¿è¾¼ã¿ã¾ã—ãŸã€‚");
+                ActionTargets = rawDict;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ActionTargetsLoader] Failed to load or parse: {ex.Message}");
+                ActionTargets = new Dictionary<string, List<string>>();
+            }
+        }
     
+        /// <summary>
+        /// æŒ‡å®šã—ãŸidã‚’value(List<string>)ã«å«ã‚€å…¨ã¦ã®keyã‚’è¿”ã™
+        /// </summary>
+        List<string> GetActionTargetKeysByObjectId(string id)
+        {
+            var result = new List<string>();
+            foreach (var pair in ActionTargets)
+            {
+                if (pair.Value != null && pair.Value.Contains(id))
+                {
+                    result.Add(pair.Key);
+                }
+            }
+            return result;
+        }
+
+        
     }
 }
 
