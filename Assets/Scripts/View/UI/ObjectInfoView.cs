@@ -85,7 +85,6 @@ namespace View.UI
             {
                 var colors = buttons[i].colors;
                 colors.selectedColor = (i == index) ? selectedColor : normalColor;
-                Debug.Log($"i:{i}, index:{index}, colors.normalcolor:{colors.normalColor}");
                 buttons[i].colors = colors;
             }
 

@@ -1,4 +1,5 @@
 using System;
+using Domain.Action;
 using Domain.Game;
 using Domain.Player;
 using UniRx;
@@ -19,6 +20,9 @@ namespace UseCase.Player
         RaycastController raycast;
 
         CompositeDisposable disposables = new CompositeDisposable();
+
+        public Subject<ActionEntity> OnActionExecute = new();
+        public Subject<Unit> OnExitPointInspected = new();
 
         public PlayerSystemUseCase(
             PlayerMoveController move,
@@ -47,8 +51,16 @@ namespace UseCase.Player
             input.OnInspectButtonPressed
                 .Subscribe(_ =>
                 {
+                    
+
                     Debug.Log("[PlayerSystemUseCase] 検査ボタンが押されました");
                     var objectId = model.currentLookingObject;
+                    if (objectId == "DoorOutside")
+                    {
+                        OnExitPointInspected.OnNext(default);
+                        return;
+                    }
+
                     var result = inspect.TryInspect(objectId, () =>
                     {
                         gameState.Set(GamePhase.Moving);
@@ -80,8 +92,10 @@ namespace UseCase.Player
                 {
                     Debug.Log("[PlayerSystemUseCase] アクションボタンが押されました");
                     var objectId = model.currentLookingObject;
-                    var result = action.TryAction(objectId, () =>
+                    var result = action.TryAction(objectId, result =>
                     {
+                        Debug.Log(result);
+                        OnActionExecute.OnNext(result);
                         gameState.Set(GamePhase.Moving);
                     });
 
@@ -110,6 +124,16 @@ namespace UseCase.Player
             {
                 TryLook();
             }
+        }
+
+        public void StartGame()
+        {
+            Debug.Log("ゲームスタート");
+        }
+
+        public void EndGame()
+        {
+            Dispose();
         }
 
         private void GetLookingObjectId()

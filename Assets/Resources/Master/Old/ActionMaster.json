@@ -1,67 +1,54 @@
 {
     "ShredderUse": {
       "ActionId": "ShredderUse",
-      "IsOnly": false,
       "Label": "シュレッダーを使う"
     },
     "TrashBin": {
       "ActionId": "TrashBin",
-      "IsOnly": false,
       "Label": "ゴミ箱に捨てる"
     },
     "LockPC": {
       "ActionId": "LockPC",
-      "IsOnly": true,
       "Label": "PCをロックする"
     },
     "Logout": {
       "ActionId": "Logout",
-      "IsOnly": true,
       "Label": "ログアウトする"
     },
     "InstallLock": {
       "ActionId": "InstallLock",
-      "IsOnly": true,
       "Label": "物理ロックを設置する"
     },
     "RestrictAccess": {
       "ActionId": "RestrictAccess",
-      "IsOnly": true,
       "Label": "入退室制限を強化する"
     },
     "InstallUPS": {
       "ActionId": "InstallUPS",
-      "IsOnly": true,
       "Label": "無停電電源装置（UPS）を導入する"
     },
     "StoreOffsite": {
       "ActionId": "StoreOffsite",
-      "IsOnly": true,
       "Label": "遠隔地にバックアップを保管する"
     },
     "CloudBackup": {
       "ActionId": "CloudBackup",
-      "IsOnly": true,
       "Label": "クラウドにバックアップを保存する"
     },
     "UseKeypad": {
       "ActionId": "UseKeypad",
-      "IsOnly": true,
       "Label": "暗証番号式の解錠方法を使う"
     },
     "EmergencyOverride": {
       "ActionId": "EmergencyOverride",
-      "IsOnly": true,
       "Label": "非常用解錠手段を使う"
     },
     "DigitizeDocument": {
       "ActionId": "DigitizeDocument",
-      "IsOnly": true,
       "Label": "ドキュメントをデジタル化する"
     },
     "SecureStorage": {
       "ActionId": "SecureStorage",
-      "IsOnly": true,
       "Label": "施錠可能な保管場所にしまう"
     }
   }

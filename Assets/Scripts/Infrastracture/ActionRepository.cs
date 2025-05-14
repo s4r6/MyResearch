@@ -10,9 +10,8 @@ namespace Infrastructure.Action
     {
         IActionDataProvider provider;
         Dictionary<string, List<ActionEntity>> CashActionEntities = new();
-        public ActionRepository(IActionDataProvider provider)
+        public ActionRepository()
         {
-            this.provider = provider;
         }
 
         public List<InspectableObject> TryGetActionableObjectsById(string objectId)

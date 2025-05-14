@@ -18,15 +18,14 @@ namespace View.Player
         }
 
         //--------------------PRESENTER--------------------
-        public void ActionExecute(ResultIds result, string? executeId, string? targetId) 
+        public void ActionExecute(string actionId, string targetId) 
         { 
-            switch(result)
+            switch(actionId)
             {
-                case ResultIds.Destroy:
+                case "ShredderUse":
                     DestroyObject(targetId);
                     break;
             }
         }
-
     }
 }

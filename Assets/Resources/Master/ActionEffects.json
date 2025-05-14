@@ -1,0 +1,30 @@
+[
+  {
+    "ActionEffectId": "ShredderUse_Memo",
+    "BaseActionId": "ShredderUse",
+    "riskChange": -10,
+    "ActionPointCost": 1,
+    "IsSuccess": true
+  },
+  {
+    "ActionEffectId": "PC01_SecureStorage",
+    "BaseActionId": "SecureStorage",
+    "riskChange": -1,
+    "ActionPointCost": 1,
+    "IsSuccess": false
+  },
+  {
+    "ActionEffectId": "PC01_CloudBackup",
+    "BaseActionId": "CloudBackup",
+    "riskChange": -5,
+    "ActionPointCost": 1,
+    "IsSuccess": false
+  },
+  {
+    "ActionEffectId": "PC01_ShredderUse",
+    "BaseActionId": "ShredderUse",
+    "riskChange": -10,
+    "ActionPointCost": 1,
+    "IsSuccess": true
+  }
+]

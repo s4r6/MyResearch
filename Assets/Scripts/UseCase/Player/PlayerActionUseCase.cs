@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using Domain.Action;
 using System;
 using View.Player;
+using JetBrains.Annotations;
+using Unity.VisualScripting;
 
 
 namespace UseCase.Player
@@ -16,148 +18,106 @@ namespace UseCase.Player
     public class PlayerActionUseCase
     {
         PlayerEntity playerEntity;
-        InspectableObjectRepository objectRepository;
-        ActionRepository actionRepository;
         ActionOverlayView actionOverlayView;
         ActionRuleService actionRule;
         PlayerActionExecuter executer;
+        IObjectRepository repository;
 
-        Action OnCompleteAction;
+        Action<ActionEntity> OnCompleteAction;
 
-        public PlayerActionUseCase(PlayerEntity playerEntity, InspectableObjectRepository objectRepository, ActionRepository actionRepository, ActionOverlayView actionOverlayView, ActionRuleService actionRule, PlayerActionExecuter executer)
+        List<ActionEntity> cashActions;
+
+        public PlayerActionUseCase(PlayerEntity playerEntity, ActionOverlayView actionOverlayView, ActionRuleService actionRule, PlayerActionExecuter executer, IObjectRepository repository)
         {
             this.playerEntity = playerEntity;
-            this.objectRepository = objectRepository;
-            this.actionRepository = actionRepository;
+            this.repository = repository;
             this.actionOverlayView = actionOverlayView;
             this.actionRule = actionRule;
             this.executer = executer;
             Debug.Log("[PlayerActionUseCase] 初期化完了");
         }
 
-        //ObjectIdをもつオブジェクトに対して現在可能なアクションのListを返す
-        /*public List<ActionEntity> FindAvailableActionId(string objectId)
-        {
-            //Objectがデータ上可能なアクションidのリストを取得
-            var availableActionIds = repository.TryGetAvailableActionIds(objectId);
-            //可能なアクションがない場合は何もしない
-            if(availableActionIds == null)
-            {
-                return null;
-            }
-
-            //フラグが立っているアクションのリストを取得
-            var availableActions = repository.TryGetAvailableActions(objectId);
-            foreach(var actions in availableActions)
-            {
-                //actions = List<ActionEntity>
-                //availableActionIds = List<string>
-                foreach(var actionId in availableActionIds)
-                {
-                    var availableAction = actions.Find(x => x.id == actionId);
-                    if(availableAction != null)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }*/
-
-        public bool TryAction(string objectId, Action onComplete)
+        public bool TryAction(string objectId, Action<ActionEntity> onComplete)
         {
             OnCompleteAction = onComplete;
 
             Debug.Log($"[PlayerActionUseCase] TryAction開始: objectId={objectId}");
-            //視認しているオブジェクトを使うアクションを持つオブジェクトのリストを取得
-            var actionEntities = actionRepository.TryGetActionableObjectsById(objectId);
-            Debug.Log($"[PlayerActionUseCase] 取得したアクションエンティティ数: {(actionEntities != null ? actionEntities.Count : 0)}");
 
-            //フラグが立っていない or 視認しているオブジェクトはAction対象でない
-            if(actionEntities == null)
+            if (!IsCanAction(objectId)) return false;
+
+            var obj = repository.LoadObjectEntity(objectId);
+            var inspectable = obj as InspectableObject;
+
+            if(inspectable == null)
             {
-                Debug.Log($"[PlayerActionUseCase] アクション可能なエンティティが見つかりません: objectId={objectId}");
-                return false;
-            }
-
-            List<ActionEntity> ActionSelf = new();
-            List<ActionEntity> ActionNeedOther = new();
-
-            foreach(var actionEntity in actionEntities)
-            {
-                Debug.Log($"[PlayerActionUseCase] アクションエンティティ処理中: {actionEntity.id}");
-                var actions = actionEntity.selectedChoice.availableActions;
-                Debug.Log($"[PlayerActionUseCase] 利用可能なアクション数: {actions.Count}");
-                
-                foreach(var action in actions)
+                var heldItem = repository.LoadObjectEntity(playerEntity.currentCarringObject);
+                if (heldItem != null) 
                 {
-                    Debug.Log($"[PlayerActionUseCase] アクション処理中: {action.id}, 実行対象: {action.executeOnObjectId}, ターゲット: {action.targetObjectId}");
-                    //自分を対象にするアクション
-                    if(action.executeOnObjectId == action.targetObjectId)
-                    {
-                        ActionSelf.Add(action);
-                        Debug.Log($"[PlayerActionUseCase] 自己アクション追加: {action.id}");
-                    }
-                    //他のオブジェクトを対象にするアクション
-                    else
-                    {
-                        ActionNeedOther.Add(action);
-                        Debug.Log($"[PlayerActionUseCase] 他者アクション追加: {action.id}");
-                    }
+                    var inspectableItem = heldItem as InspectableObject;
+                    if (inspectableItem == null) return false;
+
+                    if (!inspectableItem.availableActionIds.Contains("ShredderUse"))
+                        return false;
+
+                    cashActions = inspectableItem.selectedChoice.OverrideActions.FindAll(x => x.id == "ShredderUse");
+                    actionOverlayView.StartSelectAction(inspectableItem.availableActionIds, objectId, result => OnEndSelectAction(result));
                 }
+
+            }
+            else
+            {
+                if(inspectable.availableActionIds.Contains("ShredderUse") || inspectable.availableActionIds.Contains("TrashBin"))
+                {
+                    var actionIds = inspectable.availableActionIds.FindAll(x => !x.Equals("ShredderUse") && !x.Equals("TrashBin"));
+                    if (actionIds.Count <= 0)
+                        return false;
+                }
+                cashActions = inspectable.selectedChoice.OverrideActions;
+                actionOverlayView.StartSelectAction(inspectable.availableActionIds, objectId, result => OnEndSelectAction(result));
             }
 
-            Debug.Log($"[PlayerActionUseCase] 自己アクション数: {ActionSelf.Count}, 他者アクション数: {ActionNeedOther.Count}");
 
-            //自分を対象にするアクションは表示
-            List<ActionEntity> availableActions = new(ActionSelf);
-            //他のオブジェクトを対象にするアクションは、持っているオブジェクトが該当するなら表示
-            var actionNeedOther = ActionNeedOther.Find(x => x.targetObjectId == playerEntity.currentCarringObject);
-            if(actionNeedOther != null)
-            {
-                Debug.Log($"[PlayerActionUseCase] 他者アクション追加: {actionNeedOther.id}, 現在持っているオブジェクト: {playerEntity.currentCarringObject}");
-                availableActions.Add(actionNeedOther);
-            }
 
-            //アクションの表示
-            var actionLabels = availableActions.Select(x => x.label).ToList();
-            if(actionLabels.Count <= 0)
+                return true;
+        }
+
+        bool IsCanAction(string lookingObjectId)
+        {
+            if (lookingObjectId == "")
+                return false;
+
+            var obj = repository.LoadObjectEntity(lookingObjectId);
+            //そもそも可能なアクションがない
+            if(obj.availableActionIds.Count == 0) return false;
+
+            var inspectable = obj as InspectableObject;
+            if (inspectable == null)
             {
-                Debug.Log($"[PlayerActionUseCase] 表示するアクションがありません: objectId={objectId}");
+                if (obj.availableActionIds.Contains("ShredderUse"))
+                    return true;
+
                 return false;
             }
-
-            Debug.Log($"[PlayerActionUseCase] 表示するアクション: {string.Join(", ", actionLabels)}");
-            actionOverlayView.StartSelectAction(actionLabels, objectId, result => OnEndSelectAction(result));
+            if (inspectable.selectedChoice == null) return false;
 
             return true;
         }
 
-        void OnEndSelectAction(string? selectedAction)
+        void OnEndSelectAction(int? selectedAction)
         {
             actionOverlayView.EndSelectAction();
 
             if (selectedAction != null) 
             {
-                Debug.Log(selectedAction);
-                var actionId = actionRepository.TryGetActionIdByLabel(selectedAction);
-                if(actionId == null)
-                {
-                    Debug.LogError("ActionIdがありません");
-                    return;
-                }
+                Debug.Log(cashActions[selectedAction.Value].id);
 
-                string executeObjectId = playerEntity.currentLookingActionableObjectId;
-                string targetObjectId = playerEntity.currentCarringObject;
-
-                //アクションを実行
-                var result = actionRule.Execute(actionId, executeObjectId, targetObjectId);
-                Debug.Log($"アクション結果{result.result}");
-
-                executer.ActionExecute(result.result, result.executeObjectId, result.targetObjectId);
+                executer.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentCarringObject);
+                OnCompleteAction?.Invoke(cashActions[selectedAction.Value]);
             }
-
-            OnCompleteAction?.Invoke();
+            else
+            {
+                OnCompleteAction?.Invoke(null);
+            }
             OnCompleteAction = null;
         }
     }

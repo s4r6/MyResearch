@@ -1,0 +1,184 @@
+[
+  {
+    "ObjectId": "Memo",
+    "DisplayName": "メモ用紙",
+    "Description": "机の上にパスワードが書かれたメモが置かれている。",
+    "Choices": [
+      {
+        "Label": "メモの文字が薄れて読めなくなるリスク",
+        "RiskId": "InfoFade",
+        "IsCorrect": false,
+        "OverrideActions": [
+          {
+            "id": "DigitizeDocument",
+            "riskChange": -1,
+            "ActionPointCost": 3,
+            "IsSuccess": false
+          }
+        ],
+        "actionAttributes": [
+          { "type": "Digitizable", "priority": 10 }
+        ]
+      },
+      {
+        "Label": "メモが紛失して業務に支障が出るリスク",
+        "RiskId": "DocumentLoss",
+        "IsCorrect": false,
+        "OverrideActions": [
+          {
+            "id": "SecureStorage",
+            "riskChange": -6,
+            "ActionPointCost": 2,
+            "IsSuccess": true
+          },
+          {
+            "id": "TrashBin",
+            "riskChange": 2,
+            "ActionPointCost": 1,
+            "IsSuccess": false
+          }
+        ],
+        "actionAttributes": [
+          { "type": "Securable", "priority": 10 },
+          { "type": "Trashable", "priority": 10 }
+        ]
+      },
+      {
+        "Label": "メモを盗み見られ、認証情報が漏洩するリスク",
+        "RiskId": "PasswordLeak",
+        "IsCorrect": true,
+        "OverrideActions": [
+          {
+            "id": "ShredderUse",
+            "riskChange": -10,
+            "ActionPointCost": 1,
+            "IsSuccess": true
+          },
+          {
+            "id": "TrashBin",
+            "riskChange": -3,
+            "ActionPointCost": 1,
+            "IsSuccess": false
+          }
+        ],
+        "actionAttributes": [
+          { "type": "Shredderable", "priority": 10 },
+          { "type": "Trashable", "priority": 10 }
+        ]
+      },
+      {
+        "Label": "リスクは特に存在しない",
+        "RiskId": "NoRisk",
+        "IsCorrect": false
+      }
+    ]
+  },
+  {
+    "ObjectId": "PCSet01",
+    "DisplayName": "個人PCセット1",
+    "Description": "個人利用のPC。パスワードメモ貼付あり。",
+    "Choices": [
+      {
+        "Label": "マウスの故障リスク",
+        "RiskId": "MouseFailure",
+        "IsCorrect": false,
+        "OverrideActions": [
+          {
+            "id": "SecureStorage",
+            "riskChange": -1,
+            "ActionPointCost": 1,
+            "IsSuccess": false
+          }
+        ]
+      },
+      {
+        "Label": "データ破損リスク",
+        "RiskId": "DataLoss",
+        "IsCorrect": false,
+        "OverrideActions": [
+          {
+            "id": "CloudBackup",
+            "riskChange": -5,
+            "ActionPointCost": 1,
+            "IsSuccess": false
+          }
+        ]
+      },
+      {
+        "Label": "パスワード流出による情報漏洩リスク",
+        "RiskId": "PasswordLeak",
+        "IsCorrect": true,
+        "OverrideActions": [
+          {
+            "id": "ShredderUse",
+            "riskChange": -10,
+            "ActionPointCost": 1,
+            "IsSuccess": true
+          }
+        ],
+        "actionAttributes": [
+          { "type": "Shredderable", "priority": 10 }
+        ]
+      },
+      {
+        "Label": "特に重大なリスクは存在しない",
+        "RiskId": "NoRisk",
+        "IsCorrect": false
+      }
+    ]
+  },
+  {
+    "ObjectId": "PCSet02",
+    "DisplayName": "個人PCセット2",
+    "Description": "個人利用のPC。ログイン中放置あり。",
+    "Choices": [
+      {
+        "Label": "電源コード破損リスク",
+        "RiskId": "CableDamage",
+        "IsCorrect": false,
+        "OverrideActions": [
+          {
+            "id": "SecureStorage",
+            "riskChange": -1,
+            "ActionPointCost": 1,
+            "IsSuccess": false
+          }
+        ]
+      },
+      {
+        "Label": "バッテリー劣化リスク",
+        "RiskId": "BatteryWear",
+        "IsCorrect": false,
+        "OverrideActions": [
+          {
+            "id": "CloudBackup",
+            "riskChange": -1,
+            "ActionPointCost": 1,
+            "IsSuccess": false
+          }
+        ]
+      },
+      {
+        "Label": "放置PCからの情報漏洩リスク",
+        "RiskId": "PasswordLeak",
+        "IsCorrect": true,
+        "OverrideActions": [
+          {
+            "id": "Logout",
+            "riskChange": -8,
+            "ActionPointCost": 1,
+            "IsSuccess": true
+          }
+        ],
+        "actionAttributes": [
+          { "type": "Lockable", "priority": 10 }
+        ]
+      },
+      {
+        "Label": "特に重大なリスクは存在しない",
+        "RiskId": "NoRisk",
+        "IsCorrect": false
+      }
+    ]
+  }
+]
