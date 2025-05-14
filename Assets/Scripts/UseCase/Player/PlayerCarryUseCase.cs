@@ -8,10 +8,10 @@ namespace Domain.Player
     public class PlayerCarryUseCase
     {
         PlayerEntity model;
-        InspectableObjectRepository repository;
+        IObjectRepository repository;
         PlayerCarryPresenter presenter;
 
-        public PlayerCarryUseCase(PlayerEntity model, InspectableObjectRepository repository, PlayerCarryPresenter presenter)
+        public PlayerCarryUseCase(PlayerEntity model, PlayerCarryPresenter presenter, IObjectRepository repository)
         {
             this.model = model;
             this.repository = repository;
@@ -30,7 +30,7 @@ namespace Domain.Player
             
             // アイテムを拾う処理
             Debug.Log($"[CarryUseCase] アイテムを拾います: {objectId}");
-            var obj = repository.TryGetCarryableObject(objectId);
+            var obj = repository.LoadCarriable(objectId);
             if (obj == null)
             {
                 Debug.Log($"[CarryUseCase] 対象オブジェクト({objectId})がリポジトリに存在しないため処理を中断");

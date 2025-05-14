@@ -1,13 +1,23 @@
+using Domain.Action;
+using Domain.Stage;
 using Infrastructure.Stage.Object;
+using UnityEngine;
 
 namespace UseCase.Stage
 {
     public class StageSystemUseCase
     {
-        InspectableObjectRepository inspectableObjectRepository;
-        public StageSystemUseCase(InspectableObjectRepository inspectableObjectRepository)
+        StageEntity stage;
+        public StageSystemUseCase(StageEntity stage)
         {
-            this.inspectableObjectRepository = inspectableObjectRepository;
+            this.stage = stage;
+        }
+
+        public void OnExecuteAction(ActionEntity action)
+        {
+            stage.OnExecuteAction(action);
+            Debug.Log("ActionPointAmount;" + stage.GetActionPoint());
+            Debug.Log("RiskAmount:" + stage.GetRiskAmount());
         }
 
         

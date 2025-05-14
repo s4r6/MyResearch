@@ -1,0 +1,19 @@
+[
+  {
+    "ObjectId": "Shredder",
+    "ActionAttributes": [
+      {
+        "type": "NeedAttribute",
+        "priority": 10,
+        "params": {
+          "attributes": ["Shredderable"]
+        }
+      },
+      {
+        "type": "DestroyOther",
+        "priority": 9
+      }
+    ]
+  }
+]
+  

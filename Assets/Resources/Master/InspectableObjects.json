@@ -27,12 +27,6 @@
               "riskChange": -6,
               "ActionPointCost": 2,
               "IsSuccess": true
-            },
-            {
-              "id": "TrashBin",
-              "riskChange": 2,
-              "ActionPointCost": 1,
-              "IsSuccess": false
             }
           ]
         },
@@ -58,7 +52,8 @@
         {
           "Label": "リスクは特に存在しない",
           "RiskId": "NoRisk",
-          "IsCorrect": false
+          "IsCorrect": false,
+          "OverrideActions": []
         }
       ]
     },
@@ -127,7 +122,8 @@
         {
           "Label": "リスクは特に存在しない",
           "RiskId": "NoRisk",
-          "IsCorrect": false
+          "IsCorrect": false,
+          "OverrideActions": []
         }
       ]
     },
@@ -169,14 +165,16 @@
           ]
         },
         {
-          "Label": "特に重大なリスクは存在しない",
-          "RiskId": "NoRisk",
-          "IsCorrect": true
-        },
-        {
           "Label": "内扉にはリスクがないと判断される",
           "RiskId": "NoRisk",
-          "IsCorrect": false
+          "IsCorrect": false,
+          "OverrideActions": []
+        },
+        {
+          "Label": "特に重大なリスクは存在しない",
+          "RiskId": "NoRisk",
+          "IsCorrect": true,
+          "OverrideActions": []
         }
       ]
     },
@@ -227,7 +225,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -278,7 +277,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -329,7 +329,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -380,7 +381,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -431,7 +433,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -482,7 +485,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -533,7 +537,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -584,7 +589,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -635,7 +641,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -686,7 +693,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -737,7 +745,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -788,7 +797,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -839,7 +849,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     },
@@ -890,7 +901,8 @@
           {
             "Label": "特に重大なリスクは存在しない",
             "RiskId": "NoRisk",
-            "IsCorrect": false
+            "IsCorrect": false,
+            "OverrideActions": []
           }
         ]
     }

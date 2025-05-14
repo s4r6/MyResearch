@@ -1,0 +1,25 @@
+[
+  {
+    "ObjectId": "Shredder",
+    "ActionId": "UseShredder",
+    "DisplayName": "シュレッダー",
+    "Description": "紙を細断する機械。",
+    "ActionAttributes": [
+      {
+        "type": "NeedAttribute",
+        "priority": 10,
+        "params": { "attributes": ["Shredderable"] }
+      },
+      { "type": "DestroyOther", "priority": 9 },
+      { "type": "PlaySound", "priority": 5, "params": { "soundId": "shredder_sfx" } }
+    ]
+  },
+  {
+    "ObjectId": "PCSet01",
+    "ActionId": "LockPC",
+    "DisplayName": "個人PCセット1",
+    "ActionAttributes": [
+      { "type": "Lock", "priority": 5, "params": { "animationId": "cloud_upload" } }
+    ]
+  }
+]

@@ -13,9 +13,8 @@ namespace Infrastructure.Stage.Object
 
         IObjectDataProvider provider;
         List<List<ActionEntity>> AvailableActions = new();
-        public InspectableObjectRepository(IObjectDataProvider provider) 
+        public InspectableObjectRepository() 
         {
-            this.provider = provider;
         }
         public InspectableObject TryGetInspectableObject(string id)
         {

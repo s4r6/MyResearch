@@ -1,0 +1,10 @@
+[
+    {
+        "ObjectId": "Shredder",
+        "DisplayName": "シュレッダー",
+        "Description": "紙を細断する機械。",
+        "AvailableActionIds":[
+            "ShredderUse"
+        ]
+    }
+]

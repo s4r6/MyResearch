@@ -11,25 +11,23 @@ namespace Domain.Stage
         private readonly int maxActionPoint;
         private int currentRiskAmount;
         private int currentActionPointAmount;
+
+        //----------------------リザルト表示用--------------------------
+        //調査してリスクを選択したオブジェクトのリスト
         private readonly List<InspectableObject> inspectableObjects;
-
-        //フラグが立ったActionのリスト
+        //実行したActionのリスト
         private readonly List<ActionEntity> actions;
-
-        //持ち運べるオブジェクトのリスト
-        private readonly HashSet<string> carriableObjects;
 
         public event System.Action OnEndStage;
 
-        public StageEntity(int maxRiskAmount, int maxActionPoint, List<InspectableObject> inspectableObjects, List<ActionEntity> actions, HashSet<string> carriableObjects)
+        public StageEntity(int maxRiskAmount, int maxActionPoint, List<InspectableObject> inspectableObjects, List<ActionEntity> actions)
         {
             this.maxRiskAmount = maxRiskAmount;
             this.maxActionPoint = maxActionPoint;
-            this.currentRiskAmount = 0;
+            this.currentRiskAmount = maxRiskAmount;
             this.currentActionPointAmount = maxActionPoint;
             this.inspectableObjects = inspectableObjects;
             this.actions = actions;
-            this.carriableObjects = carriableObjects;
         }
 
         public void CalcRiskAmount(ActionEntity action)
@@ -54,9 +52,22 @@ namespace Domain.Stage
             return currentActionPointAmount;
         }
 
-        public void AddAction(ActionEntity action)
+        public void OnExecuteAction(ActionEntity action)
+        {
+            if (action == null) return;
+
+            currentActionPointAmount -= action.actionPointCost;
+            currentRiskAmount += action.riskChange;
+        }
+
+        void AddAction(ActionEntity action)
         {
             actions.Add(action);
+        }
+
+        void AddInspect(InspectableObject inspectable)
+        {
+            inspectableObjects.Add(inspectable);
         }
 
         public void EndStage()

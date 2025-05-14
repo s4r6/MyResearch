@@ -1,56 +1,35 @@
+using System.Collections.Generic;
+using System.Linq;
+using Domain.Player;
+using Domain.Stage.Object;
+using NUnit.Framework;
 using UnityEngine;
 
 namespace Domain.Action
 {
-    public enum ResultIds
-    { 
-        Unknown,
-        Destroy,
-        Lock,
-        Unavailable
-    }
-    public struct ExecuteResultData
-    {
-        public readonly ResultIds result;
-        public readonly string? targetObjectId;
-        public readonly string? executeObjectId;
-
-        public ExecuteResultData(ResultIds actionId, string? executeId, string? targetId)
-        {
-            result = actionId;
-            targetObjectId = targetId;
-            executeObjectId = executeId;
-        }
-    }
-
     public class ActionRuleService
     {
-        public ActionRuleService() 
+
+        public List<string> FindAvailableActionIds(List<string> actionIds, ObjectEntity obj, ObjectEntity lookObjctId)
         {
-            
-        }
-
-        public ExecuteResultData Execute(string actionId, string? executeObjectId, string? targetObjectId) 
-        {
-            switch (actionId) 
-            {
-                case "ShredderUse":
-                    var shredderResult = new ExecuteResultData(ResultIds.Destroy, executeObjectId, targetObjectId);
-                    return shredderResult;
-
-                case "TrashBin":
-                    var trashResult = new ExecuteResultData(ResultIds.Destroy, executeObjectId, targetObjectId);
-                    return trashResult;
-
-                case "LockPC":
-                    var lockPCResult = new ExecuteResultData(ResultIds.Lock, executeObjectId, targetObjectId);
-                    return lockPCResult;
+            List<string> result = new List<string>();
+            foreach (var actionId in actionIds) 
+            { 
+                switch(actionId)
+                {
+                    case "ShredderUse":
+                        if(obj == null) break;
+                        if(obj.ObjectId == "Memo")
+                        {
+                            if(obj.availableActionIds.Contains("ShredderUse"))
+                                result.Add(actionId);
+                        }
+                        break;
+                }
             }
 
-            return new ExecuteResultData(ResultIds.Unknown, executeObjectId, targetObjectId);
+            return result;
         }
-
-        
     }
 }
 

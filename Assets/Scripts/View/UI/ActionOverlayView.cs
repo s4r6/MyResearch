@@ -39,6 +39,12 @@ namespace View.UI
         {
             Debug.Log("[ActionOverlayView] 初期化開始");
             mainCamera = Camera.main;
+            if (mainCamera == null)
+            {
+                Debug.LogError("[CallOutView] メインカメラの参照が失われています");
+                return;
+            }
+            Debug.Log("カメラ参照:" + mainCamera.transform);
             InitializeCallOutCache();
             Debug.Log("[ActionOverlayView] 初期化完了");
         }
@@ -90,7 +96,12 @@ namespace View.UI
 
         private void CalculatePositions()
         {
-            Debug.Log("[ActionOverlayView] 位置計算開始");
+            if (mainCamera == null)
+            {
+                Debug.LogError("[CallOutView] メインカメラの参照が失われています");
+                return;
+            }
+            Debug.Log("[ActionOverlayView] 位置計算開始:" + mainCamera.transform.right);
             var rightOffset = mainCamera.transform.right * radius;
             var upOffset = mainCamera.transform.up * radius;
             var leftOffset = -mainCamera.transform.right * radius;
@@ -153,8 +164,8 @@ namespace View.UI
         //-------------------------PRESENTER----------------------------
         
         int currentSelectedIndex = 0;
-        Action<string?> OnEndActionView;
-        public void StartSelectAction(List<string> actionLabels, string targetObjectId, Action<string?> onEnd)
+        Action<int?> OnEndActionView;
+        public void StartSelectAction(List<string> actionIds, string targetObjectId, Action<int?> onEnd)
         {
             OnEndActionView = onEnd;
             OnActionKeyPressed += OnCancelSelectAction;
@@ -162,12 +173,12 @@ namespace View.UI
             OnSubmitKeyPressed += OnActionSelected;
 
 
-            Debug.Log($"[ActionOverlayView] アクションリスト表示開始: {actionLabels.Count}個のアクション");
+            Debug.Log($"[ActionOverlayView] アクションリスト表示開始: {actionIds.Count}個のアクション");
             FindPosition(targetObjectId);
             CalculatePositions();
 
             EnableUIInput();
-            UpdateCallOuts(actionLabels);
+            UpdateCallOuts(actionIds);
             ShowCallOuts();
             Debug.Log("[ActionOverlayView] アクションリスト表示完了");
         }
@@ -187,7 +198,7 @@ namespace View.UI
         void OnActionSelected()
         {
             string label = GetCurrentSelectActionLabel(currentSelectedIndex);
-            OnEndActionView?.Invoke(label);
+            OnEndActionView?.Invoke(currentSelectedIndex);
         }
 
         void OnCancelSelectAction()
