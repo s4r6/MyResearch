@@ -3,10 +3,12 @@ using Domain.Player;
 using UnityEngine;
 using View.Player;
 using View.UI;
-using Infrastructure.Stage.Object;
-using Infrastructure.Action;
 using System.Linq;
 using System;
+using Domain.Component;
+using Unity.VisualScripting;
+using static UnityEngine.EventSystems.EventTrigger;
+using Domain.Action;
 
 namespace UseCase.Player
 {
@@ -16,7 +18,7 @@ namespace UseCase.Player
         PlayerEntity model;
         ObjectInfoView view;
 
-        InspectableObject currentInspectObject;
+        ObjectEntity currentInspectObject;
 
         public PlayerInspectUseCase(PlayerEntity model, ObjectInfoView view, IObjectRepository repository)
         {
@@ -35,19 +37,20 @@ namespace UseCase.Player
         {
             OnCompleteInspect = onComplete;
 
-            ObjectEntity obj = repository.LoadObjectEntity(objectId);
-
-            var inspectable = obj as InspectableObject;
-            if (inspectable == null)
+            ObjectEntity obj = repository.GetById(objectId);
+            if (obj == null)
                 return false;
 
-            currentInspectObject = inspectable;
 
-            var choiceLabels = inspectable.choices.Select(x => x.label)
-                                            .ToList();
+            if(obj.TryGetComponent<InspectableComponent>(out var inspectable))
+            {
+                var choiceLabels = inspectable.Choices.Select(x => x.Label).ToList();
+                view.StartInspect(inspectable.DisplayName, inspectable.Description, choiceLabels, result => OnEndInspect(result));
+            }
+            currentInspectObject = obj;
 
-            Debug.Log("InspectObject:" + obj.ObjectId);
-            view.StartInspect(obj.DisplayName, obj.Description, choiceLabels, result => OnEndInspect(result));
+            Debug.Log("InspectObject:" + obj.Id);
+            
 
             return true;
         }
@@ -59,16 +62,11 @@ namespace UseCase.Player
 
             if (choiceText != null)
             {
-                Debug.Log(choiceText);
-                Debug.Log($"[PlayerInspectUseCase] 選択前のselectedChoice: {currentInspectObject.selectedChoice}");
-                currentInspectObject.SelectChoice(choiceText);
-                Debug.Log($"[PlayerInspectUseCase] 選択後のselectedChoice: {currentInspectObject.selectedChoice}");
-                Debug.Log($"[PlayerInspectUseCase] 選択したオブジェクトのID: {currentInspectObject.ObjectId}");
+                if (!currentInspectObject.TryGetComponent<InspectableComponent>(out var inspectable)) return;
 
-                //選択したChoiceのアクションを取得
-                var actions = currentInspectObject.selectedChoice;
-                //アクションを保存
-                //actionRepository.SaveActionEntities(currentInspectObject.id);
+                var choice = inspectable.Choices.Find(x => x.Label == choiceText);
+                if(choice == null) return;
+                inspectable.SelectedChoice = choice;
             }
 
             OnCompleteInspect?.Invoke();

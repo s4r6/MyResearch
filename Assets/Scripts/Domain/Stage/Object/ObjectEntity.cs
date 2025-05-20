@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Domain.Component;
 using NUnit.Framework;
 using UnityEngine;
 
@@ -6,24 +8,33 @@ namespace Domain.Stage.Object
 {
     public class ObjectEntity
     {
-        public string ObjectId;
-        public string DisplayName;
-        public string Description;
-        public List<string> availableActionIds;
+        public string Id { get; }
+        private Dictionary<Type, GameComponent> components = new();
 
-        public ObjectEntity(string ObjectId, string DisplayName, string Description, List<string> availableActionIds)
+        public ObjectEntity(string id)
         {
-            this.ObjectId = ObjectId;
-            this.DisplayName = DisplayName; 
-            this.Description = Description;
-            this.availableActionIds = availableActionIds;
+            Id = id;
         }
 
-        public List<string> GetAvailableActionIds(string heldObjectId)
+        public void Add<T>(T component) where T : GameComponent
         {
-            return availableActionIds;
+            components[typeof(T)] = component;
         }
 
-        public virtual bool IsInspectable => false;
+        public bool HasComponent<T>() where T : GameComponent
+        {
+            return components.ContainsKey(typeof(T));
+        }
+
+        public bool TryGetComponent<T>(out T component) where T : GameComponent
+        {
+            if (components.TryGetValue(typeof(T), out var comp))
+            {
+                component = (T)comp;
+                return true;
+            }
+            component = null;
+            return false;
+        }
     }
 }

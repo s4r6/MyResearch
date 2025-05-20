@@ -1,0 +1,14 @@
+[
+  {
+    "ObjectId": "PC",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "Memo",
+    "Components": ["Inspectable", "Carryable"]
+  },
+  {
+    "ObjectId": "Shredder",
+    "Components": ["ActionHeld"]
+  }
+]

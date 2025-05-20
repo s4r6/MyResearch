@@ -1,6 +1,5 @@
 using Domain.Action;
 using Domain.Stage;
-using Infrastructure.Stage.Object;
 using UnityEngine;
 
 namespace UseCase.Stage
@@ -18,6 +17,7 @@ namespace UseCase.Stage
             stage.OnExecuteAction(action);
             Debug.Log("ActionPointAmount;" + stage.GetActionPoint());
             Debug.Log("RiskAmount:" + stage.GetRiskAmount());
+            
         }
 
         
