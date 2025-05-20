@@ -1,0 +1,15 @@
+[
+  {
+    "ObjectId": "Shredder",
+    "ActionAttributes": [
+      {
+        "type": "NeedAttribute",
+        "priority": 10,
+        "param": {
+          "attributes": ["Shredderable"],
+          "target": "HeldItem"
+        }
+      }
+    ]
+  }
+]

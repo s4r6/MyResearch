@@ -1,17 +1,16 @@
 using Domain.Player;
-using Infrastructure.Stage.Object;
 using UnityEngine;
-using Infrastructure.Master;
 using UseCase.Player;
 using View.Player;
 using View.UI;
 using Domain.Game;
 using Presenter.Player;
-using Infrastructure.Action;
+
 using Domain.Action;
 using Infrastructure.Repository;
 using UseCase.GameSystem;
 using UseCase.Stage;
+using Infrastructure.Factory;
 
 namespace EntryPoint
 {
@@ -38,19 +37,19 @@ namespace EntryPoint
         PlayerSystemUseCase usecase;
         void Awake()
         {
-            var repository = new ObjectRepository();
-            repository.Initialize();
-            var stage = repository.LoadStageEntity();
+            var entityFactory = new EntityFactory();
+
+            var repository = new ObjectRepository(entityFactory);
 
             var gameState = new GameStateManager();
 
             var model = new PlayerEntity(view.Position, view.Rotation);
-            var objectRepository = new InspectableObjectRepository();
-            var actionRepository = new ActionRepository();
 
             var move = new PlayerMoveController(view, model);
             var inspect = new PlayerInspectUseCase(model, infoView, repository);
-            var action = new PlayerActionUseCase(model, actionOverlayView, new ActionRuleService(), executer, repository);
+
+            var executor = new ActionExecuter();
+            var action = new PlayerActionUseCase(model, actionOverlayView,executor ,executer, repository);
             // PresenterはViewのみを知る
             var carryPresenter = new PlayerCarryPresenter(carryView);
             
@@ -59,9 +58,9 @@ namespace EntryPoint
             
             usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action);
 
-            var gameSystem = new GameSystemUseCase(usecase, new StageSystemUseCase(stage));
+            //var gameSystem = new GameSystemUseCase(usecase, new StageSystemUseCase(stage));
         
-            gameSystem.StartGame();
+            //gameSystem.StartGame();
         }
 
         void Update()

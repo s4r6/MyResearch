@@ -1,7 +1,8 @@
 using UnityEngine;
 using Domain.Stage.Object;
 using Presenter.Player;
-using Infrastructure.Stage.Object;
+using UseCase.Player;
+using Domain.Component;
 
 namespace Domain.Player
 {
@@ -21,32 +22,23 @@ namespace Domain.Player
 
         public bool TryPickUp(string objectId)
         {
-            Debug.Log($"[CarryUseCase] TryPickUp 開始: objectId={objectId}");
-            if (string.IsNullOrEmpty(objectId))
+            var entity = repository.GetById(objectId);
+            if(entity.HasComponent<CarryableComponent>())
             {
-                Debug.Log("[CarryUseCase] objectIdが無効なため処理を中断");
-                return false;
-            }
-            
-            // アイテムを拾う処理
-            Debug.Log($"[CarryUseCase] アイテムを拾います: {objectId}");
-            var obj = repository.LoadCarriable(objectId);
-            if (obj == null)
-            {
-                Debug.Log($"[CarryUseCase] 対象オブジェクト({objectId})がリポジトリに存在しないため処理を中断");
-                return false;
+                // PlayerEntityにアイテムを保存
+                model.currentCarringObject = objectId;
+                Debug.Log($"[CarryUseCase] モデルにオブジェクト({objectId})を設定");
+
+                // Presenterを通じてViewに表示を依頼
+                Debug.Log($"[CarryUseCase] Presenterに処理を委譲");
+                presenter.HoldObject(objectId);
+
+                Debug.Log($"[CarryUseCase] TryPickUp 完了: objectId={objectId}");
+                return true; // 拾うことに成功した場合はtrueを返す
             }
 
-            // PlayerEntityにアイテムを保存
-            model.currentCarringObject = objectId;
-            Debug.Log($"[CarryUseCase] モデルにオブジェクト({objectId})を設定");
+            return false;
             
-            // Presenterを通じてViewに表示を依頼
-            Debug.Log($"[CarryUseCase] Presenterに処理を委譲");
-            presenter.HoldObject(objectId);
-            
-            Debug.Log($"[CarryUseCase] TryPickUp 完了: objectId={objectId}");
-            return true; // 拾うことに成功した場合はtrueを返す
         }
         
         public bool TryDrop()

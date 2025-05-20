@@ -5,7 +5,6 @@ public class TestObjectRepository : MonoBehaviour
 {
     private void Start()
     {
-        var repository = new ObjectRepository();
-        repository.Initialize();
+
     }
 }

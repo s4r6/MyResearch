@@ -7,7 +7,7 @@ namespace Domain.Stage
 {
     public class StageEntity
     {
-        private readonly int maxRiskAmount;
+        /*private readonly int maxRiskAmount;
         private readonly int maxActionPoint;
         private int currentRiskAmount;
         private int currentActionPointAmount;
@@ -73,6 +73,6 @@ namespace Domain.Stage
         public void EndStage()
         {
             OnEndStage?.Invoke();
-        }
+        }*/
     }
 }

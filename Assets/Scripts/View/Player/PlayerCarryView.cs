@@ -16,7 +16,6 @@ namespace View.Player
             Debug.Log("[CarryView] Start 開始");
             // シーン内の持ち運び可能なオブジェクトを検索して辞書に追加
             GameObject[] sceneObjects = GameObject.FindObjectsOfType<GameObject>();
-            Debug.Log($"[CarryView] 検索対象オブジェクト数: {sceneObjects.Length}");
             
             int addedCount = 0;
             foreach (GameObject obj in sceneObjects)
@@ -26,11 +25,8 @@ namespace View.Player
                 {
                     carryableObjects[obj.name] = obj;
                     addedCount++;
-                    Debug.Log($"[CarryView] 持ち運び可能なオブジェクトを登録: {obj.name}, Layer={obj.layer}");
                 }
             }
-            Debug.Log($"[CarryView] 持ち運び可能なオブジェクト登録完了: 合計{addedCount}個");
-            Debug.Log("[CarryView] Start 完了");
         }
 
         public void HoldObject(string objectId)
