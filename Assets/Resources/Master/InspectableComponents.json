@@ -71,13 +71,18 @@
         "OverrideActions": [
           {
             "id": "ShredderUse",
+            "label": "シュレッダーを使う",
             "riskChange": -10,
-            "ActionPointCost": 1
+            "ActionPointCost": 1,
+            "target": "Held",
+            "ObjectAttributes" : ["Shredderable"]
           },
           {
             "id": "TrashBin",
             "riskChange": -5,
-            "ActionPointCost": 1
+            "ActionPointCost": 1,
+            "target": "Held",
+            "ObjectAttributes" : ["Trashable"]
           }
         ],
         "ActionAttributes": [],

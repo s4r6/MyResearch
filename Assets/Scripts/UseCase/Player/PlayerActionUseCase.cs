@@ -10,6 +10,7 @@ using View.Player;
 using JetBrains.Annotations;
 using Unity.VisualScripting;
 using static UnityEngine.GraphicsBuffer;
+using Domain.Component;
 
 
 namespace UseCase.Player
@@ -18,7 +19,6 @@ namespace UseCase.Player
     {
         PlayerEntity playerEntity;
         ActionOverlayView actionOverlayView;
-        ActionExecuter executor;
         PlayerActionExecuter playerexecuter;
         IObjectRepository repository;
 
@@ -26,13 +26,12 @@ namespace UseCase.Player
 
         List<ActionEntity> cashActions;
 
-        public PlayerActionUseCase(PlayerEntity playerEntity, ActionOverlayView actionOverlayView, ActionExecuter executor, PlayerActionExecuter executer, IObjectRepository repository)
+        public PlayerActionUseCase(PlayerEntity playerEntity, ActionOverlayView actionOverlayView, PlayerActionExecuter executer, IObjectRepository repository)
         {
             this.playerEntity = playerEntity;
             this.repository = repository;
             this.actionOverlayView = actionOverlayView;
             this.playerexecuter = executer;
-            this.executor = executor;
             Debug.Log("[PlayerActionUseCase] 初期化完了");
         }
 
@@ -43,22 +42,31 @@ namespace UseCase.Player
             Debug.Log($"[PlayerActionUseCase] TryAction開始: objectId={objectId}");
 
             //見ているオブジェクトのEntity取得
-            var target = repository.GetById(objectId);
+            ObjectEntity target = repository.GetById(objectId);
             if (target == null) return false;
 
             //手に持っているオブジェクトのEntity取得
             ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
 
-            //ActionComponentに設定されているAttributeを取得
-            var matched = executor.Evaluate(target, heldItem);
-            if (matched.Count == 0)
+
+            var HasActions = false;
+            if (target.TryGetComponent<ActionHeld>(out var actionHeld))
             {
-                return false;
+                var isMatch = actionHeld.IsMatch(heldItem);
+                HasActions = HasActions || isMatch;
             }
 
-            //
+            if (!HasActions)
+                return false;
 
-            //actionOverlayView.StartSelectAction(action)
+
+            List<ActionEntity> availebleActions = new();
+            availebleActions.AddRange(actionHeld.GetAvailableActions(heldItem));
+
+            cashActions = availebleActions;
+
+            var actionLabels = cashActions.Select(action => action.label).ToList();
+            actionOverlayView.StartSelectAction(actionLabels, objectId, result => OnEndSelectAction(result));
             return true;
         }
 
@@ -75,7 +83,7 @@ namespace UseCase.Player
                 //手に持っているオブジェクトのEntity取得
                 ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
 
-                //executor.ExecuteMatced(, heldItem);
+                playerexecuter.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentCarringObject);
                 OnCompleteAction?.Invoke(cashActions[selectedAction.Value]);
             }
             else

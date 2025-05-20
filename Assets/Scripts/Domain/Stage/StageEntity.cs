@@ -7,26 +7,26 @@ namespace Domain.Stage
 {
     public class StageEntity
     {
-        /*private readonly int maxRiskAmount;
+        private readonly int maxRiskAmount;
         private readonly int maxActionPoint;
         private int currentRiskAmount;
         private int currentActionPointAmount;
 
         //----------------------リザルト表示用--------------------------
         //調査してリスクを選択したオブジェクトのリスト
-        private readonly List<InspectableObject> inspectableObjects;
+        private readonly List<ObjectEntity> InspectedObjectEntities;
         //実行したActionのリスト
         private readonly List<ActionEntity> actions;
 
         public event System.Action OnEndStage;
 
-        public StageEntity(int maxRiskAmount, int maxActionPoint, List<InspectableObject> inspectableObjects, List<ActionEntity> actions)
+        public StageEntity(int maxRiskAmount, int maxActionPoint, List<ObjectEntity> inspectableObjects, List<ActionEntity> actions)
         {
             this.maxRiskAmount = maxRiskAmount;
             this.maxActionPoint = maxActionPoint;
             this.currentRiskAmount = maxRiskAmount;
             this.currentActionPointAmount = maxActionPoint;
-            this.inspectableObjects = inspectableObjects;
+            this.InspectedObjectEntities = inspectableObjects;
             this.actions = actions;
         }
 
@@ -65,14 +65,14 @@ namespace Domain.Stage
             actions.Add(action);
         }
 
-        void AddInspect(InspectableObject inspectable)
+        void AddInspect(ObjectEntity inspectable)
         {
-            inspectableObjects.Add(inspectable);
+            InspectedObjectEntities.Add(inspectable);
         }
 
         public void EndStage()
         {
             OnEndStage?.Invoke();
-        }*/
+        }
     }
 }

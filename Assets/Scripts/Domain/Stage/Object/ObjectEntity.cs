@@ -10,8 +10,6 @@ namespace Domain.Stage.Object
     {
         public string Id { get; }
         private Dictionary<Type, GameComponent> components = new();
-        private readonly List<string> attributes = new();
-        private readonly List<string> temporaryAttributes = new();
 
         public ObjectEntity(string id)
         {
@@ -38,12 +36,5 @@ namespace Domain.Stage.Object
             component = null;
             return false;
         }
-
-        public void AddPermanentAttribute(string attr) => attributes.Add(attr);
-        public void AddTemporaryAttributes(IEnumerable<string> attrs) => temporaryAttributes.AddRange(attrs);
-        public void ClearTemporaryAttributes() => temporaryAttributes.Clear();
-
-        public bool HasAttribute(string attr) =>
-            attributes.Contains(attr) || temporaryAttributes.Contains(attr);
     }
 }

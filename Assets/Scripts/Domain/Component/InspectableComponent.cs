@@ -1,4 +1,5 @@
 using Domain.Stage.Object;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,5 +13,10 @@ namespace Domain.Component
 
         // 選択されたChoiceを保持（UseCaseで更新される）
         public Choice? SelectedChoice;
+
+        internal object FindAll()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

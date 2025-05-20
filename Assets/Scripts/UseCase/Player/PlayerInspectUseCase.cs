@@ -67,29 +67,6 @@ namespace UseCase.Player
                 var choice = inspectable.Choices.Find(x => x.Label == choiceText);
                 if(choice == null) return;
                 inspectable.SelectedChoice = choice;
-                foreach(var attr in choice.ObjectAttributes)
-                {
-                    currentInspectObject.AddPermanentAttribute(attr);
-                }
-                
-
-                // ActionAttributeを動的にActionableComponentに追加（※保持されていない場合は生成）
-                if (choice.ActionAttributes.Any())
-                {
-                    //ActionableComponentがついていないオブジェクトなら
-                    if (!currentInspectObject.TryGetComponent<ActionableComponent>(out var actionable))
-                    {
-                        actionable = new ActionableComponent();
-                        currentInspectObject.Add(actionable);
-                    }
-
-                    //選択したChoiceに設定されている属性をComponentに追加
-                    foreach (var attr in choice.ActionAttributes)
-                    {
-                        var actionAttr = ActionAttributeFactory.CreateFromName(attr.Name, attr.Target); // "Shredderable" → ActionAttribute
-                        actionable.Attributes.Add(actionAttr);
-                    }
-                }
             }
 
             OnCompleteInspect?.Invoke();

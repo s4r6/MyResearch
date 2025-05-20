@@ -11,6 +11,7 @@ using Infrastructure.Repository;
 using UseCase.GameSystem;
 using UseCase.Stage;
 using Infrastructure.Factory;
+using Domain.Stage;
 
 namespace EntryPoint
 {
@@ -48,8 +49,7 @@ namespace EntryPoint
             var move = new PlayerMoveController(view, model);
             var inspect = new PlayerInspectUseCase(model, infoView, repository);
 
-            var executor = new ActionExecuter();
-            var action = new PlayerActionUseCase(model, actionOverlayView,executor ,executer, repository);
+            var action = new PlayerActionUseCase(model, actionOverlayView,executer, repository);
             // PresenterはViewのみを知る
             var carryPresenter = new PlayerCarryPresenter(carryView);
             

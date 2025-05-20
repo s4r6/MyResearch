@@ -17,13 +17,13 @@ namespace Infrastructure.Factory
     public class EntityFactory : IEntityFactory
     {
         private readonly Dictionary<string, JObject> inspectableMap;
-        private readonly Dictionary<string, JObject> actionableMap;
+        private readonly Dictionary<string, JObject> actionHeldMap;
         private readonly HashSet<string> carryableSet;
 
         public EntityFactory()
         {
             inspectableMap = LoadAsMap("Master/InspectableComponents");
-            actionableMap = LoadAsMap("Master/ActionableComponents");
+            actionHeldMap = LoadAsMap("Master/ActionHeldComponents");
             carryableSet = LoadList("Master/CarryableObjects");
         }
 
@@ -44,17 +44,10 @@ namespace Infrastructure.Factory
                 entity.Add(inspectable);
             }
 
-            if (components.Contains("Actionable") && actionableMap.TryGetValue(id, out var actionJson))
+            if(components.Contains("ActionHeld") && actionHeldMap.TryGetValue(id, out var actionHeldJson))
             {
-                var attributes = new List<ActionAttribute>();
-                foreach (var attrJson in (JArray)actionJson["ActionAttributes"])
-                {
-                    attributes.Add(ActionAttributeFactory.CreateFromJson((JObject)attrJson));
-                }
-                entity.Add(new ActionableComponent()
-                {
-                    Attributes = attributes
-                });
+                var needAttribute = actionHeldJson["NeedAttribute"]?.ToString();
+                entity.Add(new ActionHeld(needAttribute));
             }
 
             if (components.Contains("Carryable") || carryableSet.Contains(id))

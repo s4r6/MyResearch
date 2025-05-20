@@ -9,6 +9,6 @@
   },
   {
     "ObjectId": "Shredder",
-    "Components": ["Actionable"]
+    "Components": ["ActionHeld"]
   }
 ]

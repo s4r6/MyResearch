@@ -37,11 +37,20 @@ namespace Infrastructure.Repository
 
             foreach (var item in array)
             {
+                var target = item["target"]?.ToString() switch
+                {
+                    "Held" => TargetType.HeldItem,
+                    _ => TargetType.HeldItem,
+                };
+
                 list.Add(new ActionEntity()
                 {
                     id = item["id"]?.ToString(),
+                    label = item["label"]?.ToString(),
                     riskChange = item["riskChange"]?.ToObject<int>() ?? 0,
                     actionPointCost = item["ActionPointCost"]?.ToObject<int>() ?? 0,
+                    target = target,
+                    ObjectAttributes = item["ObjectAttributes"]?.ToObject<List<string>>() ?? new(),
                 });
             }
 
