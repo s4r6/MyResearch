@@ -1,6 +1,7 @@
 using Domain.Action;
 using Unity.VisualScripting;
 using UnityEngine;
+using View.Stage;
 
 namespace View.Player
 {
@@ -17,6 +18,15 @@ namespace View.Player
 
         }
 
+        public void OffMonitor(string objectId)
+        {
+            var obj = GameObject.Find(objectId);
+            if (obj != null)
+            {
+                obj.GetComponent<Monitor>().TurnOff();
+            }
+        }
+
         //--------------------PRESENTER--------------------
         public void ActionExecute(string actionId, string targetId) 
         { 
@@ -25,6 +35,11 @@ namespace View.Player
                 case "ShredderUse":
                     DestroyObject(targetId);
                     break;
+
+                case "Shutdown":
+                    OffMonitor(targetId);
+                    break;
+                    
             }
         }
     }

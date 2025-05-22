@@ -23,6 +23,8 @@ namespace Domain.Player
         public bool TryPickUp(string objectId)
         {
             var entity = repository.GetById(objectId);
+            if (entity == null) return false;
+
             if(entity.HasComponent<CarryableComponent>())
             {
                 // PlayerEntityにアイテムを保存

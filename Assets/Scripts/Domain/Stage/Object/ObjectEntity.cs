@@ -36,5 +36,12 @@ namespace Domain.Stage.Object
             component = null;
             return false;
         }
+
+        public T GetComponent<T>() where T : GameComponent
+        {
+            if (!HasComponent<T>()) return null;
+
+            return (T)components[typeof(T)];
+        }
     }
 }

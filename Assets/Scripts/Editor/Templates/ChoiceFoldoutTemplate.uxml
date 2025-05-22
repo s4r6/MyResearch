@@ -1,0 +1,7 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Foldout text="Choice&#10;" name="ChoiceFoldout">
+        <ui:TextField label="Label" placeholder-text="filler text" name="LabelTextField" />
+        <ui:TextField label="Risk Id" placeholder-text="filler text" name="RiskIdTextField" />
+        <ui:Button text="アクションを追加" name="AddAction" style="align-self: flex-end;" />
+    </ui:Foldout>
+</ui:UXML>

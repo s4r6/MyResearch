@@ -1,7 +1,9 @@
 using System;
 using Domain.Action;
+using Domain.Component;
 using Domain.Game;
 using Domain.Player;
+using Domain.Stage;
 using UniRx;
 using UnityEngine;
 using View.Player;
@@ -18,10 +20,11 @@ namespace UseCase.Player
         PlayerEntity model;
         GameStateManager gameState;
         RaycastController raycast;
+        InteractUseCase interact;
 
         CompositeDisposable disposables = new CompositeDisposable();
 
-        public Subject<ActionEntity> OnActionExecute = new();
+        public Subject<RiskAssessmentHistory> OnActionExecute = new();
         public Subject<Unit> OnExitPointInspected = new();
 
         public PlayerSystemUseCase(
@@ -32,7 +35,8 @@ namespace UseCase.Player
             GameStateManager gameState,
             RaycastController raycast,
             PlayerCarryUseCase carry,
-            PlayerActionUseCase action)
+            PlayerActionUseCase action,
+            InteractUseCase interact)
         {
             this.move = move;
             this.inspect = inspect;
@@ -42,6 +46,7 @@ namespace UseCase.Player
             this.raycast = raycast;
             this.carry = carry;
             this.action = action;
+            this.interact = interact;
 
             Bind();
         }
@@ -51,8 +56,6 @@ namespace UseCase.Player
             input.OnInspectButtonPressed
                 .Subscribe(_ =>
                 {
-                    
-
                     Debug.Log("[PlayerSystemUseCase] 検査ボタンが押されました");
                     var objectId = model.currentLookingObject;
                     if (objectId == "DoorOutside")
@@ -94,8 +97,19 @@ namespace UseCase.Player
                     var objectId = model.currentLookingObject;
                     var result = action.TryAction(objectId, result =>
                     {
-                        Debug.Log(result);
-                        OnActionExecute.OnNext(result);
+                        var actionEntity = result.Item1;
+                        var targetObject = result.Item2;
+
+                        if (actionEntity == null || targetObject == null)
+                            return;
+
+                        if (!targetObject.TryGetComponent<InspectableComponent>(out var inspectable))
+                            return;
+
+                        var selectedRiskLabel = inspectable.SelectedChoice.Label;
+                        var history = new RiskAssessmentHistory(targetObject.Id, selectedRiskLabel, actionEntity.label, actionEntity.riskChange, actionEntity.actionPointCost);
+
+                        OnActionExecute.OnNext(history);
                         gameState.Set(GamePhase.Moving);
                     });
 
@@ -104,6 +118,19 @@ namespace UseCase.Player
                         gameState.Set(GamePhase.SelectAction);
                     }
 
+                }).AddTo(disposables);
+
+            input.OnInteractButtonPressed
+                .Subscribe(_ => 
+                {
+                    var objectId = model.currentLookingObject;
+                    interact.TryInteract(objectId);
+                }).AddTo(disposables);
+
+            input.OnFinishButtonPressed
+                .Subscribe(_ =>
+                {
+                    OnExitPointInspected.OnNext(default);
                 }).AddTo(disposables);
         }
 

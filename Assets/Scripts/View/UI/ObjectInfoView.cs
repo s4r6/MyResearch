@@ -15,7 +15,7 @@ namespace View.UI
     public class ObjectInfoView : MonoBehaviour
     {
         [SerializeField]
-        Text name;
+        Text objectName;
         [SerializeField]
         Text describe;
 
@@ -50,7 +50,7 @@ namespace View.UI
         }
         public void SetObjectInfo(string name, string describe)
         {
-            this.name.text = name;
+            this.objectName.text = name;
             this.describe.text = describe;
         }
 
@@ -77,6 +77,8 @@ namespace View.UI
             targetWindow.DOScale(Vector3.zero, duration)
                 .SetEase(Ease.OutBack)
                 .OnComplete(() => targetWindow.gameObject.SetActive(false));
+
+
         }
 
         public void HighlightButton(int index)
@@ -117,6 +119,16 @@ namespace View.UI
             Debug.Log(delta);
             lastFrame = Time.frameCount;
             OnScrollEvent?.Invoke(delta);
+        }
+
+        public void ResetText()
+        {
+            objectName.text = string.Empty;
+            describe.text = string.Empty;
+            foreach(var text in buttonTexts)
+            {
+                text.text = string.Empty;
+            }
         }
 
         //PRESENTER--------------------------------------------------
@@ -160,6 +172,7 @@ namespace View.UI
         {
             DisableUIInput();
             AnimateHideWindow();
+            ResetText();
 
             OnSubmitEvent -= OnChoiceSelected;
             OnBackEvent -= OnCancelInspect;

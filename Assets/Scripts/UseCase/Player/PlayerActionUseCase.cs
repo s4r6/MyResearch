@@ -22,9 +22,10 @@ namespace UseCase.Player
         PlayerActionExecuter playerexecuter;
         IObjectRepository repository;
 
-        Action<ActionEntity> OnCompleteAction;
+        Action<(ActionEntity, ObjectEntity)> OnCompleteAction;
 
         List<ActionEntity> cashActions;
+        List<ObjectEntity> cashEntities;
 
         public PlayerActionUseCase(PlayerEntity playerEntity, ActionOverlayView actionOverlayView, PlayerActionExecuter executer, IObjectRepository repository)
         {
@@ -35,7 +36,7 @@ namespace UseCase.Player
             Debug.Log("[PlayerActionUseCase] 初期化完了");
         }
 
-        public bool TryAction(string objectId, Action<ActionEntity> onComplete)
+        public bool TryAction(string objectId, Action<(ActionEntity, ObjectEntity)> onComplete)
         {
             OnCompleteAction = onComplete;
 
@@ -48,20 +49,31 @@ namespace UseCase.Player
             //手に持っているオブジェクトのEntity取得
             ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
 
+            List<ActionEntity> availebleActions = new();
 
             var HasActions = false;
             if (target.TryGetComponent<ActionHeld>(out var actionHeld))
             {
                 var isMatch = actionHeld.IsMatch(heldItem);
                 HasActions = HasActions || isMatch;
+
+                if(isMatch)
+                    availebleActions.AddRange(actionHeld?.GetAvailableActions(heldItem));
             }
+
+            if (target.TryGetComponent<ActionSelf>(out var actionSelf)) 
+            {
+                var isMatch = actionSelf.IsMatch(target);
+                HasActions = HasActions || isMatch;
+
+                if(isMatch)
+                    availebleActions.AddRange(actionSelf?.GetAvailableActions(target));
+            }
+
 
             if (!HasActions)
                 return false;
 
-
-            List<ActionEntity> availebleActions = new();
-            availebleActions.AddRange(actionHeld.GetAvailableActions(heldItem));
 
             cashActions = availebleActions;
 
@@ -79,16 +91,27 @@ namespace UseCase.Player
             {
                 Debug.Log(cashActions[selectedAction.Value].id);
 
+                
 
-                //手に持っているオブジェクトのEntity取得
-                ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
-
-                playerexecuter.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentCarringObject);
-                OnCompleteAction?.Invoke(cashActions[selectedAction.Value]);
+                var actionEntity = cashActions[selectedAction.Value];
+                if (actionEntity.target == TargetType.Self)
+                {
+                    playerexecuter.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentLookingObject);
+                    var target = repository.GetById(playerEntity.currentLookingObject);
+                    OnCompleteAction?.Invoke((actionEntity, target));
+                }
+                else if(actionEntity.target == TargetType.HeldItem)
+                {
+                    playerexecuter.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentCarringObject);
+                    //手に持っているオブジェクトのEntity取得
+                    ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
+                    OnCompleteAction?.Invoke((actionEntity, heldItem));
+                }
+                
             }
             else
             {
-                OnCompleteAction?.Invoke(null);
+                OnCompleteAction?.Invoke((null, null));
             }
             OnCompleteAction = null;
         }

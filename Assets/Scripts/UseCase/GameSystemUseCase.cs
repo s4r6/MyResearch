@@ -3,6 +3,7 @@ using UseCase.Player;
 using UniRx;
 using UseCase.Stage;
 using System;
+using Domain.Game;
 
 namespace UseCase.GameSystem
 {
@@ -10,13 +11,15 @@ namespace UseCase.GameSystem
     {
         PlayerSystemUseCase player;
         StageSystemUseCase stage;
+        GameStateManager state;
 
         CompositeDisposable disposables = new CompositeDisposable();
 
-        public GameSystemUseCase(PlayerSystemUseCase player, StageSystemUseCase stage)
+        public GameSystemUseCase(PlayerSystemUseCase player, StageSystemUseCase stage, GameStateManager state)
         {
             this.player = player;
             this.stage = stage;
+            this.state = state;
         }
 
         public void StartGame()
@@ -38,7 +41,9 @@ namespace UseCase.GameSystem
         public void EndGame()
         {
             player.EndGame();
-            Debug.Log("ゲーム終了:");
+            Debug.Log("ゲーム終了");
+            state.Set(GamePhase.Result);
+            stage.OnExitStage();
             Dispose();
         }
 

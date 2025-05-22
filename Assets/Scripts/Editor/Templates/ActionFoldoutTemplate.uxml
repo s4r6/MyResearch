@@ -1,0 +1,10 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:Foldout text="Action&#10;" name="ActionFoldout">
+        <ui:TextField label="ID" placeholder-text="filler text" name="ActionIdField" />
+        <ui:TextField label="Label" placeholder-text="filler text" name="LabelField" />
+        <ui:IntegerField label="Risk Change" value="0" name="RiskChangeField" />
+        <ui:IntegerField label="Action Cost" value="0" name="ActionPointCostField" />
+        <ui:TextField label="Target" placeholder-text="filler text" name="TargetTextField" />
+        <ui:Button text="属性を追加" name="AddObjectAttribute" style="align-self: flex-end;" />
+    </ui:Foldout>
+</ui:UXML>

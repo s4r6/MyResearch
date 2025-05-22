@@ -22,7 +22,7 @@ namespace Infrastructure.Factory
 
         public EntityFactory()
         {
-            inspectableMap = LoadAsMap("Master/InspectableComponents");
+            inspectableMap = LoadAsMap("Master/StageObjects");
             actionHeldMap = LoadAsMap("Master/ActionHeldComponents");
             carryableSet = LoadList("Master/CarryableObjects");
         }
@@ -38,6 +38,7 @@ namespace Infrastructure.Factory
             {
                 var inspectable = new InspectableComponent
                 {
+                    DisplayName = inspectJson["DisplayName"]?.ToString(),
                     Description = inspectJson["Description"]?.ToString(),
                     Choices = ChoiceFactory.FromJsonArray((JArray)inspectJson["Choices"])
                 };
@@ -48,6 +49,12 @@ namespace Infrastructure.Factory
             {
                 var needAttribute = actionHeldJson["NeedAttribute"]?.ToString();
                 entity.Add(new ActionHeld(needAttribute));
+            }
+
+            if(components.Contains("Door"))
+            {
+                Debug.Log("Door’Ç‰Á");
+                entity.Add(new DoorComponent());
             }
 
             if (components.Contains("Carryable") || carryableSet.Contains(id))
