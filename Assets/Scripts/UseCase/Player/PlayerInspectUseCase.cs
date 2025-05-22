@@ -42,11 +42,11 @@ namespace UseCase.Player
                 return false;
 
 
-            if(obj.TryGetComponent<InspectableComponent>(out var inspectable))
-            {
-                var choiceLabels = inspectable.Choices.Select(x => x.Label).ToList();
-                view.StartInspect(inspectable.DisplayName, inspectable.Description, choiceLabels, result => OnEndInspect(result));
-            }
+            if (!obj.TryGetComponent<InspectableComponent>(out var inspectable)) return false;
+                    
+            var choiceLabels = inspectable.Choices.Select(x => x.Label).ToList();
+            view.StartInspect(inspectable.DisplayName, inspectable.Description, choiceLabels, result => OnEndInspect(result));
+            
             currentInspectObject = obj;
 
             Debug.Log("InspectObject:" + obj.Id);
@@ -67,6 +67,8 @@ namespace UseCase.Player
                 var choice = inspectable.Choices.Find(x => x.Label == choiceText);
                 if(choice == null) return;
                 inspectable.SelectedChoice = choice;
+                if (inspectable.SelectedChoice.OverrideActions.Any(a => a.target == TargetType.Self))
+                    currentInspectObject.Add<ActionSelf>(new ActionSelf());
             }
 
             OnCompleteInspect?.Invoke();

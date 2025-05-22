@@ -12,6 +12,7 @@ using UseCase.GameSystem;
 using UseCase.Stage;
 using Infrastructure.Factory;
 using Domain.Stage;
+using View.Stage;
 
 namespace EntryPoint
 {
@@ -28,12 +29,16 @@ namespace EntryPoint
         PlayerCarryView carryView;
         [SerializeField]
         PlayerActionExecuter executer;
+        [SerializeField]
+        InteractView interact;
 
         //UI
         [SerializeField]
         ObjectInfoView infoView;
         [SerializeField]
         ActionOverlayView actionOverlayView;
+        [SerializeField]
+        ResultView resultView;
 
         PlayerSystemUseCase usecase;
         void Awake()
@@ -56,11 +61,16 @@ namespace EntryPoint
             // UseCaseはPresenterを利用する
             var carry = new PlayerCarryUseCase(model, carryPresenter, repository);
             
-            usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action);
+            usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact));
 
-            //var gameSystem = new GameSystemUseCase(usecase, new StageSystemUseCase(stage));
+            var stageRepository = new StageRepository(repository);
+            var maxRiskAmount = stageRepository.GetRiskAmountByStageNumber(1);
+            var maxActionPointAmount = stageRepository.GetActionPointAmountByStageNumber(1);
+
+            var stage = new StageEntity(maxRiskAmount, maxActionPointAmount);
+            var gameSystem = new GameSystemUseCase(usecase, new StageSystemUseCase(stage, resultView), gameState);
         
-            //gameSystem.StartGame();
+            gameSystem.StartGame();
         }
 
         void Update()

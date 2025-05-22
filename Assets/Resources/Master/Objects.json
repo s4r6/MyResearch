@@ -1,6 +1,10 @@
 [
   {
-    "ObjectId": "PC",
+    "ObjectId": "PCSet01",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "PCSet02",
     "Components": ["Inspectable"]
   },
   {
@@ -10,5 +14,9 @@
   {
     "ObjectId": "Shredder",
     "Components": ["ActionHeld"]
+  },
+  {
+    "ObjectId": "DoorInside",
+    "Components": ["Inspectable", "Door"]
   }
 ]

@@ -5,6 +5,24 @@ using Domain.Action; // InspectableObjectの参照
 
 namespace Domain.Stage
 {
+    public struct RiskAssessmentHistory
+    {
+        public readonly string ObjectName { get; }
+        public readonly string SelectedRiskLable {  get; }
+        public readonly string ExecutedActionLabel {  get; }
+        public readonly int RiskChange {  get; }
+        public readonly int ActionCost {  get; }
+
+        public RiskAssessmentHistory(string name, string riskLabel, string actionLabel, int riskChange, int actionCost)
+        {
+            ObjectName = name;
+            SelectedRiskLable = riskLabel;
+            ExecutedActionLabel = actionLabel;
+            RiskChange = riskChange;
+            ActionCost = actionCost;
+        }
+    }
+
     public class StageEntity
     {
         private readonly int maxRiskAmount;
@@ -13,21 +31,16 @@ namespace Domain.Stage
         private int currentActionPointAmount;
 
         //----------------------リザルト表示用--------------------------
-        //調査してリスクを選択したオブジェクトのリスト
-        private readonly List<ObjectEntity> InspectedObjectEntities;
-        //実行したActionのリスト
-        private readonly List<ActionEntity> actions;
+        public List<RiskAssessmentHistory> histories = new();
 
         public event System.Action OnEndStage;
 
-        public StageEntity(int maxRiskAmount, int maxActionPoint, List<ObjectEntity> inspectableObjects, List<ActionEntity> actions)
+        public StageEntity(int maxRiskAmount, int maxActionPoint)
         {
             this.maxRiskAmount = maxRiskAmount;
             this.maxActionPoint = maxActionPoint;
             this.currentRiskAmount = maxRiskAmount;
             this.currentActionPointAmount = maxActionPoint;
-            this.InspectedObjectEntities = inspectableObjects;
-            this.actions = actions;
         }
 
         public void CalcRiskAmount(ActionEntity action)
@@ -52,22 +65,16 @@ namespace Domain.Stage
             return currentActionPointAmount;
         }
 
-        public void OnExecuteAction(ActionEntity action)
+        public void OnExecuteAction(RiskAssessmentHistory history)
         {
-            if (action == null) return;
-
-            currentActionPointAmount -= action.actionPointCost;
-            currentRiskAmount += action.riskChange;
+            currentActionPointAmount -= history.ActionCost;
+            currentRiskAmount += history.RiskChange;
+            AddHistory(history);
         }
 
-        void AddAction(ActionEntity action)
+        void AddHistory(RiskAssessmentHistory history)
         {
-            actions.Add(action);
-        }
-
-        void AddInspect(ObjectEntity inspectable)
-        {
-            InspectedObjectEntities.Add(inspectable);
+            histories.Add(history);
         }
 
         public void EndStage()

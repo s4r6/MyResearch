@@ -1,0 +1,170 @@
+[
+  {
+    "ObjectId": "PCSet01",
+    "DisplayName": "一般業務用PC01",
+    "Description": "一般業務用に使われているPC。起動には8桁のパスワードが必要である。電源がつけっぱなしになっている。",
+    "Choices": [
+      {
+        "Label": "不正操作・内部不正のリスク",
+        "RiskId": "insiderThreat",
+        "OverrideActions": [
+          {
+            "id": "Shutdown",
+            "label": "シャットダウン",
+            "riskChange": -5,
+            "ActionPointCost": 1,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "スクリーンロックされていない",
+        "RiskId": "ScreenUnlock",
+        "OverrideActions": [
+          {
+            "id": "LockPC",
+            "label": "",
+            "riskChange": -8,
+            "ActionPointCost": 1,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "無線LANが常時ON",
+        "RiskId": "WiFiAlwaysOn",
+        "OverrideActions": [
+          {
+            "id": "DisableWiFi",
+            "label": "",
+            "riskChange": -5,
+            "ActionPointCost": 1,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "USBポートが無効化されていない",
+        "RiskId": "USBPortEnabled",
+        "OverrideActions": [
+          {
+            "id": "DisableUSB",
+            "label": "",
+            "riskChange": -6,
+            "ActionPointCost": 1,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "ObjectId": "Memo",
+    "DisplayName": "文字の書かれた付箋",
+    "Description": "付箋。「c92Y3ki7t」と8桁の英数字が書かれている。",
+    "Choices": [
+      {
+        "Label": "パスワードが書かれている",
+        "RiskId": "PasswordLeak",
+        "OverrideActions": [
+          {
+            "id": "ShredderUse",
+            "label": "シュレッダーを使う",
+            "riskChange": -8,
+            "ActionPointCost": 1,
+            "target": "Held",
+            "ObjectAttributes": [
+              "Shredderable"
+            ]
+          },
+          {
+            "id": "TrashBin",
+            "label": "",
+            "riskChange": -1,
+            "ActionPointCost": 1,
+            "target": "Held",
+            "ObjectAttributes": [
+              "Trashable"
+            ]
+          }
+        ]
+      },
+      {
+        "Label": "個人情報が記載されている",
+        "RiskId": "PersonalInfoLeak",
+        "OverrideActions": [
+          {
+            "id": "TrashBin",
+            "label": "",
+            "riskChange": -6,
+            "ActionPointCost": 1,
+            "target": "",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "社外秘資料の写しがある",
+        "RiskId": "ConfidentialLeak",
+        "OverrideActions": [
+          {
+            "id": "SecureStore",
+            "label": "",
+            "riskChange": -8,
+            "ActionPointCost": 2,
+            "target": "",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "メモに上司のパスワードが書かれていた",
+        "RiskId": "BossPasswordLeak",
+        "OverrideActions": [
+          {
+            "id": "ShredderUse",
+            "label": "",
+            "riskChange": -12,
+            "ActionPointCost": 1,
+            "target": "",
+            "ObjectAttributes": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "ObjectId": "BookCaseSet01",
+    "DisplayName": "文書庫１",
+    "Description": "鍵による施錠管理が可能であるが、在室時は開放されている。背表紙の色などで分類され、取り扱い方法が決まっているとのこと。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "BookCaseSet02",
+    "DisplayName": "文書庫２",
+    "Description": "鍵による施錠は可能であるが、在室時は開放されている。背表紙の色などで分類され、赤色の本は持ち出し禁止とされている。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "PC_ServerManage",
+    "DisplayName": "サーバ管理用PC",
+    "Description": "サーバを管理するPC。起動にはパスワードが必要であり、パスワード管理もされている。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "PCSet02",
+    "DisplayName": "一般業務用PC02",
+    "Description": "一般業務用に使われているPC。起動には8桁のパスワードが必要である。電源はオフになっている。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "DoorInside",
+    "DisplayName": "サーバールームへの扉",
+    "Description": "鍵による施錠は可能であるが業務中は開放されており、職員ならば自由に出入りが可能となっている。",
+    "Choices": []
+  }
+]

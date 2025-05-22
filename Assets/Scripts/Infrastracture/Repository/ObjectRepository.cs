@@ -34,5 +34,10 @@ namespace Infrastructure.Repository
             var text = Resources.Load<TextAsset>(path).text;
             return Newtonsoft.Json.JsonConvert.DeserializeObject<JArray>(text);
         }
+
+        public List<ObjectEntity> GetAllEntity()
+        {
+            return entities.Values.ToList();
+        }
     }
 }

@@ -15,7 +15,8 @@ namespace View.Player
         public Subject<Unit> OnInspectButtonPressed = new();
         public Subject<Unit> OnPickUpButtonPressed = new();
         public Subject<Unit> OnActionButtonPressed = new();
-
+        public Subject<Unit> OnFinishButtonPressed = new();
+        public Subject<Unit> OnInteractButtonPressed = new();
         //public PlayerMoveController usecase;
 
         void Start()
@@ -57,6 +58,18 @@ namespace View.Player
         {
             if (!context.performed) return;
             OnActionButtonPressed.OnNext(default);
+        }
+
+        public void OnInteract(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
+            OnInteractButtonPressed.OnNext(default);
+        }
+
+        public void OnFinish(InputAction.CallbackContext context)
+        {
+            if(!context.performed) return;
+            OnFinishButtonPressed.OnNext(default);
         }
 
         public void SwitchActionMapToUI()

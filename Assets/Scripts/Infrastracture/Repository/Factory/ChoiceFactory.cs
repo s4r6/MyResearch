@@ -39,6 +39,7 @@ namespace Infrastructure.Repository
             {
                 var target = item["target"]?.ToString() switch
                 {
+                    "Self" => TargetType.Self,
                     "Held" => TargetType.HeldItem,
                     _ => TargetType.HeldItem,
                 };
