@@ -9,6 +9,7 @@ using Domain.Component;
 using Unity.VisualScripting;
 using static UnityEngine.EventSystems.EventTrigger;
 using Domain.Action;
+using Cysharp.Threading.Tasks;
 
 namespace UseCase.Player
 {
@@ -45,11 +46,16 @@ namespace UseCase.Player
             if (!obj.TryGetComponent<InspectableComponent>(out var inspectable)) return false;
                     
             var choiceLabels = inspectable.Choices.Select(x => x.Label).ToList();
-            view.StartInspect(inspectable.DisplayName, inspectable.Description, choiceLabels, result => OnEndInspect(result));
-            
+            var index = choiceLabels.FindIndex(x => x == inspectable?.SelectedChoice?.Label);
+            index = index < 0 ? 0 : index;
+
+            if (!inspectable.IsActioned)
+                view.StartInspect(inspectable.DisplayName, inspectable.Description, index, choiceLabels, result => OnEndInspect(result)).Forget();
+            else
+                view.DisplayLabels(inspectable.DisplayName, inspectable.Description, index, choiceLabels, result => OnEndInspect(result)).Forget();
+                
             currentInspectObject = obj;
 
-            Debug.Log("InspectObject:" + obj.Id);
             
 
             return true;
@@ -57,7 +63,6 @@ namespace UseCase.Player
         
         public void OnEndInspect(string? choiceText)
         {
-            Debug.Log("OnEndInspect");
             view.EndInspect();
 
             if (choiceText != null)
@@ -66,7 +71,10 @@ namespace UseCase.Player
 
                 var choice = inspectable.Choices.Find(x => x.Label == choiceText);
                 if(choice == null) return;
-                inspectable.SelectedChoice = choice;
+
+                if(!inspectable.IsActioned)
+                    inspectable.SelectedChoice = choice;
+
                 if (inspectable.SelectedChoice.OverrideActions.Any(a => a.target == TargetType.Self))
                     currentInspectObject.Add<ActionSelf>(new ActionSelf());
             }

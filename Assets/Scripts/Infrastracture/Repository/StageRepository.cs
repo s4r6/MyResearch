@@ -24,14 +24,13 @@ namespace Infrastructure.Repository
             return MaxRiskMap[stageNumber];
         }
 
-        public int GetActionPointAmountByStageNumber(int stageNumber) 
+        public int GetActionPointAmountByStageNumber(int stageNumber)
         {
             return MaxActionPointMap[stageNumber];
         }
 
         int CalcMaxRiskAmount(List<ObjectEntity> entities)
         {
-            Debug.Log("読み込んだEntityの数:" + entities.Count);
             int totalMaxRisk = entities
                                    .Where(e => e.HasComponent<InspectableComponent>())
                                    .Select(e =>
@@ -45,26 +44,30 @@ namespace Infrastructure.Repository
                                    })
                                    .Sum(riskChange => -riskChange);
 
-            Debug.Log("totalMaxRisk:" + totalMaxRisk);
             return totalMaxRisk;
         }
 
-        int CalcMaxActionPoint(List<ObjectEntity> entities) 
+        int CalcMaxActionPoint(List<ObjectEntity> entities)
         {
-            int totalMaxActionPoint = entities
-                                            .Where(e => e.HasComponent<InspectableComponent>())
-                                            .Select(e =>
-                                            {
-                                                var inspectable = e.GetComponent<InspectableComponent>();
-                                                return inspectable.Choices
-                                                                  .Where (c => c.OverrideActions.Any())
-                                                                  .Select(c => c.OverrideActions.Max(a => a.actionPointCost))
-                                                                  .DefaultIfEmpty(0)
-                                                                  .Max();
-                                            })
-                                            .Sum(actionPointCost => actionPointCost);
+            int totalActionPoint = entities
+                .Where(e => e.HasComponent<InspectableComponent>())
+                .Select(e =>
+                {
+                    var inspectable = e.GetComponent<InspectableComponent>();
 
-            return totalMaxActionPoint;
+                    // すべてのChoice内のActionを1つのシーケンスに平坦化
+                    var minRiskAction = inspectable.Choices
+                        .Where(c => c.OverrideActions != null && c.OverrideActions.Any())
+                        .SelectMany(c => c.OverrideActions)
+                        .OrderBy(a => a.riskChange)
+                        .FirstOrDefault();
+
+                    // ActionEntityがなければ0、あればそのactionPointCostを返す
+                    return minRiskAction?.actionPointCost ?? 0;
+                })
+                .Sum();
+
+            return totalActionPoint;
         }
     }
 }

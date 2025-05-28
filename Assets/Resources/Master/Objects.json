@@ -16,7 +16,15 @@
     "Components": ["ActionHeld"]
   },
   {
+    "ObjectId": "BookCaseSet01",
+    "Components": ["Inspectable"]
+  },
+  {
     "ObjectId": "DoorInside",
     "Components": ["Inspectable", "Door"]
+  },
+  {
+    "ObjectId": "PCServerManage",
+    "Components": ["Inspectable"]
   }
 ]

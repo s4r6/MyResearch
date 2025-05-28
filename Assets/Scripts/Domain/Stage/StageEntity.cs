@@ -1,32 +1,53 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Domain.Stage.Object;
-using Domain.Action; // InspectableObjectの参照
+using Domain.Action;
+using UseCase.Player; // InspectableObjectの参照
 
 namespace Domain.Stage
 {
     public struct RiskAssessmentHistory
     {
-        public readonly string ObjectName { get; }
-        public readonly string SelectedRiskLable {  get; }
-        public readonly string ExecutedActionLabel {  get; }
-        public readonly int RiskChange {  get; }
-        public readonly int ActionCost {  get; }
+        public string ObjectName { get; }
+        public string SelectedRiskLable { get; }
+        public string ExecutedActionLabel { get; }
 
-        public RiskAssessmentHistory(string name, string riskLabel, string actionLabel, int riskChange, int actionCost)
+        public int RiskChange { get; } // 実行による変化量
+        public int CurrentRisk { get; }
+        public int MaxRisk { get; }
+
+        public int ActionCost { get; } // 使用したアクションポイント
+        public int CurrentActionPoint { get; }
+        public int MaxActionPoint { get; }
+
+        public RiskAssessmentHistory(
+            string objectName,
+            string riskLabel,
+            string actionLabel,
+            int riskChange,
+            int currentRisk,
+            int maxRisk,
+            int actionCost,
+            int currentAP,
+            int maxAP)
         {
-            ObjectName = name;
+            ObjectName = objectName;
             SelectedRiskLable = riskLabel;
             ExecutedActionLabel = actionLabel;
             RiskChange = riskChange;
+            CurrentRisk = currentRisk;
+            MaxRisk = maxRisk;
             ActionCost = actionCost;
+            CurrentActionPoint = currentAP;
+            MaxActionPoint = maxAP;
         }
     }
+
 
     public class StageEntity
     {
         private readonly int maxRiskAmount;
-        private readonly int maxActionPoint;
+        public readonly int maxActionPoint;
         private int currentRiskAmount;
         private int currentActionPointAmount;
 
@@ -65,11 +86,13 @@ namespace Domain.Stage
             return currentActionPointAmount;
         }
 
-        public void OnExecuteAction(RiskAssessmentHistory history)
+        public void OnExecuteAction(ActionHistory history)
         {
             currentActionPointAmount -= history.ActionCost;
             currentRiskAmount += history.RiskChange;
-            AddHistory(history);
+
+            var riskAssesmentHis = new RiskAssessmentHistory(history.ObjectName, history.SelectedRiskLable, history.ExecutedActionLabel, history.RiskChange, currentRiskAmount, maxRiskAmount, history.ActionCost, currentActionPointAmount, maxActionPoint);
+            AddHistory(riskAssesmentHis);
         }
 
         void AddHistory(RiskAssessmentHistory history)

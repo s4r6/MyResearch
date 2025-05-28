@@ -10,6 +10,7 @@ namespace Domain.Game
         Carrying,
         SelectAction,
         Settings,
+        Document,
         Result,
     }
     public readonly struct GameState : IEquatable<GameState>
@@ -26,6 +27,7 @@ namespace Domain.Game
         public bool IsCarrying => Phase == GamePhase.Carrying;
         public bool IsSelectingAction => Phase == GamePhase.SelectAction;
         public bool IsSettings => Phase == GamePhase.Settings;
+        public bool IsDocument => Phase == GamePhase.Document;
         public bool IsResult => Phase == GamePhase.Result;
 
         public GameState WithPhase(GamePhase newPhase) => new GameState(newPhase);

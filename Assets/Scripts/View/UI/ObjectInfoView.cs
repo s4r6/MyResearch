@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Domain.Stage.Object;
 using UniRx;
@@ -40,7 +41,7 @@ namespace View.UI
 
         Color selectedColor = (Color)new Color32(100, 224, 150, 255);
         Color normalColor = Color.white;
-        //VIEW--------------------------------------------------------
+        //-----------------------------------VIEW-----------------------------------
         void Start()
         {
             //初期の色をキャッシュ
@@ -63,13 +64,13 @@ namespace View.UI
             }
         }
 
-        public void AnimateShowWindow()
+        public async UniTask AnimateShowWindow()
         {
             targetWindow.localScale = Vector3.zero;
             targetWindow.gameObject.SetActive(true);
 
-            targetWindow.DOScale(Vector3.one, duration)
-                .SetEase(Ease.OutBack);
+            await targetWindow.DOScale(Vector3.one, duration)
+                .SetEase(Ease.OutBack).ToUniTask();
         }
 
         public void AnimateHideWindow()
@@ -77,8 +78,6 @@ namespace View.UI
             targetWindow.DOScale(Vector3.zero, duration)
                 .SetEase(Ease.OutBack)
                 .OnComplete(() => targetWindow.gameObject.SetActive(false));
-
-
         }
 
         public void HighlightButton(int index)
@@ -96,7 +95,18 @@ namespace View.UI
         public void OnSubmit(InputAction.CallbackContext context)
         {
             if (!context.performed || !gameObject.activeSelf) return;
-            OnSubmitEvent?.Invoke();
+            if (OnSubmitEvent != null)
+            {
+                OnSubmitEvent?.Invoke();
+            }
+            else
+            {
+                Debug.Log("何もしない");
+                // SubmitEventが無ければ、イベントを無視し、選択状態を維持する
+                // EventSystemによる"デフォーカス"を防ぐ
+                EventSystem.current.SetSelectedGameObject(EventSystem.current.currentSelectedGameObject);
+            }
+            
         }
 
         public void OnBack(InputAction.CallbackContext context)
@@ -116,7 +126,6 @@ namespace View.UI
             if (delta == 0)
                 return;
 
-            Debug.Log(delta);
             lastFrame = Time.frameCount;
             OnScrollEvent?.Invoke(delta);
         }
@@ -131,7 +140,7 @@ namespace View.UI
             }
         }
 
-        //PRESENTER--------------------------------------------------
+        //-----------------------------PRESENTER-----------------------------
 
         int currentIndex = 0;
         Action<string?> OnEndInspectView;
@@ -154,7 +163,7 @@ namespace View.UI
             HighlightButton(currentIndex);
         }
 
-        public void StartInspect(string name, string describe, List<string> ChoiceTests, Action<string?> onEnd)
+        public async UniTask StartInspect(string name, string describe, int selectedIndex, List<string> ChoiceTexts, Action<string?> onEnd)
         {
             OnEndInspectView = onEnd;
 
@@ -164,8 +173,24 @@ namespace View.UI
 
             EnableUIInput();
             SetObjectInfo(name, describe);
-            SetChoices(ChoiceTests);
-            AnimateShowWindow();
+            SetChoices(ChoiceTexts);
+            await AnimateShowWindow();
+            currentIndex = selectedIndex;
+            HighlightButton(selectedIndex);
+        }
+
+        public async UniTask DisplayLabels(string name, string describe, int selectedIndex, List<string> ChoiceTexts, Action<string?> onEnd)
+        {
+            OnEndInspectView = onEnd;
+
+            OnBackEvent += OnCancelInspect;
+
+            EnableUIInput();
+            SetObjectInfo(name, describe);
+            SetChoices(ChoiceTexts);
+            await AnimateShowWindow();
+            currentIndex = selectedIndex;
+            HighlightButton(selectedIndex);
         }
 
         public void EndInspect()

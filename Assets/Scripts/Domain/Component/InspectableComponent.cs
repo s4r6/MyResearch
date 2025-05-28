@@ -12,7 +12,9 @@ namespace Domain.Component
         public List<Choice> Choices = new();
 
         // 選択されたChoiceを保持（UseCaseで更新される）
-        public Choice? SelectedChoice;
+        public Choice SelectedChoice;
+
+        public bool IsActioned = false;
 
         internal object FindAll()
         {

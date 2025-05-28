@@ -76,6 +76,7 @@ public class ActionFoldoutElement : VisualElement
 
         row.Add(attrField);
         row.Add(deleteButton);
+        attrElemensts.Add(attrField);
         attrContainer.Add(row);
     }
 

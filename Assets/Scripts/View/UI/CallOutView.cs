@@ -5,90 +5,75 @@ namespace View.UI
 {
     public class CallOutView : MonoBehaviour
     {
-        [SerializeField] public Text labelText;
+        [SerializeField] public Text labelText;       // または TextMeshProUGUI
         [SerializeField] private Image underLine;
-        private Camera mainCamera;
+        [SerializeField] Text CostText;
+
         private bool isActive = false;
+        private Color cachedColor;
+        private RectTransform rectTransform;
 
-        Color cashColor;
-
-        private void Start()
+        private void Awake()
         {
-            Debug.Log("[CallOutView] 初期化開始");
-            mainCamera = Camera.main;
-            if (mainCamera == null)
-            {
-                Debug.LogError("[CallOutView] メインカメラが見つかりません");
-                return;
-            }
+            rectTransform = GetComponent<RectTransform>();
 
-            cashColor = underLine.color;
+            if (underLine != null)
+                cachedColor = underLine.color;
 
-            Debug.Log("[CallOutView] メインカメラの参照を取得");
             gameObject.SetActive(false);
-            Debug.Log("[CallOutView] 初期化完了");
         }
 
-        private void Update()
+        /// <summary>
+        /// UIとして位置とラベルを初期化する（Screen Space - Overlay対応）
+        /// </summary>
+        public void Initialize(string label, int actionCost, Vector2 anchoredPosition)
         {
-            if (isActive)
-            {
-                UpdateRotation();
-            }
-        }
 
-        private void UpdateRotation()
-        {
-            if (mainCamera == null)
-            {
-                Debug.LogError("[CallOutView] メインカメラの参照が失われています");
-                return;
-            }
-            transform.LookAt(mainCamera.transform);
-            transform.Rotate(0, 180, 0);
-        }
 
-        public void Initialize(string label, Vector3 position)
-        {
-            Debug.Log($"[CallOutView] 初期化開始: ラベル={label}, 位置={position}");
             if (labelText == null)
             {
-                Debug.LogError("[CallOutView] labelTextが設定されていません");
                 return;
             }
+
             labelText.text = label;
-            transform.position = position;
+            CostText.text = $"AP: -{actionCost}";
+
+            if (rectTransform == null)
+                rectTransform = GetComponent<RectTransform>();
+
+            rectTransform.anchorMin = rectTransform.anchorMax = rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            rectTransform.anchoredPosition = anchoredPosition;
+
             isActive = true;
             gameObject.SetActive(true);
-            Debug.Log("[CallOutView] 初期化完了");
         }
 
         public void SetHighlighted(bool isHighlighted)
         {
-            if(isHighlighted)
+            if (isHighlighted)
             {
                 labelText.color = Color.red;
-                underLine.color = Color.red;
+                CostText.color = Color.red;
+                if (underLine != null) underLine.color = Color.red;
             }
             else
             {
-                labelText.color = cashColor;
-                underLine.color= cashColor;
+                labelText.color = cachedColor;
+                CostText.color = cachedColor;
+                if (underLine != null) underLine.color = cachedColor;
             }
-        }
-
-        public void Deactivate()
-        {
-            Debug.Log("[CallOutView] 非アクティブ化開始");
-            isActive = false;
-            gameObject.SetActive(false);
-            Debug.Log("[CallOutView] 非アクティブ化完了");
         }
 
         public void Activate()
         {
             isActive = true;
             gameObject.SetActive(true);
+        }
+
+        public void Deactivate()
+        {
+            isActive = false;
+            gameObject.SetActive(false);
         }
     }
 }

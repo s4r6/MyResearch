@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Domain.Stage;
 using NUnit.Framework;
 using UnityEngine;
@@ -13,34 +15,55 @@ namespace View.UI
         [SerializeField]
         Transform ParentTransform;
 
-        List<GameObject> Histories = new();
+        [SerializeField]
+        IndicatorView RiskIndicator;
+        [SerializeField]
+        IndicatorView ActionPointIndicator;
 
-        void Start()
+        List<HistroyView> Histories = new();
+
+        void Awake()
         {
             gameObject.SetActive(false);    
         }
 
-        public void SetHistory(string name, string risklabel, string actionlabel, string riskReduce, string actionCost)
+        public void SetHistory(HistroyView view, RiskAssessmentHistory history)
         {
-            var history = Instantiate(HistoryViewPrefab, ParentTransform);
-            history.GetComponent<HistroyView>().Initialize(name, risklabel, actionlabel, riskReduce, actionCost);
-            Histories.Add(history);
+            view.SetText(history.ObjectName, history.SelectedRiskLable, history.ExecutedActionLabel, history.RiskChange.ToString(), history.ActionCost.ToString());
         }
 
-        public void ShowResult()
+        public void Display()
         {
-            gameObject.SetActive(true);
+            Debug.Log("表示");
+            this.gameObject.SetActive(true);
+        }
+
+        public async UniTask ShowResult(List<RiskAssessmentHistory> histories)
+        {
+            foreach(RiskAssessmentHistory history in histories)
+            {
+                //各Historyを作成&テキストの適用
+                var hist = Instantiate(HistoryViewPrefab, ParentTransform);
+                var view = hist.GetComponent<HistroyView>();
+                Histories.Add(view);
+                SetHistory(view, history);
+
+                //アニメーションしながら表示
+                await view.Display();
+
+                //表示が終わったら
+                await UniTask.WhenAll(
+                    RiskIndicator.SetValueAsync(history.CurrentRisk, history.MaxRisk),
+                    ActionPointIndicator.SetValueAsync(history.CurrentActionPoint, history.MaxActionPoint)
+                );
+            }
         }
 
         //-------------------PRESENTER------------------------
         public void ShowResultWindow(List<RiskAssessmentHistory> histories)
         {
-            foreach(RiskAssessmentHistory history in histories)
-            {
-                SetHistory(history.ObjectName, history.SelectedRiskLable, history.ExecutedActionLabel, history.RiskChange.ToString(), history.ActionCost.ToString());
-            }
-
-            ShowResult();
+            Display();
+            ShowResult(histories).Forget();
         }
     }
 }
