@@ -13,6 +13,7 @@ using UseCase.Stage;
 using Infrastructure.Factory;
 using Domain.Stage;
 using View.Stage;
+using UseCase.Game;
 
 namespace EntryPoint
 {
@@ -39,13 +40,21 @@ namespace EntryPoint
         ActionOverlayView actionOverlayView;
         [SerializeField]
         ResultView resultView;
+        [SerializeField]
+        DocumentView documentView;
 
         PlayerSystemUseCase usecase;
         void Awake()
         {
             var entityFactory = new EntityFactory();
-
             var repository = new ObjectRepository(entityFactory);
+
+            var stageRepository = new StageRepository(repository);
+            var maxRiskAmount = stageRepository.GetRiskAmountByStageNumber(1);
+            var maxActionPointAmount = stageRepository.GetActionPointAmountByStageNumber(1);
+
+            var stage = new StageEntity(maxRiskAmount, maxActionPointAmount);
+
 
             var gameState = new GameStateManager();
 
@@ -54,21 +63,19 @@ namespace EntryPoint
             var move = new PlayerMoveController(view, model);
             var inspect = new PlayerInspectUseCase(model, infoView, repository);
 
-            var action = new PlayerActionUseCase(model, actionOverlayView,executer, repository);
+            var action = new PlayerActionUseCase(model, actionOverlayView,executer, repository, stage);
             // PresenterはViewのみを知る
             var carryPresenter = new PlayerCarryPresenter(carryView);
             
             // UseCaseはPresenterを利用する
             var carry = new PlayerCarryUseCase(model, carryPresenter, repository);
-            
+
+            var document = new DocumentUseCase(documentView, new DocumentEntity());
+
             usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact));
 
-            var stageRepository = new StageRepository(repository);
-            var maxRiskAmount = stageRepository.GetRiskAmountByStageNumber(1);
-            var maxActionPointAmount = stageRepository.GetActionPointAmountByStageNumber(1);
-
-            var stage = new StageEntity(maxRiskAmount, maxActionPointAmount);
-            var gameSystem = new GameSystemUseCase(usecase, new StageSystemUseCase(stage, resultView), gameState);
+            
+            var gameSystem = new GameSystemUseCase(usecase, new StageSystemUseCase(stage, resultView), gameState, document, input);
         
             gameSystem.StartGame();
         }

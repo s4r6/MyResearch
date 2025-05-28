@@ -2,7 +2,7 @@
   {
     "ObjectId": "PCSet01",
     "DisplayName": "一般業務用PC01",
-    "Description": "一般業務用に使われているPC。起動には8桁のパスワードが必要である。電源がつけっぱなしになっている。",
+    "Description": "一般業務用に使われているPC。起動には8桁のパスワードが必要である。電源はついたまま。",
     "Choices": [
       {
         "Label": "不正操作・内部不正のリスク",
@@ -11,49 +11,81 @@
           {
             "id": "Shutdown",
             "label": "シャットダウン",
-            "riskChange": -5,
+            "riskChange": -1,
             "ActionPointCost": 1,
             "target": "Self",
             "ObjectAttributes": []
-          }
-        ]
-      },
-      {
-        "Label": "スクリーンロックされていない",
-        "RiskId": "ScreenUnlock",
-        "OverrideActions": [
+          },
           {
-            "id": "LockPC",
-            "label": "",
-            "riskChange": -8,
-            "ActionPointCost": 1,
-            "target": "Self",
-            "ObjectAttributes": []
-          }
-        ]
-      },
-      {
-        "Label": "無線LANが常時ON",
-        "RiskId": "WiFiAlwaysOn",
-        "OverrideActions": [
-          {
-            "id": "DisableWiFi",
-            "label": "",
-            "riskChange": -5,
-            "ActionPointCost": 1,
-            "target": "Self",
-            "ObjectAttributes": []
-          }
-        ]
-      },
-      {
-        "Label": "USBポートが無効化されていない",
-        "RiskId": "USBPortEnabled",
-        "OverrideActions": [
-          {
-            "id": "DisableUSB",
-            "label": "",
+            "id": "AutoLock",
+            "label": "自動ロックを設定",
             "riskChange": -6,
+            "ActionPointCost": 1,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "全端末乗っ取りのリスク",
+        "RiskId": "SharedLocalAdmin",
+        "OverrideActions": [
+          {
+            "id": "AutoChangePassword",
+            "label": "パスワードの自動変更設定",
+            "riskChange": 0,
+            "ActionPointCost": 3,
+            "target": "Self",
+            "ObjectAttributes": []
+          },
+          {
+            "id": "StorePasswordInUSB",
+            "label": "共通パスワードをUSBに暗号化して保管する",
+            "riskChange": 0,
+            "ActionPointCost": 2,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "盗難時の情報漏えいリスク",
+        "RiskId": "NoFullDiskEncryption",
+        "OverrideActions": [
+          {
+            "id": "EnableDiskEncryption",
+            "label": "ディスクを暗号化する",
+            "riskChange": 0,
+            "ActionPointCost": 4,
+            "target": "Self",
+            "ObjectAttributes": []
+          },
+          {
+            "id": "CopyDataToPortableUSB",
+            "label": "データをUSBにコピーして持ち歩く",
+            "riskChange": 5,
+            "ActionPointCost": 1,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "既知の脆弱性からの侵入リスク",
+        "RiskId": "OutofDate Patch",
+        "OverrideActions": [
+          {
+            "id": "AutoUpdate",
+            "label": "自動アップデートを設定",
+            "riskChange": 0,
+            "ActionPointCost": 2,
+            "target": "Self",
+            "ObjectAttributes": []
+          },
+          {
+            "id": "UseAntivirusSoftware",
+            "label": "セキュリティソフトを導入",
+            "riskChange": -2,
             "ActionPointCost": 1,
             "target": "Self",
             "ObjectAttributes": []
@@ -68,7 +100,7 @@
     "Description": "付箋。「c92Y3ki7t」と8桁の英数字が書かれている。",
     "Choices": [
       {
-        "Label": "パスワードが書かれている",
+        "Label": "なりすまし・不正操作のリスク",
         "RiskId": "PasswordLeak",
         "OverrideActions": [
           {
@@ -94,54 +126,127 @@
         ]
       },
       {
-        "Label": "個人情報が記載されている",
+        "Label": "重要書類の漏出のリスク",
         "RiskId": "PersonalInfoLeak",
         "OverrideActions": [
           {
-            "id": "TrashBin",
-            "label": "",
-            "riskChange": -6,
-            "ActionPointCost": 1,
-            "target": "",
+            "id": "DigitizeDocument",
+            "label": "デジタル化する",
+            "riskChange": 0,
+            "ActionPointCost": 2,
+            "target": "Self",
+            "ObjectAttributes": []
+          },
+          {
+            "id": "StoreCabinet",
+            "label": "保管する",
+            "riskChange": 0,
+            "ActionPointCost": 2,
+            "target": "Held",
             "ObjectAttributes": []
           }
         ]
       },
       {
-        "Label": "社外秘資料の写しがある",
-        "RiskId": "ConfidentialLeak",
+        "Label": "誤廃棄・情報混入のリスク",
+        "RiskId": "BackSideLeak",
         "OverrideActions": [
           {
-            "id": "SecureStore",
-            "label": "",
-            "riskChange": -8,
+            "id": "StoreCabinet",
+            "label": "保管する",
+            "riskChange": 0,
             "ActionPointCost": 2,
-            "target": "",
+            "target": "Held",
             "ObjectAttributes": []
-          }
-        ]
-      },
-      {
-        "Label": "メモに上司のパスワードが書かれていた",
-        "RiskId": "BossPasswordLeak",
-        "OverrideActions": [
+          },
           {
             "id": "ShredderUse",
-            "label": "",
-            "riskChange": -12,
-            "ActionPointCost": 1,
-            "target": "",
-            "ObjectAttributes": []
+            "label": "シュレッダーを使う",
+            "riskChange": 0,
+            "ActionPointCost": 2,
+            "target": "Held",
+            "ObjectAttributes": [
+              "Shredderable"
+            ]
           }
         ]
+      },
+      {
+        "Label": "特にリスクはない",
+        "RiskId": "NoRisk",
+        "OverrideActions": []
       }
     ]
   },
   {
     "ObjectId": "BookCaseSet01",
     "DisplayName": "文書庫１",
-    "Description": "鍵による施錠管理が可能であるが、在室時は開放されている。背表紙の色などで分類され、取り扱い方法が決まっているとのこと。",
-    "Choices": []
+    "Description": "鍵による施錠管理が可能であるが、在室時は開放されている。背表紙の色などで分類され、取り扱い方法が決まっているとのこと。地震対策でL字金具で固定されている。",
+    "Choices": [
+      {
+        "Label": "地震による本棚の転倒時の文書散乱・紛失のリスク",
+        "RiskId": "ShelfCollapseRisk",
+        "OverrideActions": [
+          {
+            "id": "SortBooks",
+            "label": "重い本を下段に移動",
+            "riskChange": 0,
+            "ActionPointCost": 3,
+            "target": "Self",
+            "ObjectAttributes": []
+          },
+          {
+            "id": "UseAntiSlipPads",
+            "label": "耐震ジェルマットを棚の下に敷く",
+            "riskChange": 0,
+            "ActionPointCost": 3,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "内部不正のリスク",
+        "RiskId": "insiderThreat",
+        "OverrideActions": [
+          {
+            "id": "PlaceCamera",
+            "label": "監視カメラの設置",
+            "riskChange": -2,
+            "ActionPointCost": 4,
+            "target": "Self",
+            "ObjectAttributes": []
+          },
+          {
+            "id": "RequireSign",
+            "label": "貸出帳簿への署名を義務付ける",
+            "riskChange": 0,
+            "ActionPointCost": 3,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "鍵のかけ忘れリスク",
+        "RiskId": "ForgetLock",
+        "OverrideActions": [
+          {
+            "id": "AutoLock",
+            "label": "オートロックの導入",
+            "riskChange": -4,
+            "ActionPointCost": 3,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "特にリスクはない",
+        "RiskId": "NoRisk",
+        "OverrideActions": []
+      }
+    ]
   },
   {
     "ObjectId": "BookCaseSet02",
@@ -150,10 +255,99 @@
     "Choices": []
   },
   {
-    "ObjectId": "PC_ServerManage",
-    "DisplayName": "サーバ管理用PC",
-    "Description": "サーバを管理するPC。起動にはパスワードが必要であり、パスワード管理もされている。",
-    "Choices": []
+    "ObjectId": "PCServerManage",
+    "DisplayName": "サーバー管理用PC",
+    "Description": "管理用PC。画面ロック設定がされていない。",
+    "Choices": [
+      {
+        "Label": "不正操作・内部不正のリスク",
+        "RiskId": "insiderThreat",
+        "OverrideActions": [
+          {
+            "id": "Shutdown",
+            "label": "シャットダウン",
+            "riskChange": -1,
+            "ActionPointCost": 1,
+            "target": "Self",
+            "ObjectAttributes": []
+          },
+          {
+            "id": "AutoLock",
+            "label": "自動ロックを設定",
+            "riskChange": -6,
+            "ActionPointCost": 1,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "全端末乗っ取りのリスク",
+        "RiskId": "SharedLocalAdmin",
+        "OverrideActions": [
+          {
+            "id": "AutoChangePassword",
+            "label": "パスワードの自動変更設定",
+            "riskChange": 0,
+            "ActionPointCost": 3,
+            "target": "Self",
+            "ObjectAttributes": []
+          },
+          {
+            "id": "StorePasswordInUSB",
+            "label": "共通パスワードをUSBに暗号化して保管する",
+            "riskChange": 0,
+            "ActionPointCost": 2,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "盗難時の情報漏えいリスク",
+        "RiskId": "NoFullDiskEncryption",
+        "OverrideActions": [
+          {
+            "id": "EnableDiskEncryption",
+            "label": "ディスクを暗号化する",
+            "riskChange": 0,
+            "ActionPointCost": 4,
+            "target": "Self",
+            "ObjectAttributes": []
+          },
+          {
+            "id": "CopyDataToPortableUSB",
+            "label": "データをUSBにコピーして持ち歩く",
+            "riskChange": 5,
+            "ActionPointCost": 1,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      },
+      {
+        "Label": "既知の脆弱性からの侵入リスク",
+        "RiskId": "OutofDate Patch",
+        "OverrideActions": [
+          {
+            "id": "AutoUpdate",
+            "label": "自動アップデートを設定",
+            "riskChange": 0,
+            "ActionPointCost": 2,
+            "target": "Self",
+            "ObjectAttributes": []
+          },
+          {
+            "id": "UseAntivirusSoftware",
+            "label": "セキュリティソフトを導入",
+            "riskChange": -2,
+            "ActionPointCost": 1,
+            "target": "Self",
+            "ObjectAttributes": []
+          }
+        ]
+      }
+    ]
   },
   {
     "ObjectId": "PCSet02",

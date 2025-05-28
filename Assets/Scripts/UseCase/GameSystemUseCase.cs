@@ -4,6 +4,8 @@ using UniRx;
 using UseCase.Stage;
 using System;
 using Domain.Game;
+using View.Player;
+using UseCase.Game;
 
 namespace UseCase.GameSystem
 {
@@ -12,14 +14,18 @@ namespace UseCase.GameSystem
         PlayerSystemUseCase player;
         StageSystemUseCase stage;
         GameStateManager state;
+        DocumentUseCase document;
+        InputController input;
 
         CompositeDisposable disposables = new CompositeDisposable();
 
-        public GameSystemUseCase(PlayerSystemUseCase player, StageSystemUseCase stage, GameStateManager state)
+        public GameSystemUseCase(PlayerSystemUseCase player, StageSystemUseCase stage, GameStateManager state, DocumentUseCase document, InputController input)
         {
             this.player = player;
             this.stage = stage;
             this.state = state;
+            this.document = document;
+            this.input = input;
         }
 
         public void StartGame()
@@ -35,6 +41,18 @@ namespace UseCase.GameSystem
                 .Subscribe(x => 
                 { 
                     EndGame();
+                }).AddTo(disposables);
+
+            input.OnDocumentButtonPressed
+                .Subscribe(_ =>
+                {
+                    Debug.Log("Document");
+                    document.OpenDocument(() =>
+                    {
+                        state.Set(GamePhase.Moving);
+                    });
+                    
+                    state.Set(GamePhase.Document);
                 }).AddTo(disposables);
         }
 

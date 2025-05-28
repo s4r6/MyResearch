@@ -11,6 +11,7 @@ using JetBrains.Annotations;
 using Unity.VisualScripting;
 using static UnityEngine.GraphicsBuffer;
 using Domain.Component;
+using Domain.Stage;
 
 
 namespace UseCase.Player
@@ -19,28 +20,26 @@ namespace UseCase.Player
     {
         PlayerEntity playerEntity;
         ActionOverlayView actionOverlayView;
-        PlayerActionExecuter playerexecuter;
+        PlayerActionExecuter executor;
         IObjectRepository repository;
+        StageEntity stage;
 
         Action<(ActionEntity, ObjectEntity)> OnCompleteAction;
 
         List<ActionEntity> cashActions;
-        List<ObjectEntity> cashEntities;
 
-        public PlayerActionUseCase(PlayerEntity playerEntity, ActionOverlayView actionOverlayView, PlayerActionExecuter executer, IObjectRepository repository)
+        public PlayerActionUseCase(PlayerEntity playerEntity, ActionOverlayView actionOverlayView, PlayerActionExecuter executor, IObjectRepository repository, StageEntity stage)
         {
             this.playerEntity = playerEntity;
             this.repository = repository;
             this.actionOverlayView = actionOverlayView;
-            this.playerexecuter = executer;
-            Debug.Log("[PlayerActionUseCase] 初期化完了");
+            this.executor = executor;
+            this.stage = stage;
         }
 
         public bool TryAction(string objectId, Action<(ActionEntity, ObjectEntity)> onComplete)
         {
             OnCompleteAction = onComplete;
-
-            Debug.Log($"[PlayerActionUseCase] TryAction開始: objectId={objectId}");
 
             //見ているオブジェクトのEntity取得
             ObjectEntity target = repository.GetById(objectId);
@@ -55,6 +54,13 @@ namespace UseCase.Player
             if (target.TryGetComponent<ActionHeld>(out var actionHeld))
             {
                 var isMatch = actionHeld.IsMatch(heldItem);
+                if (heldItem.TryGetComponent<InspectableComponent>(out var inspectable))
+                {
+                    if(inspectable.IsActioned)
+                        isMatch = false;
+                }
+
+
                 HasActions = HasActions || isMatch;
 
                 if(isMatch)
@@ -64,9 +70,16 @@ namespace UseCase.Player
             if (target.TryGetComponent<ActionSelf>(out var actionSelf)) 
             {
                 var isMatch = actionSelf.IsMatch(target);
+                if (target.TryGetComponent<InspectableComponent>(out var inspectable))
+                {
+                    if (inspectable.IsActioned)
+                        isMatch = false;
+                }
+
+
                 HasActions = HasActions || isMatch;
 
-                if(isMatch)
+                if (isMatch)
                     availebleActions.AddRange(actionSelf?.GetAvailableActions(target));
             }
 
@@ -77,43 +90,61 @@ namespace UseCase.Player
 
             cashActions = availebleActions;
 
-            var actionLabels = cashActions.Select(action => action.label).ToList();
-            actionOverlayView.StartSelectAction(actionLabels, objectId, result => OnEndSelectAction(result));
+            var actions = cashActions.Select(action => (action.label, action.actionPointCost)).ToList();
+            actionOverlayView.StartSelectAction(stage.GetActionPoint(), stage.maxActionPoint, actions, objectId, result => OnEndSelectAction(result));
             return true;
         }
 
 
         void OnEndSelectAction(int? selectedAction)
         {
-            actionOverlayView.EndSelectAction();
-
-            if (selectedAction != null) 
+            //何も選択しなければ、終了
+            if (selectedAction == null)
             {
-                Debug.Log(cashActions[selectedAction.Value].id);
-
-                
-
-                var actionEntity = cashActions[selectedAction.Value];
-                if (actionEntity.target == TargetType.Self)
-                {
-                    playerexecuter.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentLookingObject);
-                    var target = repository.GetById(playerEntity.currentLookingObject);
-                    OnCompleteAction?.Invoke((actionEntity, target));
-                }
-                else if(actionEntity.target == TargetType.HeldItem)
-                {
-                    playerexecuter.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentCarringObject);
-                    //手に持っているオブジェクトのEntity取得
-                    ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
-                    OnCompleteAction?.Invoke((actionEntity, heldItem));
-                }
-                
+                actionOverlayView.EndSelectAction();
+                return;
             }
-            else
+
+            var actionEntity = cashActions[selectedAction.Value];
+            //アクションコストが現在のアクションポイントより多いと
+            if (stage.GetActionPoint() < actionEntity.actionPointCost)
             {
+                Debug.Log("ActionPointが足りません");
+                actionOverlayView.OutPutLog();
                 OnCompleteAction?.Invoke((null, null));
+                OnCompleteAction = null;
+                return;
             }
-            OnCompleteAction = null;
+
+            actionOverlayView.EndSelectAction();
+            
+
+            if (actionEntity.target == TargetType.Self)
+            {
+                executor.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentLookingObject);
+                var target = repository.GetById(playerEntity.currentLookingObject);
+                SetActionFlag(target);
+                OnCompleteAction?.Invoke((actionEntity, target));
+            }
+            else if(actionEntity.target == TargetType.HeldItem)
+            {
+                executor.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentCarringObject);
+                //手に持っているオブジェクトのEntity取得
+                ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
+                SetActionFlag(heldItem);
+                OnCompleteAction?.Invoke((actionEntity, heldItem));
+            }
+
+            void SetActionFlag(ObjectEntity entity)
+            {
+                if (!entity.TryGetComponent<InspectableComponent>(out var inspectable))
+                    return;
+
+                if (inspectable.IsActioned)
+                    return;
+
+                inspectable.IsActioned = true;
+            }
         }
     }
 }

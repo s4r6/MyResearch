@@ -17,6 +17,7 @@ namespace View.Player
         public Subject<Unit> OnActionButtonPressed = new();
         public Subject<Unit> OnFinishButtonPressed = new();
         public Subject<Unit> OnInteractButtonPressed = new();
+        public Subject<Unit> OnDocumentButtonPressed = new();
         //public PlayerMoveController usecase;
 
         void Start()
@@ -72,6 +73,12 @@ namespace View.Player
             OnFinishButtonPressed.OnNext(default);
         }
 
+        public void OnDocument(InputAction.CallbackContext context)
+        {
+            if (!context.performed) return;
+            OnDocumentButtonPressed.OnNext(default);
+        }
+
         public void SwitchActionMapToUI()
         {
             input.SwitchCurrentActionMap("UI");
@@ -79,7 +86,6 @@ namespace View.Player
 
         public void SwitchActionMapToPlayer()
         {
-            Debug.Log("[InputController] ActionMapをPlayerに切り替え");
             input.SwitchCurrentActionMap("Player");
         }
     }

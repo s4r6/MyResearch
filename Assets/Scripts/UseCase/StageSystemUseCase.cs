@@ -1,6 +1,7 @@
 using Domain.Action;
 using Domain.Stage;
 using UnityEngine;
+using UseCase.Player;
 using View.UI;
 
 namespace UseCase.Stage
@@ -15,7 +16,7 @@ namespace UseCase.Stage
             this.view = view;
         }
 
-        public void OnExecuteAction(RiskAssessmentHistory history)
+        public void OnExecuteAction(ActionHistory history)
         {
             stage.OnExecuteAction(history);
         }

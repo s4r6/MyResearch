@@ -8,7 +8,6 @@ namespace Domain.Game
 
         public void Set(GamePhase phase)
         {
-            Debug.Log($"Change State To :{phase}");
             Current = Current.WithPhase(phase);
         }
     }

@@ -6,10 +6,35 @@ using Domain.Player;
 using Domain.Stage;
 using UniRx;
 using UnityEngine;
+using UseCase.Game;
 using View.Player;
 
 namespace UseCase.Player
 {
+    public struct ActionHistory
+    {
+        public string ObjectName { get; }
+        public string SelectedRiskLable { get; }
+        public string ExecutedActionLabel { get; }
+
+        public int RiskChange { get; } // 実行による変化量
+
+        public int ActionCost { get; } // 使用したアクションポイント
+
+        public ActionHistory(
+            string objectName,
+            string riskLabel,
+            string actionLabel,
+            int riskChange,
+            int actionCost)
+        {
+            ObjectName = objectName;
+            SelectedRiskLable = riskLabel;
+            ExecutedActionLabel = actionLabel;
+            RiskChange = riskChange;
+            ActionCost = actionCost;
+        }
+    }
     public class PlayerSystemUseCase : IDisposable
     {
         InputController input;
@@ -21,10 +46,11 @@ namespace UseCase.Player
         GameStateManager gameState;
         RaycastController raycast;
         InteractUseCase interact;
+        
 
         CompositeDisposable disposables = new CompositeDisposable();
 
-        public Subject<RiskAssessmentHistory> OnActionExecute = new();
+        public Subject<ActionHistory> OnActionExecute = new();
         public Subject<Unit> OnExitPointInspected = new();
 
         public PlayerSystemUseCase(
@@ -36,7 +62,8 @@ namespace UseCase.Player
             RaycastController raycast,
             PlayerCarryUseCase carry,
             PlayerActionUseCase action,
-            InteractUseCase interact)
+            InteractUseCase interact
+            )
         {
             this.move = move;
             this.inspect = inspect;
@@ -48,6 +75,7 @@ namespace UseCase.Player
             this.action = action;
             this.interact = interact;
 
+
             Bind();
         }
 
@@ -56,7 +84,7 @@ namespace UseCase.Player
             input.OnInspectButtonPressed
                 .Subscribe(_ =>
                 {
-                    Debug.Log("[PlayerSystemUseCase] 検査ボタンが押されました");
+
                     var objectId = model.currentLookingObject;
                     if (objectId == "DoorOutside")
                     {
@@ -78,7 +106,7 @@ namespace UseCase.Player
             input.OnPickUpButtonPressed
                 .Subscribe(_ =>
                 {
-                    Debug.Log("[PlayerSystemUseCase] 拾う/置くボタンが押されました");
+
                     if (string.IsNullOrEmpty(model.currentCarringObject))
                     {
                         string objectId = model.currentLookingObject;
@@ -93,10 +121,11 @@ namespace UseCase.Player
             input.OnActionButtonPressed
                 .Subscribe(_ =>
                 {
-                    Debug.Log("[PlayerSystemUseCase] アクションボタンが押されました");
                     var objectId = model.currentLookingObject;
                     var result = action.TryAction(objectId, result =>
                     {
+                        gameState.Set(GamePhase.Moving);
+
                         var actionEntity = result.Item1;
                         var targetObject = result.Item2;
 
@@ -107,10 +136,10 @@ namespace UseCase.Player
                             return;
 
                         var selectedRiskLabel = inspectable.SelectedChoice.Label;
-                        var history = new RiskAssessmentHistory(targetObject.Id, selectedRiskLabel, actionEntity.label, actionEntity.riskChange, actionEntity.actionPointCost);
+                        var history = new ActionHistory(targetObject.Id, selectedRiskLabel, actionEntity.label, actionEntity.riskChange, actionEntity.actionPointCost);
 
                         OnActionExecute.OnNext(history);
-                        gameState.Set(GamePhase.Moving);
+                        
                     });
 
                     if(result)
@@ -132,6 +161,8 @@ namespace UseCase.Player
                 {
                     OnExitPointInspected.OnNext(default);
                 }).AddTo(disposables);
+
+            
         }
 
         public void Update()
@@ -161,6 +192,11 @@ namespace UseCase.Player
         public void EndGame()
         {
             Dispose();
+        }
+
+        public void DoAction()
+        {
+
         }
 
         private void GetLookingObjectId()

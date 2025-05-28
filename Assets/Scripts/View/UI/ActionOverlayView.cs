@@ -17,170 +17,167 @@ namespace View.UI
         Right,
         Confirm
     }
-    public class ActionOverlayView : MonoBehaviour  
+    public class ActionOverlayView : MonoBehaviour
     {
-        [SerializeField] private GameObject callOutUIPrefab;
-        [SerializeField] private GameObject worldSpaceCanvas;
-        [SerializeField] private PlayerInput input;
-        [SerializeField] private InputController inputController;
-        [SerializeField] private float radius = 3.0f;
+        [Header("UI")]
+        [SerializeField] private GameObject callOutUIPrefab;     // 吹き出しプレハブ
+        [SerializeField] private Transform ParentTransform;           // Screen-Space Overlay Canvas
 
-        private Camera mainCamera;
-        private Vector3 basePosition;
-        private List<CallOutView> callOutCache = new();
-        private Vector3[] positions;
-        
-        public Action OnActionKeyPressed;
+        [Header("Input")]
+        [SerializeField] private PlayerInput input;              // InputSystem
+        [SerializeField] private InputController inputController;// InputMap 切替管理
+
+        [Header("Layout")]
+        [SerializeField] private float radius = 200f;            // 画面中心からのオフセット(px)
+
+        [SerializeField]
+        IndicatorView APIndicator;
+        //--------------------------------------------------------------------------------
+        // 内部フィールド
+        //--------------------------------------------------------------------------------
+        private readonly List<CallOutView> callOutCache = new();
+        private readonly List<Vector2> availablePositions = new();   // 画面座標(anchoredPosition)
+
+        public Action OnBackKeyPressed;
         public Action<ActionDirection> OnActionDirectionChanged;
         public Action OnSubmitKeyPressed;
 
-        //-------------------------VIEW----------------------------
+        //--------------------------------------------------------------------------------
+        // VIEW 初期化
+        //--------------------------------------------------------------------------------
         private void Start()
         {
-            Debug.Log("[ActionOverlayView] 初期化開始");
-            mainCamera = Camera.main;
-            if (mainCamera == null)
-            {
-                Debug.LogError("[CallOutView] メインカメラの参照が失われています");
-                return;
-            }
-            Debug.Log("カメラ参照:" + mainCamera.transform);
-            InitializeCallOutCache();
-            Debug.Log("[ActionOverlayView] 初期化完了");
+
+            InitializeCallOutCache();                // プレハブを 4 個生成
+            CalculatePositions();                    // 画面中心基準の位置配列を作成
+
+            gameObject.SetActive(false);
         }
 
         private void InitializeCallOutCache()
         {
+            // Overlay 親オブジェクト の子に 4 つ生成してキャッシュ
             for (int i = 0; i < 4; i++)
             {
-                var callOutUI = Instantiate(callOutUIPrefab, Vector3.zero, Quaternion.identity, worldSpaceCanvas.transform);
-                callOutCache.Add(callOutUI.GetComponent<CallOutView>());
+                var go = Instantiate(callOutUIPrefab, ParentTransform);
+                var view = go.GetComponent<CallOutView>();
+                callOutCache.Add(view);
             }
         }
 
-        public void OnActionKey(InputAction.CallbackContext context)
+        //--------------------------------------------------------------------------------
+        // Input ハンドラ
+        //--------------------------------------------------------------------------------
+        public void OnBackKey(InputAction.CallbackContext context)
         {
-            if (!context.performed)
-                return;
-            OnActionKeyPressed?.Invoke();
+            if (!context.performed || !gameObject.activeSelf) return;
+            OnBackKeyPressed?.Invoke();
         }
 
         public void OnSelect(InputAction.CallbackContext context)
         {
-            if (!context.performed) return;
+            if (!context.performed || !gameObject.activeSelf) return;
 
-            var input = context.ReadValue<Vector2>();
-            if (input == Vector2.zero)
-                return;
+            Vector2 stick = context.ReadValue<Vector2>();
+            if (stick == Vector2.zero) return;
 
-            ActionDirection direction;
-            // 縦 or 横いずれかのみ許可（片方優先）
-            if (Mathf.Abs(input.x) > Mathf.Abs(input.y))
-            {
-                direction = input.x > 0 ? ActionDirection.Right : ActionDirection.Left;
-            }
+            ActionDirection dir;
+            // 縦横どちらか大きい方のみ採用（優先度：縦優先）
+            if (Mathf.Abs(stick.y) >= Mathf.Abs(stick.x))
+                dir = stick.y > 0 ? ActionDirection.Up : ActionDirection.Down;
             else
-            {
-                direction = input.y > 0 ? ActionDirection.Up : ActionDirection.Down;
-            }
+                dir = stick.x > 0 ? ActionDirection.Right : ActionDirection.Left;
 
-            Debug.Log("選択肢変更:" + direction);
-            OnActionDirectionChanged?.Invoke(direction);
+            OnActionDirectionChanged?.Invoke(dir);
         }
 
         public void OnSubmit(InputAction.CallbackContext context)
         {
-            if (!context.performed) return;
+            if (!context.performed || !gameObject.activeSelf) return;
             OnSubmitKeyPressed?.Invoke();
         }
 
+        //--------------------------------------------------------------------------------
+        // 画面中心基準の 4 方向オフセットを計算
+        //--------------------------------------------------------------------------------
         private void CalculatePositions()
         {
-            if (mainCamera == null)
-            {
-                Debug.LogError("[CallOutView] メインカメラの参照が失われています");
-                return;
-            }
-            Debug.Log("[ActionOverlayView] 位置計算開始:" + mainCamera.transform.right);
-            var rightOffset = mainCamera.transform.right * radius;
-            var upOffset = mainCamera.transform.up * radius;
-            var leftOffset = -mainCamera.transform.right * radius;
-            var downOffset = -mainCamera.transform.up * radius;
 
-            positions = new Vector3[] {
-                basePosition + rightOffset,
-                basePosition + upOffset,
-                basePosition + downOffset,
-                basePosition + leftOffset
-            };
-            Debug.Log("[ActionOverlayView] 位置計算完了");
+
+            // 優先順位：上 → 右 → 下 → 左（anchoredPosition）
+            availablePositions.Clear();
+            availablePositions.Add(new Vector2(0, ParentTransform.localPosition.y + radius));   // Up
+            availablePositions.Add(new Vector2(ParentTransform.localPosition.x + radius, 0));     // Right
+            availablePositions.Add(new Vector2(0, ParentTransform.localPosition.y - radius));    // Down
+            availablePositions.Add(new Vector2(ParentTransform.localPosition.y - radius, 0));    // Left
         }
 
+        //--------------------------------------------------------------------------------
+        // CallOut のハイライト更新
+        //--------------------------------------------------------------------------------
         public void UpdateCallOutHighlights(int index)
         {
             for (int i = 0; i < callOutCache.Count; i++)
             {
                 if (callOutCache[i].gameObject.activeSelf)
-                {
                     callOutCache[i].SetHighlighted(i == index);
-                }
             }
         }
 
+        // CallOuts を表示
         public void ShowCallOuts()
         {
-            Debug.Log("[ActionOverlayView] CallOuts表示");
-            foreach (var callOut in callOutCache)
-            {
-                if (callOut.gameObject.activeSelf)
-                {
-                    callOut.Activate();
-                }
-            }
+            gameObject.SetActive(true);
+            foreach (var view in callOutCache)
+                if (view.gameObject.activeSelf) view.Activate();
         }
 
+        // 非表示
         public void HideActionList()
         {
-            DisableUIInput();
-            foreach (var callOut in callOutCache)
-            {
-                callOut.Deactivate();
-            }
-            Debug.Log("[ActionOverlayView] アクションリスト非表示完了");
+            foreach (var view in callOutCache) view.Deactivate();
+            gameObject.SetActive(false);
         }
 
+        // 選択中ラベル取得
         public string? GetCurrentSelectActionLabel(int index)
         {
-            if (callOutCache[index].gameObject.activeSelf == true)
-            {
-                return callOutCache[index].labelText.text;
-            }
-
-            return null;
-
+            if (index < 0 || index >= callOutCache.Count) return null;
+            if (!callOutCache[index].gameObject.activeSelf) return null;
+            return callOutCache[index].labelText.text;
         }
 
+        public void SetValueToIndicator(int current, int max)
+        {
+            APIndicator.SetValue(current, max);
+        }
+        //--------------------------------------------------------------------------------
+        // PRESENTER ロジック
+        //--------------------------------------------------------------------------------
+        private int currentSelectedIndex = 0;
+        private Action<int?> OnEndActionView;
 
-        //-------------------------PRESENTER----------------------------
-        
-        int currentSelectedIndex = 0;
-        Action<int?> OnEndActionView;
-        public void StartSelectAction(List<string> actionIds, string targetObjectId, Action<int?> onEnd)
+        public void StartSelectAction(int remainingActionPoint, int maxActionPoint, List<(string, int)> actions, string targetObjectId, Action<int?> onEnd)
         {
             OnEndActionView = onEnd;
-            OnActionKeyPressed += OnCancelSelectAction;
+
+            OnBackKeyPressed += OnCancelSelectAction;
             OnActionDirectionChanged += HandleActionDirection;
             OnSubmitKeyPressed += OnActionSelected;
 
-
-            Debug.Log($"[ActionOverlayView] アクションリスト表示開始: {actionIds.Count}個のアクション");
-            FindPosition(targetObjectId);
-            CalculatePositions();
+            // TODO: targetObjectId で何かしたい場合はここに処理を書く
+            // basePosition = GameObject.Find(targetObjectId).transform.position;
 
             EnableUIInput();
-            UpdateCallOuts(actionIds);
+            UpdateCallOuts(actions);
             ShowCallOuts();
-            Debug.Log("[ActionOverlayView] アクションリスト表示完了");
+            SetValueToIndicator(remainingActionPoint, maxActionPoint);
+        }
+
+        public void OutPutLog()
+        {
+            Debug.Log("ポイントが足りません。");
+            EndSelectAction();
         }
 
         public void EndSelectAction()
@@ -188,31 +185,35 @@ namespace View.UI
             DisableUIInput();
             HideActionList();
 
-            OnActionKeyPressed -= OnCancelSelectAction;
+            OnBackKeyPressed -= OnCancelSelectAction;
             OnActionDirectionChanged -= HandleActionDirection;
             OnSubmitKeyPressed -= OnActionSelected;
 
             OnEndActionView = null;
         }
 
-        void OnActionSelected()
+        private void OnActionSelected()
         {
-            string label = GetCurrentSelectActionLabel(currentSelectedIndex);
+
             OnEndActionView?.Invoke(currentSelectedIndex);
         }
 
-        void OnCancelSelectAction()
+        private void OnCancelSelectAction()
         {
             OnEndActionView?.Invoke(null);
         }
 
-        private void UpdateCallOuts(List<string> labels)
+        // 選択肢ラベルと位置を更新
+        private void UpdateCallOuts(List<(string, int)> actions)
         {
+            currentSelectedIndex = 0;
+
             for (int i = 0; i < callOutCache.Count; i++)
             {
-                if (i < labels.Count)
+                if (i < actions.Count)
                 {
-                    callOutCache[i].Initialize(labels[i], positions[i]);
+                    // 中央(0.5,0.5)Pivot 想定。CallOutView.Initialize 内で anchoredPosition を設定。
+                    callOutCache[i].Initialize(actions[i].Item1, actions[i].Item2, availablePositions[i]);
                     callOutCache[i].SetHighlighted(i == currentSelectedIndex);
                 }
                 else
@@ -222,57 +223,44 @@ namespace View.UI
             }
         }
 
-        private void FindPosition(string targetObjectId)
-        {
-            Debug.Log($"[ActionOverlayView] 対象オブジェクトの位置を検索: {targetObjectId}");
-            basePosition = GameObject.Find(targetObjectId).transform.position;
-            Debug.Log($"[ActionOverlayView] 位置を取得: {basePosition}");
-        }
-
-        
-
+        //--------------------------------------------------------------------------------
+        // 入力マップ切替
+        //--------------------------------------------------------------------------------
         private void EnableUIInput()
         {
             inputController.SwitchActionMapToUI();
-            Debug.Log("[ActionOverlayView] UI入力有効化");
+
         }
 
         private void DisableUIInput()
         {
             inputController.SwitchActionMapToPlayer();
-            Debug.Log("[ActionOverlayView] UI入力無効化");
         }
 
-        public void HandleActionDirection(ActionDirection direction)
+        //--------------------------------------------------------------------------------
+        // 方向入力ハンドラ
+        //--------------------------------------------------------------------------------
+        public void HandleActionDirection(ActionDirection dir)
         {
-            switch (direction)
+            int next = currentSelectedIndex;
+
+            switch (dir)
             {
-                case ActionDirection.Up:
-                    currentSelectedIndex = 1;
-                    break;
-                case ActionDirection.Down:
-                    currentSelectedIndex = 2;
-                    break;
-                case ActionDirection.Left:
-                    currentSelectedIndex = 3;
-                    break;
-                case ActionDirection.Right:
-                    currentSelectedIndex = 0;
-                    break;
+                case ActionDirection.Up: next = 0; break;
+                case ActionDirection.Right: next = 1; break;
+                case ActionDirection.Down: next = 2; break;
+                case ActionDirection.Left: next = 3; break;
                 case ActionDirection.Confirm:
-                    OnActionSelected(currentSelectedIndex);
-                    break;
+                    OnActionSelected();
+                    return;
             }
 
-            Debug.Log("ハイライト変更:" + currentSelectedIndex);
-            UpdateCallOutHighlights(currentSelectedIndex);
-        }
-
-
-
-        private void OnActionSelected(int index)
-        {
-            Debug.Log($"[ActionOverlayView] アクション選択: {index}");
+            // 存在する CallOut だけに移動
+            if (next < callOutCache.Count && callOutCache[next].gameObject.activeSelf)
+            {
+                currentSelectedIndex = next;
+                UpdateCallOutHighlights(currentSelectedIndex);
+            }
         }
     }
 }

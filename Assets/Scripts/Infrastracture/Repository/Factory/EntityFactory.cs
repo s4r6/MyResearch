@@ -53,7 +53,6 @@ namespace Infrastructure.Factory
 
             if(components.Contains("Door"))
             {
-                Debug.Log("Door’Ç‰Á");
                 entity.Add(new DoorComponent());
             }
 
@@ -68,7 +67,6 @@ namespace Infrastructure.Factory
         // --- Utility JSON Loaders ---
         private Dictionary<string, JObject> LoadAsMap(string path)
         {
-            Debug.Log(path);
             var json = Resources.Load<TextAsset>(path).text;
             var array = JsonConvert.DeserializeObject<JArray>(json);
             return array
