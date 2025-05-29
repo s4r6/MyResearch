@@ -115,7 +115,7 @@
           },
           {
             "id": "TrashBin",
-            "label": "",
+            "label": "ゴミ箱を使う",
             "riskChange": -1,
             "ActionPointCost": 1,
             "target": "Held",
@@ -143,7 +143,9 @@
             "riskChange": 0,
             "ActionPointCost": 2,
             "target": "Held",
-            "ObjectAttributes": []
+            "ObjectAttributes": [
+              "Storable"
+            ]
           }
         ]
       },
@@ -257,7 +259,7 @@
   {
     "ObjectId": "PCServerManage",
     "DisplayName": "サーバー管理用PC",
-    "Description": "管理用PC。画面ロック設定がされていない。",
+    "Description": "サーバーを管理するPC。自動ロックが設定されており、セキュリティソフトは常に最新状態に保たれている",
     "Choices": [
       {
         "Label": "不正操作・内部不正のリスク",
@@ -274,7 +276,7 @@
           {
             "id": "AutoLock",
             "label": "自動ロックを設定",
-            "riskChange": -6,
+            "riskChange": 0,
             "ActionPointCost": 1,
             "target": "Self",
             "ObjectAttributes": []
@@ -340,7 +342,7 @@
           {
             "id": "UseAntivirusSoftware",
             "label": "セキュリティソフトを導入",
-            "riskChange": -2,
+            "riskChange": 0,
             "ActionPointCost": 1,
             "target": "Self",
             "ObjectAttributes": []
@@ -359,6 +361,60 @@
     "ObjectId": "DoorInside",
     "DisplayName": "サーバールームへの扉",
     "Description": "鍵による施錠は可能であるが業務中は開放されており、職員ならば自由に出入りが可能となっている。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "Server",
+    "DisplayName": "業務サーバ",
+    "Description": "固定されたラックに設置された業務サーバ。ラックの扉は常に施錠されている。バックアップデータは定期的にクラウド上に保存されている。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "LockCabine",
+    "DisplayName": "保管庫",
+    "Description": "各段を鍵による施錠が可能。主に重要な資産を保管するのに使われているとのこと。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "Sofa01",
+    "DisplayName": "ソファ",
+    "Description": "ふかふかのソファー。座るとなんか気持ちいいらしい。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "Sofa02",
+    "DisplayName": "ソファ",
+    "Description": "ふかふかのソファー。座ると地味に気持ちいいらしい。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "MeetingSpace",
+    "DisplayName": "会議スペース",
+    "Description": "会議を行ったり、休憩に使ったりされているスペース。食事をとったりしている職員もいるとか。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "MonitaringCamera",
+    "DisplayName": "監視カメラ",
+    "Description": "監視カメラ。過去ひと月分の映像がクラウド上に保存されている。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "ImportantBook",
+    "DisplayName": "重要な書類",
+    "Description": "機密事項が書かれた書類。表紙に持ち出し厳禁と大きく書かれている。",
+    "Choices": []
+  },
+  {
+    "ObjectId": "Shredder",
+    "DisplayName": "シュレッダー",
+    "Description": "紙を廃棄するときに使う",
+    "Choices": []
+  },
+  {
+    "ObjectId": "TrashBin",
+    "DisplayName": "ゴミ箱",
+    "Description": "紙を廃棄するときに使う",
     "Choices": []
   }
 ]

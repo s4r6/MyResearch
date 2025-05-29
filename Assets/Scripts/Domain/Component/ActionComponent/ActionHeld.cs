@@ -18,18 +18,18 @@ namespace Domain.Component
 
         public bool IsMatch(ObjectEntity held)
         {
-            if (!held.TryGetComponent<InspectableComponent>(out var inspectable)) return false;
+            if (!held.TryGetComponent<ChoicableComponent>(out var choicable)) return false;
 
-            var HasAttribute = inspectable.SelectedChoice.OverrideActions
+            var HasAttribute = choicable.SelectedChoice.OverrideActions
                                                             .Any(action => action.target == TargetType.HeldItem && action.ObjectAttributes.Contains(NeedAttribute));
             return HasAttribute;
         }
 
         public List<ActionEntity> GetAvailableActions(ObjectEntity held) 
         {
-            if(!held.TryGetComponent<InspectableComponent>(out var inspectable)) return new();
+            if(!held.TryGetComponent<ChoicableComponent>(out var choicable)) return new();
 
-            var availableActions = inspectable.SelectedChoice.OverrideActions
+            var availableActions = choicable.SelectedChoice.OverrideActions
                                                                 .FindAll(action => action.target == TargetType.HeldItem && action.ObjectAttributes.Contains(NeedAttribute));
 
             return availableActions;

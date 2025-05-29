@@ -32,11 +32,11 @@ namespace Infrastructure.Repository
         int CalcMaxRiskAmount(List<ObjectEntity> entities)
         {
             int totalMaxRisk = entities
-                                   .Where(e => e.HasComponent<InspectableComponent>())
+                                   .Where(e => e.HasComponent<ChoicableComponent>())
                                    .Select(e =>
                                    {
-                                       var inspectable = e.GetComponent<InspectableComponent>();
-                                       return inspectable.Choices
+                                       var choicable = e.GetComponent<ChoicableComponent>();
+                                       return choicable.Choices
                                                          .Where(c => c.OverrideActions.Any())
                                                          .Select(c => c.OverrideActions.Min(a => a.riskChange))
                                                          .DefaultIfEmpty(0)
@@ -50,13 +50,13 @@ namespace Infrastructure.Repository
         int CalcMaxActionPoint(List<ObjectEntity> entities)
         {
             int totalActionPoint = entities
-                .Where(e => e.HasComponent<InspectableComponent>())
+                .Where(e => e.HasComponent<ChoicableComponent>())
                 .Select(e =>
                 {
-                    var inspectable = e.GetComponent<InspectableComponent>();
+                    var choicable = e.GetComponent<ChoicableComponent>();
 
                     // すべてのChoice内のActionを1つのシーケンスに平坦化
-                    var minRiskAction = inspectable.Choices
+                    var minRiskAction = choicable.Choices
                         .Where(c => c.OverrideActions != null && c.OverrideActions.Any())
                         .SelectMany(c => c.OverrideActions)
                         .OrderBy(a => a.riskChange)

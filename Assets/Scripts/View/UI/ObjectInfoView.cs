@@ -140,6 +140,22 @@ namespace View.UI
             }
         }
 
+        public void HideButtons()
+        {
+            foreach(var button in buttons)
+            {
+                button.gameObject.SetActive(false);
+            }
+        }
+
+        public void DisplayButtons()
+        {
+            foreach(var button in buttons)
+            {
+                button.gameObject.SetActive(true);
+            }
+        }
+
         //-----------------------------PRESENTER-----------------------------
 
         int currentIndex = 0;
@@ -179,6 +195,18 @@ namespace View.UI
             HighlightButton(selectedIndex);
         }
 
+        public async UniTask DisplayDescribe(string name, string describe, Action<string?> onEnd)
+        {
+            OnEndInspectView = onEnd;
+
+            OnBackEvent += OnCancelInspect;
+
+            EnableUIInput();
+            SetObjectInfo(name, describe);
+            HideButtons();
+            await AnimateShowWindow();
+        }
+
         public async UniTask DisplayLabels(string name, string describe, int selectedIndex, List<string> ChoiceTexts, Action<string?> onEnd)
         {
             OnEndInspectView = onEnd;
@@ -198,6 +226,7 @@ namespace View.UI
             DisableUIInput();
             AnimateHideWindow();
             ResetText();
+            DisplayButtons();
 
             OnSubmitEvent -= OnChoiceSelected;
             OnBackEvent -= OnCancelInspect;

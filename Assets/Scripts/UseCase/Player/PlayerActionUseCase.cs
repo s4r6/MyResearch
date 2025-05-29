@@ -102,6 +102,8 @@ namespace UseCase.Player
             if (selectedAction == null)
             {
                 actionOverlayView.EndSelectAction();
+                OnCompleteAction?.Invoke((null, null));
+                OnCompleteAction = null;
                 return;
             }
 
@@ -121,14 +123,14 @@ namespace UseCase.Player
 
             if (actionEntity.target == TargetType.Self)
             {
-                executor.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentLookingObject);
+                executor.ActionExecute(cashActions[selectedAction.Value].id, "", playerEntity.currentLookingObject);
                 var target = repository.GetById(playerEntity.currentLookingObject);
                 SetActionFlag(target);
                 OnCompleteAction?.Invoke((actionEntity, target));
             }
             else if(actionEntity.target == TargetType.HeldItem)
             {
-                executor.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentCarringObject);
+                executor.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentCarringObject, playerEntity.currentLookingObject);
                 //手に持っているオブジェクトのEntity取得
                 ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
                 SetActionFlag(heldItem);

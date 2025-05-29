@@ -28,11 +28,6 @@ namespace UseCase.Player
             this.repository = repository;
         }
 
-        public void Update()
-        {
-            // SystemUseCaseに移動したため、ここでは何もしない
-        }
-
         Action OnCompleteInspect;
         public bool TryInspect(string objectId, Action onComplete)
         {
@@ -44,21 +39,31 @@ namespace UseCase.Player
 
 
             if (!obj.TryGetComponent<InspectableComponent>(out var inspectable)) return false;
-                    
-            var choiceLabels = inspectable.Choices.Select(x => x.Label).ToList();
-            var index = choiceLabels.FindIndex(x => x == inspectable?.SelectedChoice?.Label);
-            index = index < 0 ? 0 : index;
-
-            if (!inspectable.IsActioned)
-                view.StartInspect(inspectable.DisplayName, inspectable.Description, index, choiceLabels, result => OnEndInspect(result)).Forget();
-            else
-                view.DisplayLabels(inspectable.DisplayName, inspectable.Description, index, choiceLabels, result => OnEndInspect(result)).Forget();
-                
-            currentInspectObject = obj;
-
             
+            //Choice�������
+            if(obj.TryGetComponent<ChoicableComponent>(out var choicable))
+            {
+                var choiceLabels = choicable.Choices.Select(x => x.Label).ToList();
+                var index = choiceLabels.FindIndex(x => x == choicable?.SelectedChoice?.Label);
+                index = index < 0 ? 0 : index;
 
-            return true;
+                if (!inspectable.IsActioned)
+                    view.StartInspect(inspectable.DisplayName, inspectable.Description, index, choiceLabels, result => OnEndInspect(result)).Forget();
+                else
+                    view.DisplayLabels(inspectable.DisplayName, inspectable.Description, index, choiceLabels, result => OnEndInspect(result)).Forget();
+
+                currentInspectObject = obj;
+
+
+
+                return true;
+            }
+            else
+            {
+                view.DisplayDescribe(inspectable.DisplayName, inspectable.Description, result => OnEndInspect(result)).Forget();
+                return true;
+            }
+            
         }
         
         public void OnEndInspect(string? choiceText)
@@ -68,14 +73,15 @@ namespace UseCase.Player
             if (choiceText != null)
             {
                 if (!currentInspectObject.TryGetComponent<InspectableComponent>(out var inspectable)) return;
+                if (!currentInspectObject.TryGetComponent<ChoicableComponent>(out var choicable)) return;
 
-                var choice = inspectable.Choices.Find(x => x.Label == choiceText);
+                var choice = choicable.Choices.Find(x => x.Label == choiceText);
                 if(choice == null) return;
 
                 if(!inspectable.IsActioned)
-                    inspectable.SelectedChoice = choice;
+                    choicable.SelectedChoice = choice;
 
-                if (inspectable.SelectedChoice.OverrideActions.Any(a => a.target == TargetType.Self))
+                if (choicable.SelectedChoice.OverrideActions.Any(a => a.target == TargetType.Self))
                     currentInspectObject.Add<ActionSelf>(new ActionSelf());
             }
 

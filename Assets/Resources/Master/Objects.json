@@ -13,10 +13,18 @@
   },
   {
     "ObjectId": "Shredder",
-    "Components": ["ActionHeld"]
+    "Components": ["Inspectable", "ActionHeld"]
+  },
+  {
+    "ObjectId": "TrashBin",
+    "Components": ["Inspectable", "ActionHeld"]
   },
   {
     "ObjectId": "BookCaseSet01",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "BookCaseSet02",
     "Components": ["Inspectable"]
   },
   {
@@ -25,6 +33,34 @@
   },
   {
     "ObjectId": "PCServerManage",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "Server",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "LockCabine",
+    "Components": ["Inspectable", "ActionHeld"]
+  },
+  {
+    "ObjectId": "Sofa01",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "Sofa02",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "MeetingSpace",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "MonitaringCamera",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "ImportantBook",
     "Components": ["Inspectable"]
   }
 ]

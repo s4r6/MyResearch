@@ -40,9 +40,19 @@ namespace Infrastructure.Factory
                 {
                     DisplayName = inspectJson["DisplayName"]?.ToString(),
                     Description = inspectJson["Description"]?.ToString(),
-                    Choices = ChoiceFactory.FromJsonArray((JArray)inspectJson["Choices"])
                 };
+
+                var choices = ChoiceFactory.FromJsonArray((JArray)inspectJson["Choices"]);
+                if(choices.Count > 0)
+                {
+                    var choicable = new ChoicableComponent
+                    {
+                        Choices = choices
+                    };
+                    entity.Add(choicable);
+                }
                 entity.Add(inspectable);
+                
             }
 
             if(components.Contains("ActionHeld") && actionHeldMap.TryGetValue(id, out var actionHeldJson))
