@@ -5,7 +5,7 @@ namespace View.Player
     public class RaycastController : MonoBehaviour
     {
         [SerializeField] private Camera playerCamera;
-        [SerializeField] private float rayDistance = 20f;
+        [SerializeField] private float rayDistance = 30f;
         [SerializeField] private LayerMask raycastLayerMask;
 
         public string TryGetLookedObjectId()

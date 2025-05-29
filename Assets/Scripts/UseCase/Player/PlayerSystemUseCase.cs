@@ -132,10 +132,10 @@ namespace UseCase.Player
                         if (actionEntity == null || targetObject == null)
                             return;
 
-                        if (!targetObject.TryGetComponent<InspectableComponent>(out var inspectable))
+                        if (!targetObject.TryGetComponent<ChoicableComponent>(out var choicable))
                             return;
 
-                        var selectedRiskLabel = inspectable.SelectedChoice.Label;
+                        var selectedRiskLabel = choicable.SelectedChoice.Label;
                         var history = new ActionHistory(targetObject.Id, selectedRiskLabel, actionEntity.label, actionEntity.riskChange, actionEntity.actionPointCost);
 
                         OnActionExecute.OnNext(history);
@@ -172,8 +172,6 @@ namespace UseCase.Player
                 TryMove();
                 GetLookingObjectId();
             }
-            
-            inspect.Update();
         }
 
         public void LateUpdate()

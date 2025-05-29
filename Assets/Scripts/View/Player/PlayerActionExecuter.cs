@@ -28,16 +28,23 @@ namespace View.Player
         }
 
         //--------------------PRESENTER--------------------
-        public void ActionExecute(string actionId, string targetId) 
+        public void ActionExecute(string actionId, string heldId, string lookingId) 
         { 
             switch(actionId)
             {
                 case "ShredderUse":
-                    DestroyObject(targetId);
+                    DestroyObject(heldId);
                     break;
-
+                case "TrashBin":
+                    DestroyObject(heldId);  
+                    break;
                 case "Shutdown":
-                    OffMonitor(targetId);
+                    OffMonitor(lookingId);
+                    break;
+                case "StoreCabinet":
+                    DestroyObject(heldId);
+                    break;
+                case "PlaceCamera":
                     break;
                     
             }

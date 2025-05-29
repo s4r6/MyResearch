@@ -9,16 +9,7 @@ namespace Domain.Component
     {
         public string DisplayName;
         public string Description;
-        public List<Choice> Choices = new();
-
-        // 選択されたChoiceを保持（UseCaseで更新される）
-        public Choice SelectedChoice;
-
+        
         public bool IsActioned = false;
-
-        internal object FindAll()
-        {
-            throw new NotImplementedException();
-        }
     }
 }
