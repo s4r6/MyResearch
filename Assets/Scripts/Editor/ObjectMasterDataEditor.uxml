@@ -1,0 +1,13 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/Scripts/Editor/ObjectMasterDataEditor.uss?fileID=7433441132597879392&amp;guid=fcde8ce56cec1ab419fa4d52f980844c&amp;type=3#ObjectMasterDataEditor" />
+    <ui:VisualElement name="RootContainer" style="flex-grow: 1; justify-content: flex-end;">
+        <ui:Label text="ObjectMasterDataEditor&#10;" name="EditorName" />
+        <ui:Label text="オブジェクトデータ" name="ObjectData" style="white-space: pre; -unity-text-align: upper-left;" />
+        <ui:Button text="追加" name="AddObject" style="-unity-text-align: middle-center; opacity: 1; width: 60px; height: 30px; position: relative; right: auto; translate: 0 0; transform-origin: right; align-self: flex-end;" />
+        <ui:ScrollView name="ObjectScrollView" style="height: 334px; flex-grow: 1;" />
+        <ui:VisualElement name="Footer" style="align-self: auto; flex-direction: row-reverse; min-height: 40px;">
+            <ui:Button text="保存" name="SaveJson" style="transform-origin: center; scale: 1 1; width: 60px; height: 30px; align-self: flex-end; align-content: flex-start; translate: 0 0; bottom: 0; position: relative; left: auto; top: auto; justify-content: flex-start; flex-direction: column; -unity-text-align: middle-center;" />
+            <ui:Button text="読み込み&#10;" name="LoadJson" style="transform-origin: center; scale: 1 1; width: 60px; height: 30px; align-self: flex-end; align-content: auto; translate: 0 0; bottom: 0; position: relative; left: auto; right: auto; justify-content: flex-start; white-space: nowrap; flex-direction: column;" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>
