@@ -17,9 +17,7 @@ namespace Infrastructure.Repository
                 Label = json["Label"]?.ToString(),
                 RiskId = json["RiskId"]?.ToString(),
                 IsCorrect = json["IsCorrect"]?.ToObject<bool>() ?? true,
-                OverrideActions = ParseOverrideActions(json["OverrideActions"]),
-                ActionAttributes = ParseActionAttributes(json["ActionAttributes"]),
-                ObjectAttributes = ParseObjectAttributes(json["ObjectAttributes"])
+                OverrideActions = ParseOverrideActions(json["OverrideActions"])
             };
 
             return choice;
@@ -56,32 +54,6 @@ namespace Infrastructure.Repository
             }
 
             return list;
-        }
-
-        private static List<ChoiceAttribute> ParseActionAttributes(JToken token)
-        {
-            var list = new List<ChoiceAttribute>();
-            if (token is not JArray array) return list;
-
-            foreach (var item in array)
-            {
-                list.Add(new ChoiceAttribute
-                {
-                    Name = item["name"]?.ToString(),
-                    Target = Enum.TryParse(item["target"]?.ToString(), out TargetType parsed)
-                                ? parsed
-                                : TargetType.Self
-                });
-            }
-
-            return list;
-        }
-
-        private static List<string> ParseObjectAttributes(JToken token)
-        {
-            return token is JArray array
-                ? array.Select(x => x?.ToString()).Where(x => !string.IsNullOrEmpty(x)).ToList()
-                : new List<string>();
         }
     }
 }
