@@ -1,31 +1,27 @@
-using Domain.Stage.Object;
-using Domain.Player;
-using View.UI;
-using System.Linq;
 using System;
-using Domain.Component;
-using Domain.Action;
+using System.Linq;
 using Cysharp.Threading.Tasks;
+using Domain.Action;
+using Domain.Component;
+using Domain.Player;
+using Domain.Stage.Object;
 using UnityEngine;
+using UseCase.Player;
+using View.UI;
 
-namespace UseCase.Player
+namespace UseCase.Player.Network
 {
-    public interface ISyncService
-    {
-        UniTask SyncEntity<TEntity>(TEntity entity);
-    }
-
-    public class PlayerInspectUseCase : IInspectUseCase
+    public class RemoteInspectUseCase : IInspectUseCase
     {
         IObjectRepository repository;
-        PlayerEntity model;
+        PlayerEntity entity;
         ObjectInfoView view;
 
         ObjectEntity currentInspectObject;
 
-        public PlayerInspectUseCase(PlayerEntity model, ObjectInfoView view, IObjectRepository repository)
+        public RemoteInspectUseCase(PlayerEntity entity, ObjectInfoView view, IObjectRepository repository) 
         {
-            this.model = model;
+            this.entity = entity;
             this.view = view;
             this.repository = repository;
         }
@@ -39,11 +35,11 @@ namespace UseCase.Player
             if (obj == null)
                 return false;
 
-            Debug.Log($"Search component type: {typeof(InspectableComponent).AssemblyQualifiedName}");
+
             if (!obj.TryGetComponent<InspectableComponent>(out var inspectable)) return false;
-            
+
             //Choice‚ª‚ ‚ê‚Î
-            if(obj.TryGetComponent<ChoicableComponent>(out var choicable))
+            if (obj.TryGetComponent<ChoicableComponent>(out var choicable))
             {
                 var choiceLabels = choicable.Choices.Select(x => x.Label).ToList();
                 var index = choiceLabels.FindIndex(x => x == choicable?.SelectedChoice?.Label);
@@ -56,8 +52,6 @@ namespace UseCase.Player
 
                 currentInspectObject = obj;
 
-
-
                 return true;
             }
             else
@@ -65,10 +59,9 @@ namespace UseCase.Player
                 view.DisplayDescribe(inspectable.DisplayName, inspectable.Description, result => OnEndInspect(result)).Forget();
                 return true;
             }
-            
         }
-        
-        public void OnEndInspect(string? choiceText)
+
+        public void OnEndInspect(string choiceText)
         {
             view.EndInspect();
 
@@ -78,9 +71,9 @@ namespace UseCase.Player
                 if (!currentInspectObject.TryGetComponent<ChoicableComponent>(out var choicable)) return;
 
                 var choice = choicable.Choices.Find(x => x.Label == choiceText);
-                if(choice == null) return;
+                if (choice == null) return;
 
-                if(!inspectable.IsActioned)
+                if (!inspectable.IsActioned)
                     choicable.SelectedChoice = choice;
 
                 if (choicable.SelectedChoice.OverrideActions.Any(a => a.target == TargetType.Self))
@@ -91,5 +84,7 @@ namespace UseCase.Player
             OnCompleteInspect = null;
             return;
         }
+
+
     }
 }

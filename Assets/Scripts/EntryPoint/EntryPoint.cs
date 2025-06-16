@@ -14,6 +14,9 @@ using Infrastructure.Factory;
 using Domain.Stage;
 using View.Stage;
 using UseCase.Game;
+using Infrastructure.Game;
+using Infrastracture.Network;
+using Infrastructure.Network;
 
 namespace EntryPoint
 {
@@ -44,19 +47,38 @@ namespace EntryPoint
         DocumentView documentView;
 
         PlayerSystemUseCase usecase;
+        IObjectRepository repository;
+        StageEntity stage;
         void Awake()
         {
-            var entityFactory = new EntityFactory();
-            var repository = new ObjectRepository(entityFactory);
+            var gameMode = FindFirstObjectByType<GameModeHolder>();
+            
 
-            var stageRepository = new StageRepository(repository);
-            var maxRiskAmount = stageRepository.GetRiskAmountByStageNumber(1);
-            var maxActionPointAmount = stageRepository.GetActionPointAmountByStageNumber(1);
+            if(gameMode?.CurrentMode == GameMode.Solo)
+            {
+                var entityFactory = new EntityFactory();
+                repository = new ObjectRepository(entityFactory);
+                var stageRepository = new StageRepository(repository);
+                var maxRiskAmount = stageRepository.GetRiskAmountByStageNumber(1);
+                var maxActionPointAmount = stageRepository.GetActionPointAmountByStageNumber(1);
+                stage = new StageEntity(maxRiskAmount, maxActionPointAmount);
+            }
+            else if(gameMode?.CurrentMode == GameMode.Multi)
+            {
+                repository = FindFirstObjectByType<ObjectRepositoryHolder>().repository;
+                stage = new StageEntity(100, 100);
+            }
+            else
+            {
+                var entityFactory = new EntityFactory();
+                repository = new ObjectRepository(entityFactory);
+                var stageRepository = new StageRepository(repository);
+                var maxRiskAmount = stageRepository.GetRiskAmountByStageNumber(1);
+                var maxActionPointAmount = stageRepository.GetActionPointAmountByStageNumber(1);
+                stage = new StageEntity(maxRiskAmount, maxActionPointAmount);
+            }
 
-            var stage = new StageEntity(maxRiskAmount, maxActionPointAmount);
-
-
-            var gameState = new GameStateManager();
+                var gameState = new GameStateManager();
 
             var model = new PlayerEntity(view.Position, view.Rotation);
 
