@@ -1,13 +1,14 @@
 using Domain.Network;
+using Infrastracture.Repository;
 using UnityEngine;
 
 namespace Infrastructure.Network
 {
     public class SessionHolder : MonoBehaviour
     {
-        public RoomSession room { get; private set; }
+        public RoomRepository room { get; private set; }
 
-        public void SetSession(RoomSession room)
+        public void SetSession(RoomRepository room)
         {
             this.room = room;
         }

@@ -14,10 +14,16 @@ using UseCase.Network;
 
 namespace Infrastracture.Repository
 {
-    public class RoomRepository : IRoomRepository
+    public class RoomRepository : ISessionRepository
     {
         IWebSocketService server;
-        public RoomSession CurrentRoomSession = null;
+
+        
+        RoomSession CurrentRoomSession = null;
+        PlayerSession SelfPlayerSession = null;
+        
+        Dictionary<string, PlayerSession> RemotePlayerSessions = new Dictionary<string, PlayerSession>();
+
         public RoomRepository(IWebSocketService server)
         {
             this.server = server;
@@ -46,6 +52,7 @@ namespace Infrastracture.Repository
                 throw new Exception("ルーム作成に失敗しました。");
 
             var player = new PlayerSession(payload["ConnectionId"]?.Value<string>() ?? string.Empty, playerName);
+            SelfPlayerSession = player;
 
             CurrentRoomSession = new RoomSession(payload["RoomId"]?.Value<string>() ?? string.Empty, new List<PlayerSession> {player});
             return CurrentRoomSession;
@@ -56,9 +63,14 @@ namespace Infrastracture.Repository
             throw new NotImplementedException();
         }
 
-        public RoomSession FindById(string roomId)
+        public RoomSession GetRoomSession()
         {
-            throw new NotImplementedException();
+            return CurrentRoomSession;
+        }
+
+        public PlayerSession GetPlayerSession()
+        {
+            return SelfPlayerSession;
         }
 
         public IEnumerable<RoomSession> GetAll()
@@ -66,6 +78,9 @@ namespace Infrastracture.Repository
             throw new NotImplementedException();
         }
 
-        
+        public IEnumerable<PlayerSession> GetAllPlayerSession()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

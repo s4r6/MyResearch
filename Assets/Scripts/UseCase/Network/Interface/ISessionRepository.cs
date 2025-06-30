@@ -8,11 +8,13 @@ using Domain.Network;
 
 namespace UseCase.Network
 {
-    public interface IRoomRepository
+    public interface ISessionRepository
     {
-        RoomSession? FindById(string roomId);
+        RoomSession GetRoomSession();
+        PlayerSession GetPlayerSession();
+
         UniTask<RoomSession> Create(string roomId, string playerName, int stageId);
         void Join(string roomId);
-        IEnumerable<RoomSession> GetAll();
+        IEnumerable<PlayerSession> GetAllPlayerSession();
     }
 }

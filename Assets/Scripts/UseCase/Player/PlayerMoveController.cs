@@ -17,6 +17,7 @@ namespace UseCase.Player
 
         void TryMove(Vector2 inputDirection)
         {
+            Debug.Log(inputDirection);
             var position = view.Move(inputDirection.normalized, model.speed);
             model.SetPosition(position);
         }

@@ -21,6 +21,12 @@ namespace Infrastracture.Network
         readonly Dictionary<PacketId, TaskCompletionSource<JObject>> _responseWaiters = new();
 
         public WebSocketState ConnectionState => _socket.State;
+
+        void Awake()
+        {
+            DontDestroyOnLoad(this);
+        }
+
         async void Start()
         {
 
@@ -60,7 +66,9 @@ namespace Infrastracture.Network
                 {
                     _responseWaiters.Remove(packetId);
                     tcs.SetResult(jObject);
+                    Debug.Log("TaskComplete");
                 }
+                Debug.Log("Event Provide");
                 OnReceiveMessage.OnNext((packetId, jObject));
             };
 

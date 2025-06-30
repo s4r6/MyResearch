@@ -29,7 +29,7 @@ namespace View.UI
 
         public void SetHistory(HistroyView view, RiskAssessmentHistory history)
         {
-            view.SetText(history.ObjectName, history.SelectedRiskLable, history.ExecutedActionLabel, history.RiskChange.ToString(), history.ActionCost.ToString());
+            view.SetText(history.ObjectName, history.SelectedRiskLabel, history.ExecutedActionLabel, history.RiskChange.ToString(), history.ActionCost.ToString());
         }
 
         public void Display()

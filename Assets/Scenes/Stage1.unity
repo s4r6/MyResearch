@@ -1547,7 +1547,6 @@ MonoBehaviour:
   callOutUIPrefab: {fileID: 2999046188288850791, guid: b240b35edab20614f8311a8cebab85d0, type: 3}
   ParentTransform: {fileID: 0}
   input: {fileID: 1199659832}
-  inputController: {fileID: 1199659833}
   radius: 3
   APIndicator: {fileID: 0}
 --- !u!114 &240486217
@@ -4790,6 +4789,60 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 20.67, y: 11.81, z: 11.2}
   m_Center: {x: 11.4, y: 5.58, z: -0.19}
+--- !u!1 &711581277
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 711581278}
+  - component: {fileID: 711581279}
+  m_Layer: 0
+  m_Name: Local
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &711581278
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 711581277}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1787520150}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &711581279
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 711581277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4b4af571794fe840a65e6084625a909, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  view: {fileID: 1199659834}
+  raycast: {fileID: 1199659836}
+  input: {fileID: 1199659833}
+  carryView: {fileID: 1199659837}
+  executer: {fileID: 1199659838}
+  interact: {fileID: 1199659839}
+  infoView: {fileID: 1087943285}
+  actionOverlayView: {fileID: 2117468885}
+  resultView: {fileID: 1635123934}
+  documentView: {fileID: 376210392}
 --- !u!1 &714518582
 GameObject:
   m_ObjectHideFlags: 0
@@ -6908,7 +6961,6 @@ MonoBehaviour:
   - {fileID: 1236358157}
   - {fileID: 820100432}
   input: {fileID: 1199659832}
-  inputController: {fileID: 1199659833}
 --- !u!114 &1087943286
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10021,16 +10073,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b5bb0877dbfc7249b24198f755e88ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  view: {fileID: 1199659834}
-  raycast: {fileID: 1199659836}
-  input: {fileID: 1199659833}
-  carryView: {fileID: 1199659837}
-  executer: {fileID: 1199659838}
-  interact: {fileID: 1199659839}
-  infoView: {fileID: 1087943285}
-  actionOverlayView: {fileID: 2117468885}
-  resultView: {fileID: 1635123934}
-  documentView: {fileID: 376210392}
+  local: {fileID: 711581279}
+  network: {fileID: 2091835588}
 --- !u!4 &1787520150
 Transform:
   m_ObjectHideFlags: 0
@@ -10043,7 +10087,9 @@ Transform:
   m_LocalPosition: {x: 272.27966, y: 0, z: -21.26693}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 711581278}
+  - {fileID: 2091835587}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1790786289 stripped
@@ -12100,6 +12146,60 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1964822425}
   m_SourcePrefab: {fileID: 100100000, guid: 5518466ac73c3b94e8f1765c6c455927, type: 3}
+--- !u!1 &2091835586
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2091835587}
+  - component: {fileID: 2091835588}
+  m_Layer: 0
+  m_Name: Network
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2091835587
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2091835586}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1787520150}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2091835588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2091835586}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7029215198ee5594d84063e10456bed9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  view: {fileID: 1199659834}
+  raycast: {fileID: 1199659836}
+  input: {fileID: 1199659833}
+  carryView: {fileID: 1199659837}
+  executer: {fileID: 1199659838}
+  interact: {fileID: 1199659839}
+  infoView: {fileID: 1087943285}
+  actionOverlayView: {fileID: 2117468885}
+  resultView: {fileID: 1635123934}
+  documentView: {fileID: 376210392}
 --- !u!1001 &2096205484
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12750,7 +12850,6 @@ MonoBehaviour:
   callOutUIPrefab: {fileID: 2999046188288850791, guid: b240b35edab20614f8311a8cebab85d0, type: 3}
   ParentTransform: {fileID: 2117468884}
   input: {fileID: 1199659832}
-  inputController: {fileID: 1199659833}
   radius: 200
   APIndicator: {fileID: 899401237}
 --- !u!4 &2134515342 stripped
