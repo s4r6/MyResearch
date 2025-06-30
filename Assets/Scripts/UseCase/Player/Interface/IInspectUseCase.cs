@@ -1,4 +1,5 @@
 using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace UseCase.Player
@@ -6,6 +7,6 @@ namespace UseCase.Player
     public interface IInspectUseCase
     {
         bool TryInspect(string objectId, Action onComplete);
-        void OnEndInspect(string? choiceText);
+        UniTask OnEndInspect(string choiceText);
     }
 }

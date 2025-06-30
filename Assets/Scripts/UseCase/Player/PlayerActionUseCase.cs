@@ -7,37 +7,46 @@ using System.Collections.Generic;
 using Domain.Action;
 using System;
 using View.Player;
-using JetBrains.Annotations;
-using Unity.VisualScripting;
-using static UnityEngine.GraphicsBuffer;
 using Domain.Component;
 using Domain.Stage;
+using Unity.VisualScripting;
+using static UnityEngine.GraphicsBuffer;
+using Cysharp.Threading.Tasks;
 
 
 namespace UseCase.Player
 {
-    public class PlayerActionUseCase
+    public interface IActionPresenter
+    {
+        void StartSelectAction(int remainingActionPoint, int maxActionPoint, List<(string, int)> actions, string targetObjectId, Action<string> onEnd);
+        void EndSelectAction();
+        void OutPutLog();
+    }
+
+    public class PlayerActionUseCase : IActionUseCase
     {
         PlayerEntity playerEntity;
-        ActionOverlayView actionOverlayView;
+        IActionPresenter presenter;
         PlayerActionExecuter executor;
         IObjectRepository repository;
         StageEntity stage;
+        ActionService actionService;
 
-        Action<(ActionEntity, ObjectEntity)> OnCompleteAction;
+        Action OnCompleteAction;
 
         List<ActionEntity> cashActions;
 
-        public PlayerActionUseCase(PlayerEntity playerEntity, ActionOverlayView actionOverlayView, PlayerActionExecuter executor, IObjectRepository repository, StageEntity stage)
+        public PlayerActionUseCase(PlayerEntity playerEntity, IActionPresenter presenter, PlayerActionExecuter executor, IObjectRepository repository, StageEntity stage, ActionService actionService)
         {
             this.playerEntity = playerEntity;
             this.repository = repository;
-            this.actionOverlayView = actionOverlayView;
+            this.presenter = presenter;
             this.executor = executor;
             this.stage = stage;
+            this.actionService = actionService;
         }
 
-        public bool TryAction(string objectId, Action<(ActionEntity, ObjectEntity)> onComplete)
+        public bool TryAction(string objectId, Action onComplete)
         {
             OnCompleteAction = onComplete;
 
@@ -48,105 +57,59 @@ namespace UseCase.Player
             //手に持っているオブジェクトのEntity取得
             ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
 
-            List<ActionEntity> availebleActions = new();
+            var availableActions = actionService.GetAvailableActions(target, heldItem);
+            if(availableActions == null) return false;
 
-            var HasActions = false;
-            if (target.TryGetComponent<ActionHeld>(out var actionHeld))
-            {
-                var isMatch = actionHeld.IsMatch(heldItem);
-                if (heldItem.TryGetComponent<InspectableComponent>(out var inspectable))
-                {
-                    if(inspectable.IsActioned)
-                        isMatch = false;
-                }
+            var actions = availableActions.Select(action => (action.label, action.actionPointCost)).ToList();
+            if(actions.Count == 0) return false;
+            presenter.StartSelectAction(stage.GetActionPoint(), stage.maxActionPoint, actions, objectId, result => OnEndSelectAction(result));
 
-
-                HasActions = HasActions || isMatch;
-
-                if(isMatch)
-                    availebleActions.AddRange(actionHeld?.GetAvailableActions(heldItem));
-            }
-
-            if (target.TryGetComponent<ActionSelf>(out var actionSelf)) 
-            {
-                var isMatch = actionSelf.IsMatch(target);
-                if (target.TryGetComponent<InspectableComponent>(out var inspectable))
-                {
-                    if (inspectable.IsActioned)
-                        isMatch = false;
-                }
-
-
-                HasActions = HasActions || isMatch;
-
-                if (isMatch)
-                    availebleActions.AddRange(actionSelf?.GetAvailableActions(target));
-            }
-
-
-            if (!HasActions)
-                return false;
-
-
-            cashActions = availebleActions;
-
-            var actions = cashActions.Select(action => (action.label, action.actionPointCost)).ToList();
-            actionOverlayView.StartSelectAction(stage.GetActionPoint(), stage.maxActionPoint, actions, objectId, result => OnEndSelectAction(result));
+            cashActions = availableActions;
             return true;
         }
 
 
-        void OnEndSelectAction(int? selectedAction)
+        public UniTask OnEndSelectAction(string selectedActionLabel)
         {
-            //何も選択しなければ、終了
-            if (selectedAction == null)
+            //バリデーションチェック
+            if (!string.IsNullOrEmpty(selectedActionLabel)) 
             {
-                actionOverlayView.EndSelectAction();
-                OnCompleteAction?.Invoke((null, null));
-                OnCompleteAction = null;
-                return;
+                var actionEntity = cashActions.Find(a => a.label == selectedActionLabel);
+                var actionId = actionEntity.id;
+
+                if (actionEntity.target == TargetType.Self)
+                {
+                    var target = repository.GetById(playerEntity.currentLookingObject);
+                    var result = actionService.ApplyAction(cashActions, selectedActionLabel, target, stage);
+                    if (result)
+                    {
+                        executor.ActionExecute(actionId, "", target.Id);
+                    }
+                    else
+                    {
+                        presenter.OutPutLog();
+                    }
+                        
+                }
+                else if (actionEntity.target == TargetType.HeldItem)
+                {
+                    var heldItem = repository.GetById(playerEntity.currentCarringObject);
+                    var result = actionService.ApplyAction(cashActions, selectedActionLabel, heldItem, stage);
+                    if (result)
+                    {
+                        executor.ActionExecute(actionId, playerEntity.currentCarringObject, playerEntity.currentLookingObject);
+                    }
+                    else
+                    {
+                        presenter.OutPutLog();
+                    }
+                }
             }
 
-            var actionEntity = cashActions[selectedAction.Value];
-            //アクションコストが現在のアクションポイントより多いと
-            if (stage.GetActionPoint() < actionEntity.actionPointCost)
-            {
-                Debug.Log("ActionPointが足りません");
-                actionOverlayView.OutPutLog();
-                OnCompleteAction?.Invoke((null, null));
-                OnCompleteAction = null;
-                return;
-            }
+            OnCompleteAction?.Invoke();
+            OnCompleteAction = null;
 
-            actionOverlayView.EndSelectAction();
-            
-
-            if (actionEntity.target == TargetType.Self)
-            {
-                executor.ActionExecute(cashActions[selectedAction.Value].id, "", playerEntity.currentLookingObject);
-                var target = repository.GetById(playerEntity.currentLookingObject);
-                SetActionFlag(target);
-                OnCompleteAction?.Invoke((actionEntity, target));
-            }
-            else if(actionEntity.target == TargetType.HeldItem)
-            {
-                executor.ActionExecute(cashActions[selectedAction.Value].id, playerEntity.currentCarringObject, playerEntity.currentLookingObject);
-                //手に持っているオブジェクトのEntity取得
-                ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
-                SetActionFlag(heldItem);
-                OnCompleteAction?.Invoke((actionEntity, heldItem));
-            }
-
-            void SetActionFlag(ObjectEntity entity)
-            {
-                if (!entity.TryGetComponent<InspectableComponent>(out var inspectable))
-                    return;
-
-                if (inspectable.IsActioned)
-                    return;
-
-                inspectable.IsActioned = true;
-            }
+            return UniTask.CompletedTask;
         }
     }
 }

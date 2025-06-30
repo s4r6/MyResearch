@@ -9,6 +9,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UseCase.Player;
 using View.Player;
 
 namespace View.UI
@@ -33,8 +34,7 @@ namespace View.UI
 
         [SerializeField]
         PlayerInput input;
-        [SerializeField]
-        InputController inputController;
+        
         public Action OnSubmitEvent;
         public Action OnBackEvent;
         public Action<int> OnScrollEvent;
@@ -90,6 +90,11 @@ namespace View.UI
             }
 
             EventSystem.current.SetSelectedGameObject(buttons[index].gameObject);
+        }
+
+        public string GetButtonLabel(int index)
+        {
+            return buttonTexts[index].text;
         }
 
         public void OnSubmit(InputAction.CallbackContext context)
@@ -156,96 +161,7 @@ namespace View.UI
             }
         }
 
-        //-----------------------------PRESENTER-----------------------------
-
-        int currentIndex = 0;
-        Action<string?> OnEndInspectView;
-
-        void OnChoiceSelected()
-        {
-            var selectedChoiceText = buttonTexts[currentIndex].text;
-            OnEndInspectView?.Invoke(selectedChoiceText);
-        }
-
-        void OnCancelInspect()
-        {
-            OnEndInspectView?.Invoke(null);
-        }
-
-        void MoveSelection(int delta)
-        {
-            int max = buttons.Count;
-            currentIndex = Mathf.Clamp(currentIndex - delta, 0, max - 1);
-            HighlightButton(currentIndex);
-        }
-
-        public async UniTask StartInspect(string name, string describe, int selectedIndex, List<string> ChoiceTexts, Action<string?> onEnd)
-        {
-            OnEndInspectView = onEnd;
-
-            OnSubmitEvent += OnChoiceSelected;
-            OnBackEvent += OnCancelInspect;
-            OnScrollEvent += MoveSelection;
-
-            EnableUIInput();
-            SetObjectInfo(name, describe);
-            SetChoices(ChoiceTexts);
-            await AnimateShowWindow();
-            currentIndex = selectedIndex;
-            HighlightButton(selectedIndex);
-        }
-
-        public async UniTask DisplayDescribe(string name, string describe, Action<string?> onEnd)
-        {
-            OnEndInspectView = onEnd;
-
-            OnBackEvent += OnCancelInspect;
-
-            EnableUIInput();
-            SetObjectInfo(name, describe);
-            HideButtons();
-            await AnimateShowWindow();
-        }
-
-        public async UniTask DisplayLabels(string name, string describe, int selectedIndex, List<string> ChoiceTexts, Action<string?> onEnd)
-        {
-            OnEndInspectView = onEnd;
-
-            OnBackEvent += OnCancelInspect;
-
-            EnableUIInput();
-            SetObjectInfo(name, describe);
-            SetChoices(ChoiceTexts);
-            await AnimateShowWindow();
-            currentIndex = selectedIndex;
-            HighlightButton(selectedIndex);
-        }
-
-        public void EndInspect()
-        {
-            DisableUIInput();
-            AnimateHideWindow();
-            ResetText();
-            DisplayButtons();
-
-            OnSubmitEvent -= OnChoiceSelected;
-            OnBackEvent -= OnCancelInspect;
-            OnScrollEvent -= MoveSelection;
-
-            OnEndInspectView = null;
-        }
-
-        void EnableUIInput()
-        {
-            inputController.SwitchActionMapToUI();
-        }
-
-        void DisableUIInput()
-        {
-            inputController.SwitchActionMapToPlayer();
-        }
-
-
+        
     }
 
 }

@@ -1,5 +1,7 @@
-﻿using Domain.Stage.Object;
+﻿using Domain.Stage;
+using Domain.Stage.Object;
 using System.Collections.Generic;
+using UseCase.Network;
 
 namespace Infrastructure.Network
 {
@@ -12,6 +14,8 @@ namespace Infrastructure.Network
         CreateRoomResponse,
         SyncObjectDataRequest,
         SyncObjectDataResponse,
+        InspectObjectRequest,
+        InspectObjectResponse,
         ActionRequest,
         ActionResponse,
         StateUpdate,
@@ -43,6 +47,8 @@ namespace Infrastructure.Network
         public string RoomId { set; get; }
         public string ConnectionId { get; set; }
         public List<SyncObjectPacket> SyncData { get; set; }
+        public int MaxRiskAmount {  get; set; }
+        public int MaxActionPointAmount {  get; set; }
     }
 
     public class JoinRequest
@@ -66,7 +72,6 @@ namespace Infrastructure.Network
     {
         public string objectId { get; set; }
         public List<IGameComponentDTO> Components { get; set; } = new();
-
     }
 
     public interface IGameComponentDTO
@@ -105,5 +110,36 @@ namespace Infrastructure.Network
         public string Type { get; set; }
         public bool IsOpen { get; set; }
         public bool IsLock { get; set; }
+    }
+
+    public class InspectObjectRequest
+    {
+        public string PlayerId {  get; set; }
+        public string RoomId {  get; set; }
+        public string ObjectId {  get; set; }
+        public string SelectedChoiceLabel {  get; set; }
+    }
+
+    public class InspectObjectResponse
+    {
+        public string ObjectId { get; set; }
+        public SyncObjectPacket SyncData { get; set; }
+    }
+
+    public class ActionRequest
+    {
+        public string PlayerId { get; set; }
+        public string RoomId { get; set; }
+        public string ObjectId { get; set; }
+        public string SelectedActionLabel { get; set; }
+    }
+
+    public class ActionResponse
+    {
+        public ActionResultType Result { get; set; }
+        public SyncObjectPacket SyncData { get; set; }
+        public int currentRiskAmount { get; set; }
+        public int currentActionPointAmount { get; set; }
+        public List<RiskAssessmentHistory> histories { get; set; }
     }
 }

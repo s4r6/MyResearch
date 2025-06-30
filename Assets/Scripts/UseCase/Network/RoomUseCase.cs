@@ -11,16 +11,16 @@ namespace UseCase.Network
 {
     public class RoomUseCase
     {
-        private readonly IRoomRepository roomRepository;
+        private readonly ISessionRepository sessionRepository;
 
-        public RoomUseCase(IRoomRepository roomRepository)
+        public RoomUseCase(ISessionRepository sessionRepository)
         {
-            this.roomRepository = roomRepository;
+            this.sessionRepository = sessionRepository;
         }
 
-        public async UniTask Create(CreateRoomInputData input, Action<CreateRoomOutputData, RoomSession> OnComplete)
+        public async UniTask Create(CreateRoomInputData input, Action<CreateRoomOutputData> OnComplete)
         {
-            var room = await roomRepository.Create(input.RoomId, input.PlayerName, input.StageId);
+            var room = await sessionRepository.Create(input.RoomId, input.PlayerName, input.StageId);
 
             var result = new CreateRoomOutputData
             {
@@ -28,7 +28,7 @@ namespace UseCase.Network
                 RoomId = room.Id,
                 ConnectionId = room.Players[0].Id
             };
-            OnComplete?.Invoke(result, room);
+            OnComplete?.Invoke(result);
         }
 
         public void Join(JoinRoomInputData input)

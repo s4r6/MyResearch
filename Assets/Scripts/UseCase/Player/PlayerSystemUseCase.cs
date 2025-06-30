@@ -39,9 +39,9 @@ namespace UseCase.Player
     {
         InputController input;
         PlayerMoveController move;
-        PlayerInspectUseCase inspect;
+        IInspectUseCase inspect;
         PlayerCarryUseCase carry;
-        PlayerActionUseCase action;
+        IActionUseCase action;
         PlayerEntity model;
         GameStateManager gameState;
         RaycastController raycast;
@@ -50,18 +50,17 @@ namespace UseCase.Player
 
         CompositeDisposable disposables = new CompositeDisposable();
 
-        public Subject<ActionHistory> OnActionExecute = new();
         public Subject<Unit> OnExitPointInspected = new();
 
         public PlayerSystemUseCase(
             PlayerMoveController move,
-            PlayerInspectUseCase inspect,
+            IInspectUseCase inspect,
             PlayerEntity model,
             InputController input,
             GameStateManager gameState,
             RaycastController raycast,
             PlayerCarryUseCase carry,
-            PlayerActionUseCase action,
+            IActionUseCase action,
             InteractUseCase interact
             )
         {
@@ -122,24 +121,9 @@ namespace UseCase.Player
                 .Subscribe(_ =>
                 {
                     var objectId = model.currentLookingObject;
-                    var result = action.TryAction(objectId, result =>
+                    var result = action.TryAction(objectId, () =>
                     {
-                        gameState.Set(GamePhase.Moving);
-
-                        var actionEntity = result.Item1;
-                        var targetObject = result.Item2;
-
-                        if (actionEntity == null || targetObject == null)
-                            return;
-
-                        if (!targetObject.TryGetComponent<ChoicableComponent>(out var choicable))
-                            return;
-
-                        var selectedRiskLabel = choicable.SelectedChoice.Label;
-                        var history = new ActionHistory(targetObject.Id, selectedRiskLabel, actionEntity.label, actionEntity.riskChange, actionEntity.actionPointCost);
-
-                        OnActionExecute.OnNext(history);
-                        
+                        gameState.Set(GamePhase.Moving);   
                     });
 
                     if(result)

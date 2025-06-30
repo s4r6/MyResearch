@@ -87,6 +87,7 @@ namespace View.Player
         public void SwitchActionMapToPlayer()
         {
             input.SwitchCurrentActionMap("Player");
+            Debug.Log(input.currentActionMap);
         }
     }
 

@@ -19,7 +19,6 @@ namespace UseCase.Player
         public void TryInteract(string objectId)
         {
             var entity = repository.GetById(objectId);
-            Debug.Log(objectId + ":" + entity);
             if (entity == null) return;
 
             if (!entity.TryGetComponent<DoorComponent>(out var interactable))

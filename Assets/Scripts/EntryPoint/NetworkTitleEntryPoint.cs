@@ -8,7 +8,7 @@ using Presenter.Network;
 using UnityEngine;
 using UseCase.Network;
 
-public class NetworkEntryPoint : MonoBehaviour
+public class NetworkTitleEntryPoint : MonoBehaviour
 {
     [SerializeField]
     NativeWebSocketService socket;
@@ -19,7 +19,9 @@ public class NetworkEntryPoint : MonoBehaviour
     [SerializeField]
     SessionHolder sessionHolder;
     [SerializeField]
-    ObjectRepositoryHolder repositoryHolder;
+    ObjectRepositoryHolder objectRepositoryHolder;
+    [SerializeField]
+    StageRepositoryHolder stageRepositoryHolder;
 
 
     RoomPresenter presenter;
@@ -29,12 +31,16 @@ public class NetworkEntryPoint : MonoBehaviour
         gameMode.SetMode(GameMode.Multi);
 
         var repository = new RoomRepository(socket);
+        var remoteStageRepository = new RemoteStageRepository(socket);
         var remoteObjectRepository = new RemoteObjectRepository(socket);
+        
 
-        repositoryHolder.SetRepository(remoteObjectRepository);
+        objectRepositoryHolder.SetRepository(remoteObjectRepository);
+        stageRepositoryHolder.SetRepository(remoteStageRepository);
+        sessionHolder.SetSession(repository);
 
         var usecase = new RoomUseCase(repository);
-        presenter = new RoomPresenter(roomView, usecase, sessionHolder);        
+        presenter = new RoomPresenter(roomView, usecase);        
     }
 
     async void Start()

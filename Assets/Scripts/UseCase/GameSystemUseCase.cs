@@ -31,11 +31,6 @@ namespace UseCase.GameSystem
         public void StartGame()
         {
             player.StartGame();
-            player.OnActionExecute
-                .Subscribe(x =>
-                {
-                    stage.OnExecuteAction(x);
-                }).AddTo(disposables);
 
             player.OnExitPointInspected
                 .Subscribe(x => 

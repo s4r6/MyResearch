@@ -5,7 +5,9 @@ using Domain.Action;
 using Domain.Component;
 using Domain.Player;
 using Domain.Stage.Object;
+using JetBrains.Annotations;
 using UnityEngine;
+using UseCase.Network;
 using UseCase.Player;
 using View.UI;
 
@@ -13,17 +15,21 @@ namespace UseCase.Player.Network
 {
     public class RemoteInspectUseCase : IInspectUseCase
     {
+        ISessionRepository sessionRepository;
         IObjectRepository repository;
-        PlayerEntity entity;
-        ObjectInfoView view;
+        IInspectPresenter presenter;
+        IPacketSender sender;
+        InspectService inspectService;
 
         ObjectEntity currentInspectObject;
 
-        public RemoteInspectUseCase(PlayerEntity entity, ObjectInfoView view, IObjectRepository repository) 
-        {
-            this.entity = entity;
-            this.view = view;
+        public RemoteInspectUseCase(IInspectPresenter presenter, InspectService inspectService, IObjectRepository repository, IPacketSender sender, ISessionRepository sessionRepository) 
+        { 
+            this.sessionRepository = sessionRepository;
+            this.sender = sender;
             this.repository = repository;
+            this.presenter = presenter;
+            this.inspectService = inspectService;   
         }
 
         Action OnCompleteInspect;
@@ -32,59 +38,68 @@ namespace UseCase.Player.Network
             OnCompleteInspect = onComplete;
 
             ObjectEntity obj = repository.GetById(objectId);
-            if (obj == null)
-                return false;
 
+            if (!inspectService.CanInspect(obj)) return false;
 
-            if (!obj.TryGetComponent<InspectableComponent>(out var inspectable)) return false;
+            currentInspectObject = obj;
 
-            //Choiceがあれば
-            if (obj.TryGetComponent<ChoicableComponent>(out var choicable))
+            var choicable = inspectService.TryGetChoice(obj);
+
+            var Inspectable = obj.GetComponent<InspectableComponent>();
+            var dto = new InspectData
             {
-                var choiceLabels = choicable.Choices.Select(x => x.Label).ToList();
-                var index = choiceLabels.FindIndex(x => x == choicable?.SelectedChoice?.Label);
-                index = index < 0 ? 0 : index;
+                DisplayName = Inspectable.DisplayName,
+                Description = Inspectable.Description,
+                ChoiceLabels = choicable?.Choices?.Select(x => x.Label).ToList() ?? null,
+                SelectedLabel = choicable?.SelectedChoice?.Label ?? string.Empty,
+                IsSelectable = !Inspectable.IsActioned
+            };
 
-                if (!inspectable.IsActioned)
-                    view.StartInspect(inspectable.DisplayName, inspectable.Description, index, choiceLabels, result => OnEndInspect(result)).Forget();
-                else
-                    view.DisplayLabels(inspectable.DisplayName, inspectable.Description, index, choiceLabels, result => OnEndInspect(result)).Forget();
+            presenter.StartInspect(dto, async result => await OnEndInspect(result)).Forget();
 
-                currentInspectObject = obj;
-
-                return true;
-            }
-            else
-            {
-                view.DisplayDescribe(inspectable.DisplayName, inspectable.Description, result => OnEndInspect(result)).Forget();
-                return true;
-            }
+            return true;
         }
 
-        public void OnEndInspect(string choiceText)
+        public async UniTask OnEndInspect(string choiceText)
         {
-            view.EndInspect();
-
-            if (choiceText != null)
+            var roomSession = sessionRepository.GetRoomSession();
+            var playerSession = sessionRepository.GetPlayerSession();
+            if (roomSession == null || playerSession == null)
             {
-                if (!currentInspectObject.TryGetComponent<InspectableComponent>(out var inspectable)) return;
-                if (!currentInspectObject.TryGetComponent<ChoicableComponent>(out var choicable)) return;
+                throw new Exception("RoomSessionまたはPlayerSessionがありません");
+            }
 
-                var choice = choicable.Choices.Find(x => x.Label == choiceText);
-                if (choice == null) return;
+            if (string.IsNullOrEmpty(choiceText))
+            {
+                OnCompleteInspect?.Invoke();
+                OnCompleteInspect = null;
+                return;
+            }
 
-                if (!inspectable.IsActioned)
-                    choicable.SelectedChoice = choice;
+            var playerId = playerSession.Id;
+            var roomId = roomSession.Id;
 
-                if (choicable.SelectedChoice.OverrideActions.Any(a => a.target == TargetType.Self))
-                    currentInspectObject.Add(new ActionSelf());
+            var dto = new InspectResultData
+            {
+                PlayerId = playerId,
+                RoomId = roomId,
+                ObjectId = currentInspectObject.Id,
+                SelectedChoiceLabel = choiceText,
+            };
+
+            var IsSuccess = await sender.SendInspectData(dto);
+            if (!IsSuccess)
+            {
+                Debug.Log("Inspectがサーバー側で失敗しました.");
+                return;   
             }
 
             OnCompleteInspect?.Invoke();
             OnCompleteInspect = null;
+
+            Debug.Log("Inspect終了");
             return;
         }
-
 
     }
 }

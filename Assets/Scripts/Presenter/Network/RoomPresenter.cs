@@ -22,12 +22,10 @@ namespace Presenter.Network
         SessionHolder holder;
         GameModeHolder gameMode;
 
-        public RoomPresenter(RoomView view, RoomUseCase usecase, SessionHolder holder) 
+        public RoomPresenter(RoomView view, RoomUseCase usecase) 
         { 
             this.view = view;
             this.usecase = usecase;
-
-            this.holder = holder;
         }
 
         public void CreateRoom(string roomId, string playerName)
@@ -39,14 +37,12 @@ namespace Presenter.Network
                 StageId = 1
             };
 
-            usecase.Create(dto, (result, room) => OnCompleteCreate(result, room)).Forget();
+            usecase.Create(dto, (result) => OnCompleteCreate(result)).Forget();
         }
 
-        public void OnCompleteCreate(CreateRoomOutputData output, RoomSession room)
+        public void OnCompleteCreate(CreateRoomOutputData output)
         {
             view.DisplayRoom(output.RoomId, output.ConnectionId, output.Success);
-
-            holder.SetSession(room);
 
             view.TransitionInGameScene();
         }

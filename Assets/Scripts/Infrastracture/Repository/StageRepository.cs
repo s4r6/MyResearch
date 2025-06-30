@@ -1,15 +1,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Component;
+using Domain.Stage;
 using Domain.Stage.Object;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UseCase.Player;
 
 namespace Infrastructure.Repository
 {
     //ステージのデータを保持しておく
-    public class StageRepository
+    public class StageRepository : IStageRepository
     {
+        StageEntity currentStageEntity;
+
         Dictionary<int, int> MaxRiskMap = new();
         Dictionary<int, int> MaxActionPointMap = new();
 
@@ -18,6 +22,27 @@ namespace Infrastructure.Repository
             var entities = repository.GetAll();
             MaxRiskMap.Add(1, CalcMaxRiskAmount(entities));
             MaxActionPointMap.Add(1, CalcMaxActionPoint(entities));
+        }
+    
+        public StageEntity CreateStage(int stageNumber)
+        {
+            var maxRiskAmount = GetRiskAmountByStageNumber(1);
+            var maxActionPointAmount = GetActionPointAmountByStageNumber(1);
+            var stage = new StageEntity(maxRiskAmount, maxActionPointAmount);
+
+            Save(stage);
+
+            return stage;
+        }
+
+        public void Save(StageEntity entity)
+        {
+            currentStageEntity = entity;
+        }
+
+        public StageEntity GetCurrentStageEntity()
+        {
+            return currentStageEntity;
         }
 
         public int GetRiskAmountByStageNumber(int stageNumber)
