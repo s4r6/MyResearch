@@ -3,7 +3,6 @@ using System.Linq;
 using Domain.Component;
 using Domain.Stage;
 using Domain.Stage.Object;
-using UnityEditor.SceneManagement;
 using UnityEngine;
 using UseCase.Player;
 

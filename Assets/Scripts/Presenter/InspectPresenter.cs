@@ -5,6 +5,8 @@ using UnityEngine;
 using UseCase.Player;
 using View.Player;
 using View.UI;
+using Presenter.Sound;
+using UniRx;
 
 namespace Presenter.Player
 {
@@ -16,8 +18,11 @@ namespace Presenter.Player
         int currentIndex = 0;
         Action<string> OnEndInspectView;
 
-        public InspectPresenter(InputController inputController, ObjectInfoView view)
+        SoundPresenter sound;
+
+        public InspectPresenter(InputController inputController, ObjectInfoView view, SoundPresenter sound)
         {
+            this.sound = sound;
             this.inputController = inputController;
             this.view = view;
         }
@@ -65,6 +70,7 @@ namespace Presenter.Player
 
             //Viewの表示アニメーション
             await view.AnimateShowWindow();
+            sound.PlaySE(AudioId.WindowOpen, 1f);
 
             if (data.ChoiceLabels != null)
             {
@@ -94,6 +100,8 @@ namespace Presenter.Player
             view.AnimateHideWindow();
             view.ResetText();
             view.DisplayButtons();
+
+            sound.PlaySE(AudioId.WindowOpen, 1f);
 
             view.OnSubmitEvent -= OnChoiceSelected;
             view.OnBackEvent -= OnCancelInspect;

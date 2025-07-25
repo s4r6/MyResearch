@@ -24,7 +24,7 @@ namespace Infrastructure.Repository
 
         public void Save(ObjectEntity entity)
         {
-            entities.Add(entity.Id, entity);
+            entities[entity.Id] = entity;
         }
 
         public ObjectEntity GetById(string objectId)
@@ -41,8 +41,8 @@ namespace Infrastructure.Repository
 
         void Bind()
         {
-            server.OnMessage
-                .Where(tuple => tuple.Item1 == PacketId.CreateRoomResponse)
+            /*server.OnMessage
+                .Where(tuple => tuple.Item1 == PacketId.JoinResponse)
                 .Subscribe(tuple =>
                 {
                     var payload = tuple.Item2["Payload"];
@@ -74,11 +74,10 @@ namespace Infrastructure.Repository
 
                             // DTO ¨ DomainComponent ‚Ö•ÏŠ·‚µAEntity ‚É’Ç‰Á
                             var component = ComponentSerializer.ToComponent(dto);
-                            Debug.Log($"Added component type: {component.GetType().AssemblyQualifiedName}");
                             entity.Add(component);
                         }
                     }
-                });
+                });*/
 
             server.OnMessage
                 .Where(tuple => tuple.Item1 == PacketId.InspectObjectResponse)

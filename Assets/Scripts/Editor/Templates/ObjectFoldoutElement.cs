@@ -4,6 +4,7 @@ using Domain.Stage.Object;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Foldout = UnityEngine.UIElements.Foldout;
 
 public class ObjectFoldoutElement : VisualElement
 {

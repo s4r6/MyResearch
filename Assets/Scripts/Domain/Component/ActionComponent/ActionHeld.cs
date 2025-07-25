@@ -18,10 +18,11 @@ namespace Domain.Component
 
         public bool IsMatch(ObjectEntity held)
         {
+            
             if (!held.TryGetComponent<ChoicableComponent>(out var choicable)) return false;
 
-            var HasAttribute = choicable.SelectedChoice.OverrideActions
-                                                            .Any(action => action.target == TargetType.HeldItem && action.ObjectAttributes.Contains(NeedAttribute));
+            var HasAttribute = choicable.SelectedChoice?.OverrideActions
+                                                            .Any(action => action.target == TargetType.HeldItem && action.ObjectAttributes.Contains(NeedAttribute)) ?? false;
             return HasAttribute;
         }
 

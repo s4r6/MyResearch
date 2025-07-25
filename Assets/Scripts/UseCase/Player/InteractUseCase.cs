@@ -16,17 +16,26 @@ namespace UseCase.Player
             this.view = view;
         }
 
-        public void TryInteract(string objectId)
+        public bool CanInteract(string objectId)
         {
             var entity = repository.GetById(objectId);
-            if (entity == null) return;
+            if (entity == null) return false;
 
             if (!entity.TryGetComponent<DoorComponent>(out var interactable))
-                return;
+                return false;
 
             if (!interactable.CanInteract())
-                return;
+                return false;
 
+            return true;
+        }
+
+        public void TryInteract(string objectId)
+        {
+            if(!CanInteract(objectId)) return;
+
+            var entity = repository.GetById(objectId);
+            var interactable = entity.GetComponent<DoorComponent>();
             interactable.Interact();
 
             string action = "";

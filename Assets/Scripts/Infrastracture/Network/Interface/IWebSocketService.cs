@@ -12,6 +12,8 @@ namespace Infrastracture.Network
 {
     public interface IWebSocketService
     {
+        bool IsConnected { get; }
+        UniTask Connect(string url = "ws://localhost:5001/ws");
         Subject<(PacketId, JObject)> OnMessage { get; }
         UniTask Send<T>(PacketModel<T> data);
         UniTask<JObject> SendAndReceive<TRequest>(PacketModel<TRequest> data, PacketId responseId);

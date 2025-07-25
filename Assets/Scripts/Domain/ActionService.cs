@@ -11,13 +11,35 @@ namespace Domain.Action
 {
     public class ActionService
     {
+        public bool CanAction(ObjectEntity target, ObjectEntity held)
+        {
+            if(target.TryGetComponent<ActionHeld>(out var actionHeld) && held != null)
+            {
+                //Action可能か確認
+                if(actionHeld.IsMatch(held) && !(held.TryGetComponent<InspectableComponent>(out var inspectable) && inspectable.IsActioned))
+                {
+                    return true;
+                }
+            }
+
+            if (target.TryGetComponent<ActionSelf>(out var actionSelf))
+            {
+                if (actionSelf.IsMatch(target) && !(target.TryGetComponent<InspectableComponent>(out var targetInsp) && targetInsp.IsActioned))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         //実行可能なアクションのリストを取得
         public List<ActionEntity> GetAvailableActions(ObjectEntity target, ObjectEntity held) 
         {
             List<ActionEntity> availebleActions = new();
 
-            if (target.TryGetComponent<ActionHeld>(out var actionHeld))
-            {
+            if (target.TryGetComponent<ActionHeld>(out var actionHeld) && held != null)
+            {       
                 var isMatch = actionHeld.IsMatch(held);
                 if (held.TryGetComponent<InspectableComponent>(out var inspectable))
                 {
@@ -30,7 +52,7 @@ namespace Domain.Action
                     availebleActions.AddRange(actionHeld?.GetAvailableActions(held));
             }
 
-            if (target.TryGetComponent<ActionSelf>(out var actionSelf))
+            if (target.TryGetComponent<ActionSelf>(out var actionSelf) && target != null)
             {
                 var isMatch = actionSelf.IsMatch(target);
                 if (target.TryGetComponent<InspectableComponent>(out var inspectable))

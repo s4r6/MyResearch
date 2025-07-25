@@ -19,8 +19,8 @@ namespace View.Player
         float SpeedChangeRate = 10.0f;
 
         [Header("Mouse Cursor Settings")]
-        public bool cursorLocked = true;
-        public bool cursorInputForLook = true;
+        public static bool cursorLocked = true;
+        public static bool cursorInputForLook = true;
         void OnApplicationFocus(bool hasFocus)
         {
             SetCursorState(cursorLocked);

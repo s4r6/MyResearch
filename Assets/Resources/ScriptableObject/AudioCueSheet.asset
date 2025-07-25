@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1dafdceec987a874f9c73c0e852b195a, type: 3}
+  m_Name: AudioCueSheet
+  m_EditorClassIdentifier: 
+  _cues:
+  - Id: 0
+    Clip: {fileID: 8300000, guid: fabe54cb7ab3ba240b5777ea94133b71, type: 3}
+    Category: 0
+  - Id: 1
+    Clip: {fileID: 8300000, guid: b0dd778e9e61f524d82a614cc19d7146, type: 3}
+    Category: 0
+  - Id: 2
+    Clip: {fileID: 8300000, guid: 8f95334f05c6e1941828564c822098f0, type: 3}
+    Category: 0
+  - Id: 3
+    Clip: {fileID: 8300000, guid: c3eb3ed2534ea934aa829b0761b4bab1, type: 3}
+    Category: 0
+  - Id: 4
+    Clip: {fileID: 8300000, guid: 26c3044a94e7d4e428c746c790571789, type: 3}
+    Category: 0

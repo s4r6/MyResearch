@@ -14,7 +14,8 @@
             "riskChange": -1,
             "ActionPointCost": 1,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "シャットダウンは端末の電源を切ることで不正操作や内部不正のリスクを一定程度軽減できる基本的な対応策ですが、手動での操作に依存し忘れやすいため、最適な対応策とは言えません。"
           },
           {
             "id": "AutoLock",
@@ -22,7 +23,8 @@
             "riskChange": -6,
             "ActionPointCost": 1,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "自動ロックは、一定時間操作がない場合に端末を自動でロックすることで、不正操作や内部不正のリスクを確実に軽減できる効果的な対応策です。設定さえ行えば常に機能するため、手動操作に依存せず、シャットダウンと比較して現実的かつ継続的に端末を保護できる点で、より適切な対応策といえます。"
           }
         ]
       },
@@ -36,7 +38,8 @@
             "riskChange": 0,
             "ActionPointCost": 3,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "環境資料より、このPCではすでに管理者パスワードは自動で個別に設定・定期的に変更されています。したがって、あらためて「パスワードの自動変更設定」を行っても実質的なリスクの低減にはつながりません。"
           },
           {
             "id": "StorePasswordInUSB",
@@ -44,7 +47,8 @@
             "riskChange": 0,
             "ActionPointCost": 2,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "環境資料より、このPCでは共通パスワードを使用していないため、「共通パスワードをUSBに暗号化して保管する」という対応は状況に合っておらず、リスクの低減にはなりません。"
           }
         ]
       },
@@ -58,7 +62,8 @@
             "riskChange": 0,
             "ActionPointCost": 4,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "環境資料より、このPCのディスク（SSD/HDD）はすでに暗号化されているため、あらためて「ディスクを暗号化する」操作を行ってもリスクの低減にはつながりません。"
           },
           {
             "id": "CopyDataToPortableUSB",
@@ -66,7 +71,8 @@
             "riskChange": 5,
             "ActionPointCost": 1,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "データをUSBにコピーして持ち歩く行為は、盗難や紛失時に情報漏えいのリスクを高めるため、適切な対応とは言えません。"
           }
         ]
       },
@@ -80,7 +86,8 @@
             "riskChange": 0,
             "ActionPointCost": 2,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "環境資料より、このPCではOSの更新が毎週自動で実行されているため、「自動アップデートを設定」してもリスクの低減にはつながりません。"
           },
           {
             "id": "UseAntivirusSoftware",
@@ -88,7 +95,8 @@
             "riskChange": -2,
             "ActionPointCost": 1,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "セキュリティソフトの導入により、OSやソフトウェアの脆弱性を悪用するマルウェアの検出・防御が可能となるため、既知の脆弱性を突いた侵入リスクを効果的に軽減できます。"
           }
         ]
       }
@@ -111,7 +119,8 @@
             "target": "Held",
             "ObjectAttributes": [
               "Shredderable"
-            ]
+            ],
+            "Explanation": "付箋に書かれたパスワードのような機密情報は、完全に破棄することで情報漏えいリスクを大きく軽減できます。シュレッダーを使えば読み取り不可能な状態で処理できるため、極めて効果的な対策です。"
           },
           {
             "id": "TrashBin",
@@ -121,7 +130,8 @@
             "target": "Held",
             "ObjectAttributes": [
               "Trashable"
-            ]
+            ],
+            "Explanation": "ゴミ箱に捨てるだけでは、パスワードが記載された付箋が回収・再利用される可能性があるため、情報漏えいリスクの軽減効果は限定的です。"
           }
         ]
       },
@@ -135,7 +145,8 @@
             "riskChange": 0,
             "ActionPointCost": 2,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "この付箋はパスワードのみが記載された紙であり、デジタル化すること自体がリスクへの対処にはなりません。保存形式を変えても根本的なリスクは残ります。"
           },
           {
             "id": "StoreCabinet",
@@ -145,7 +156,8 @@
             "target": "Held",
             "ObjectAttributes": [
               "Storable"
-            ]
+            ],
+            "Explanation": "パスワードのような機密情報が書かれたメモを保管しておく行為は、リスクを温存するだけであり、情報漏えいの可能性を下げることにはつながりません。"
           }
         ]
       },
@@ -159,7 +171,8 @@
             "riskChange": 0,
             "ActionPointCost": 2,
             "target": "Held",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "パスワードのような機密情報が書かれたメモを保管しておく行為は、リスクを温存するだけであり、情報漏えいの可能性を下げることにはつながりません。"
           },
           {
             "id": "ShredderUse",
@@ -169,14 +182,16 @@
             "target": "Held",
             "ObjectAttributes": [
               "Shredderable"
-            ]
+            ],
+            "Explanation": "付箋に書かれたパスワードのような機密情報は、完全に破棄することで情報漏えいリスクを大きく軽減できます。シュレッダーを使えば読み取り不可能な状態で処理できるため、極めて効果的な対策です。"
           }
         ]
       },
       {
         "Label": "特にリスクはない",
         "RiskId": "NoRisk",
-        "OverrideActions": []
+        "OverrideActions": [],
+        "Explanation": "この付箋には8桁の英数字が書かれており、パスワードの可能性があります。放置すればなりすましや不正利用につながるリスクがあるため、『特にリスクはない』という判断は不適切です。"
       }
     ]
   },
@@ -195,7 +210,8 @@
             "riskChange": 0,
             "ActionPointCost": 3,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "文書庫はすでにL字金具で固定されており、重い本を下段に移動する追加の対策は実施済みまたは効果が限定的であり、リスク低減にはつながりません。"
           },
           {
             "id": "UseAntiSlipPads",
@@ -203,7 +219,8 @@
             "riskChange": 0,
             "ActionPointCost": 3,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "すでに地震対策としてL字金具による固定が施されているため、追加でジェルマットを敷いても実質的なリスク低減効果は見込めません。"
           }
         ]
       },
@@ -217,7 +234,8 @@
             "riskChange": -2,
             "ActionPointCost": 4,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "監視カメラの設置は、文書の持ち出しや閲覧行為の記録を通じて内部不正の抑止・追跡に有効であり、リスクを確実に軽減する対策です。"
           },
           {
             "id": "RequireSign",
@@ -225,7 +243,8 @@
             "riskChange": 0,
             "ActionPointCost": 3,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "貸出記録を残すことは一定の抑止効果がありますが、記入漏れや形骸化のリスクがあり、監視手段がない状況では効果が限定的です。"
           }
         ]
       },
@@ -239,14 +258,16 @@
             "riskChange": -4,
             "ActionPointCost": 3,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "在室中は開放されている文書庫にオートロック機能を導入することで、退室時の鍵のかけ忘れを防ぎ、重要書類への不正アクセスを効果的に防止できます。"
           }
         ]
       },
       {
         "Label": "特にリスクはない",
         "RiskId": "NoRisk",
-        "OverrideActions": []
+        "OverrideActions": [],
+        "Explanation": "文書庫は在室時に施錠されず開放されており、内部不正や施錠忘れによる情報漏えいのリスクが存在します。したがって『特にリスクはない』という判断は不適切です。"
       }
     ]
   },
@@ -259,7 +280,7 @@
   {
     "ObjectId": "PCServerManage",
     "DisplayName": "サーバー管理用PC",
-    "Description": "サーバーを管理するPC。自動ロックが設定されており、セキュリティソフトは常に最新状態に保たれている",
+    "Description": "サーバーを管理するPC。自動ロックが設定されており、セキュリティソフトは常に最新状態に保たれている。電源はついたまま。",
     "Choices": [
       {
         "Label": "不正操作・内部不正のリスク",
@@ -271,7 +292,8 @@
             "riskChange": -1,
             "ActionPointCost": 1,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "電源を切ることで一時的に不正操作のリスクは下がりますが、サーバー管理用PCとしては運用上の実用性が低く、根本的な対策とは言えません。"
           },
           {
             "id": "AutoLock",
@@ -279,7 +301,8 @@
             "riskChange": 0,
             "ActionPointCost": 1,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "このPCではすでに自動ロックが設定されているため、改めて設定してもリスクの軽減にはつながりません。"
           }
         ]
       },
@@ -293,7 +316,8 @@
             "riskChange": 0,
             "ActionPointCost": 3,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "管理用PCではすでにパスワードが定期的に自動変更されているため、この操作は意味を持ちません。"
           },
           {
             "id": "StorePasswordInUSB",
@@ -301,7 +325,8 @@
             "riskChange": 0,
             "ActionPointCost": 2,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "共通パスワードではなく自動で個別に管理されているため、この対応は不要です。"
           }
         ]
       },
@@ -315,7 +340,8 @@
             "riskChange": 0,
             "ActionPointCost": 4,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "このPCはすでにディスク暗号化が適用されているため、再度の設定は不要であり、リスクの軽減にもつながりません。"
           },
           {
             "id": "CopyDataToPortableUSB",
@@ -323,7 +349,8 @@
             "riskChange": 5,
             "ActionPointCost": 1,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "機密性の高いサーバー管理データをUSBにコピーして持ち歩く行為は、紛失や盗難による情報漏えいリスクを大幅に高める危険な対応です。"
           }
         ]
       },
@@ -337,7 +364,8 @@
             "riskChange": 0,
             "ActionPointCost": 2,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "このPCではすでにOSの自動アップデートが設定されており、あらためて設定してもリスクの軽減にはつながりません。"
           },
           {
             "id": "UseAntivirusSoftware",
@@ -345,7 +373,8 @@
             "riskChange": 0,
             "ActionPointCost": 1,
             "target": "Self",
-            "ObjectAttributes": []
+            "ObjectAttributes": [],
+            "Explanation": "セキュリティソフトはすでに導入されており、常に最新の状態に保たれているため、追加で導入しても効果はありません。"
           }
         ]
       }

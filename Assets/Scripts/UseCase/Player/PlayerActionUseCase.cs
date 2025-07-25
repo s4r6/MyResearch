@@ -46,6 +46,18 @@ namespace UseCase.Player
             this.actionService = actionService;
         }
 
+        public bool CanAction(string objectId)
+        {
+            //見ているオブジェクトのEntity取得
+            ObjectEntity target = repository.GetById(objectId);
+            if (target == null) return false;
+
+            //手に持っているオブジェクトのEntity取得
+            ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
+
+            return actionService.CanAction(target, heldItem);
+        }
+
         public bool TryAction(string objectId, Action onComplete)
         {
             OnCompleteAction = onComplete;

@@ -50,6 +50,7 @@ namespace Infrastructure.Repository
                     actionPointCost = item["ActionPointCost"]?.ToObject<int>() ?? 0,
                     target = target,
                     ObjectAttributes = item["ObjectAttributes"]?.ToObject<List<string>>() ?? new(),
+                    Explanation = item["Explanation"]?.ToString() ?? ""
                 });
             }
 

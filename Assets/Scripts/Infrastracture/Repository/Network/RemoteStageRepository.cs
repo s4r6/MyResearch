@@ -42,7 +42,7 @@ namespace Infrastracture.Repository
         void Bind()
         {
             server.OnMessage
-                .Where(tuple => tuple.Item1 == PacketId.CreateRoomResponse)
+                .Where(tuple => tuple.Item1 == PacketId.JoinResponse)
                 .Subscribe(tuple =>
                 {
                     var payload = tuple.Item2["Payload"];
@@ -55,7 +55,7 @@ namespace Infrastracture.Repository
                     currentStageEntity = new StageEntity(riskAmount, actionPointAmount);
                 });
 
-            server.OnMessage
+            /*server.OnMessage
                 .Where(tuple => tuple.Item1 == PacketId.ActionResponse)
                 .Subscribe(tuple =>
                 {
@@ -69,7 +69,7 @@ namespace Infrastracture.Repository
                     var histories = payload["histories"].ToObject<List<RiskAssessmentHistory>>();
 
                     currentStageEntity.Update(currentRiskAmount, currentActionPointAmount, histories);
-                });
+                });*/
         }
     }
 }

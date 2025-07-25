@@ -13,8 +13,12 @@ namespace UseCase.Network
         RoomSession GetRoomSession();
         PlayerSession GetPlayerSession();
 
-        UniTask<RoomSession> Create(string roomId, string playerName, int stageId);
-        void Join(string roomId);
+        void SavePlayerSession(PlayerSession player);
+        void SaveRoomSession(RoomSession room);
+        UniTask Create(string roomId, string playerName, int stageId);
+        UniTask<List<RoomSession>> Search();
+        UniTask Join(string roomId, string playerName);
         IEnumerable<PlayerSession> GetAllPlayerSession();
+        void CreatePlayerSession(string id = "", string name = "");
     }
 }
