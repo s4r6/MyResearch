@@ -9,13 +9,19 @@ using Infrastructure.Network;
 using Infrastructure.Repository;
 using Presenter.Network;
 using Presenter.Player;
+using Presenter.Sound;
+using Presenter.Vote;
 using UnityEngine;
+using UnityEngine.Video;
 using UseCase.Game;
 using UseCase.GameSystem;
+using UseCase.Network;
 using UseCase.Player;
 using UseCase.Player.Network;
 using UseCase.Stage;
+using View.Network;
 using View.Player;
+using View.Sound;
 using View.Stage;
 using View.UI;
 
@@ -35,6 +41,9 @@ public class InGameEntryPoint_Network : MonoBehaviour
     [SerializeField]
     InteractView interact;
 
+    [SerializeField]
+    RemotePlayerViewFactory remotePlayerFactory;
+
     //UI
     [SerializeField]
     ObjectInfoView infoView;
@@ -44,10 +53,20 @@ public class InGameEntryPoint_Network : MonoBehaviour
     ResultView resultView;
     [SerializeField]
     DocumentView documentView;
+    [SerializeField]
+    ActionHintUI hintUI;
+    [SerializeField]
+    VoteView voteView;
+
+    //Sound
+    [SerializeField]
+    SoundView sound;
 
     PlayerSystemUseCase usecase;
     IObjectRepository repository;
     StageEntity stage;
+
+
 
     bool IsActive = false;
 
@@ -55,37 +74,46 @@ public class InGameEntryPoint_Network : MonoBehaviour
     {
         repository = FindFirstObjectByType<ObjectRepositoryHolder>().repository;
         var session = FindFirstObjectByType<SessionHolder>().room;
-        var stageRepositoryHolder = FindFirstObjectByType<StageRepositoryHolder>();
-        var stageRepository = stageRepositoryHolder.repository;
+        var receiver = FindFirstObjectByType<ReceiverHolder>().receiver;
+        var stageRepository = FindFirstObjectByType<StageRepositoryHolder>().repository;
         stage = stageRepository.GetCurrentStageEntity();
+
+        var soundPresenter = new SoundPresenter(sound);
 
         var gameState = new GameStateManager();
 
         var model = new PlayerEntity(view.Position, view.Rotation);
 
-        var move = new PlayerMoveController(view, model);
-
         var socket = FindFirstObjectByType<NativeWebSocketService>();
         var sender = new PacketSender(socket);
-        var presenter = new InspectPresenter(input, infoView);
+
+        var move = new RemotePlayerMoveController(model, view, sender, session);
+
+        var presenter = new InspectPresenter(input, infoView, soundPresenter);
+        
         var inspect = new RemoteInspectUseCase(presenter, new InspectService(), repository, sender, session);
 
         var actionService = new ActionService();
         var actionPresenter = new ActionPresenter(actionOverlayView, input);
-        var action = new RemoteActionUseCase(model, actionPresenter, executer, repository, stage, actionService, sender, session);
-        
-        // Presenter‚ÍView‚Ì‚Ý‚ð’m‚é
+        var action = new RemoteActionUseCase(model, actionPresenter, executer, repository, stage, actionService, sender, receiver, session, stageRepository);
+
         var carryPresenter = new PlayerCarryPresenter(carryView);
 
-        // UseCase‚ÍPresenter‚ð—˜—p‚·‚é
         var carry = new PlayerCarryUseCase(model, carryPresenter, repository);
 
         var document = new DocumentUseCase(documentView, new DocumentEntity());
 
-        usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact));
+        var hintPresenter = new ActionHintPresenter(hintUI);
+        usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact), hintPresenter);
 
+        var remotePlayerRepository = new RemotePlayerRepository();
+        var syncUseCase = new RemotePlayerSyncUseCase(remotePlayerRepository, remotePlayerFactory, session, receiver);
 
-        var gameSystem = new GameSystemUseCase(usecase, new StageSystemUseCase(stage, resultView), gameState, document, input);
+        
+        var voteUseCase = new VoteUseCase(sender, receiver, session);
+        var gameSystem = new RemoteGameSystemUseCase(usecase, new StageSystemUseCase(stage, resultView), gameState, document, input, voteUseCase, session, sender, receiver);
+        var votePresenter = new VotePresenter(voteUseCase, gameSystem, voteView);
+        voteView.Inject(votePresenter);
 
         gameSystem.StartGame();
 
@@ -96,9 +124,9 @@ public class InGameEntryPoint_Network : MonoBehaviour
         if (!IsActive)
             gameObject.SetActive(false);
     }
-    void Update()
+    async void Update()
     {
-        usecase.Update();
+        await usecase.Update();
     }
 
     void LateUpdate()

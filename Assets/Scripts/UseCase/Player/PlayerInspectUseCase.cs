@@ -42,6 +42,12 @@ namespace UseCase.Player
             this.repository = repository;
         }
 
+        public bool CanInspect(string objectId)
+        {
+            var entity = repository.GetById(objectId);
+            return inspectService.CanInspect(entity);
+        }
+
         Action OnCompleteInspect;
         public bool TryInspect(string objectId, Action onComplete)
         {

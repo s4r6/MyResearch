@@ -14,6 +14,7 @@ namespace Infrastracture.Network
 {
     public class NativeWebSocketService : MonoBehaviour, IWebSocketService
     {
+        bool IsRemote = true;
         private WebSocket _socket;
         
         Subject<(PacketId, JObject)> OnReceiveMessage = new Subject<(PacketId, JObject)>();
@@ -21,6 +22,7 @@ namespace Infrastracture.Network
         readonly Dictionary<PacketId, TaskCompletionSource<JObject>> _responseWaiters = new();
 
         public WebSocketState ConnectionState => _socket.State;
+        public bool IsConnected => _socket.State == WebSocketState.Open;
 
         void Awake()
         {
@@ -31,14 +33,19 @@ namespace Infrastracture.Network
         {
 
 #if UNITY_WEBGL && !UNITY_EDITOR
-        webSocket = new WebSocket("wss://192.168.174.114:443/ws"); // ← 本番用
+            if(!IsRemote)
+                _socket = new WebSocket("wss://192.168.174.114:443/ws"); // ← 本番用
+            else
+                _socket = new WebSocket("wss://150.59.175.170:443/ws"); 
 #else
-            _socket = new WebSocket("ws://localhost:5001/ws"); // ← ローカルテスト用
+            //_socket = new WebSocket("ws://localhost:5001/ws"); // ← ローカルテスト用
+            _socket = new WebSocket("wss://150.59.175.170/ws");
 #endif
 
             _socket.OnOpen += () =>
             {
                 Debug.Log("Connection opened");
+                Debug.Log(IsConnected);
             };
 
             _socket.OnError += (e) =>
@@ -66,13 +73,20 @@ namespace Infrastracture.Network
                 {
                     _responseWaiters.Remove(packetId);
                     tcs.SetResult(jObject);
-                    Debug.Log("TaskComplete");
                 }
-                Debug.Log("Event Provide");
                 OnReceiveMessage.OnNext((packetId, jObject));
             };
 
+            
+        }
+
+        public async UniTask Connect(string url = "ws://localhost:5001/ws")
+        {
+#if UNITY_EDITOR
             await _socket.Connect();
+#else
+            await _socket.Connect();
+#endif
         }
 
 #if !UNITY_WEBGL || UNITY_EDITOR

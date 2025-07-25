@@ -20,6 +20,8 @@ namespace Domain.Stage
         public int CurrentActionPoint { get; set; }
         public int MaxActionPoint { get; set; }
 
+        public string Explanation { get; set; }
+
         public RiskAssessmentHistory(
             string objectName,
             string riskLabel,
@@ -29,7 +31,8 @@ namespace Domain.Stage
             int maxRisk,
             int actionCost,
             int currentAP,
-            int maxAP)
+            int maxAP,
+            string explanation)
         {
             ObjectName = objectName;
             SelectedRiskLabel = riskLabel;
@@ -40,6 +43,7 @@ namespace Domain.Stage
             ActionCost = actionCost;
             CurrentActionPoint = currentAP;
             MaxActionPoint = maxAP;
+           Explanation = explanation;
         }
     }
 
@@ -102,7 +106,7 @@ namespace Domain.Stage
             currentActionPointAmount -= history.ActionCost;
             currentRiskAmount += history.RiskChange;
 
-            var riskAssesmentHis = new RiskAssessmentHistory(history.ObjectName, history.SelectedRiskLable, history.ExecutedActionLabel, history.RiskChange, currentRiskAmount, maxRiskAmount, history.ActionCost, currentActionPointAmount, maxActionPoint);
+            var riskAssesmentHis = new RiskAssessmentHistory(history.ObjectName, history.SelectedRiskLable, history.ExecutedActionLabel, history.RiskChange, currentRiskAmount, maxRiskAmount, history.ActionCost, currentActionPointAmount, maxActionPoint, "");
             AddHistory(riskAssesmentHis);
         }
 

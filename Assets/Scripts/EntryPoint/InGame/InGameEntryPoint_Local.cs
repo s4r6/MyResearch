@@ -7,12 +7,14 @@ using Infrastructure.Game;
 using Infrastructure.Network;
 using Infrastructure.Repository;
 using Presenter.Player;
+using Presenter.Sound;
 using UnityEngine;
 using UseCase.Game;
 using UseCase.GameSystem;
 using UseCase.Player;
 using UseCase.Stage;
 using View.Player;
+using View.Sound;
 using View.Stage;
 using View.UI;
 
@@ -41,6 +43,13 @@ public class InGameEntryPoint_Local : MonoBehaviour
     ResultView resultView;
     [SerializeField]
     DocumentView documentView;
+    [SerializeField]
+    ActionHintUI hintUI;
+
+    //Sound
+    [SerializeField]
+    SoundView sound;
+
 
     PlayerSystemUseCase usecase;
     IObjectRepository repository;
@@ -58,6 +67,7 @@ public class InGameEntryPoint_Local : MonoBehaviour
         var stageRepository = new StageRepository(repository);
         stage = stageRepository.CreateStage(1);
 
+        var soundPresenter = new SoundPresenter(sound);
 
         var gameState = new GameStateManager();
 
@@ -66,7 +76,7 @@ public class InGameEntryPoint_Local : MonoBehaviour
         var move = new PlayerMoveController(view, model);
 
 
-        var presenter = new InspectPresenter(input, infoView);
+        var presenter = new InspectPresenter(input, infoView, soundPresenter);
         var inspect = new PlayerInspectUseCase(model, presenter, new InspectService(), repository);
 
         var actionService = new ActionService();
@@ -80,7 +90,8 @@ public class InGameEntryPoint_Local : MonoBehaviour
 
         var document = new DocumentUseCase(documentView, new DocumentEntity());
 
-        usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact));
+        var hintPresenter = new ActionHintPresenter(hintUI);
+        usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact), hintPresenter);
 
 
         var gameSystem = new GameSystemUseCase(usecase, new StageSystemUseCase(stage, resultView), gameState, document, input);

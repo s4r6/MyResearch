@@ -29,7 +29,8 @@ namespace View.Player
 
         //--------------------PRESENTER--------------------
         public void ActionExecute(string actionId, string heldId, string lookingId) 
-        { 
+        {
+            Debug.Log("“K—p‚·‚éAction:"+ actionId);
             switch(actionId)
             {
                 case "ShredderUse":

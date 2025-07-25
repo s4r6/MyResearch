@@ -32,6 +32,12 @@ namespace UseCase.Player.Network
             this.inspectService = inspectService;   
         }
 
+        public bool CanInspect(string objectId)
+        {
+            var entity = repository.GetById(objectId);
+            return inspectService.CanInspect(entity);
+        }
+
         Action OnCompleteInspect;
         public bool TryInspect(string objectId, Action onComplete)
         {

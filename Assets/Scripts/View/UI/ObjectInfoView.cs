@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Domain.Stage.Object;
+using TMPro;
 using UniRx;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -17,9 +18,9 @@ namespace View.UI
     public class ObjectInfoView : MonoBehaviour
     {
         [SerializeField]
-        Text objectName;
+        TMP_Text objectName;
         [SerializeField]
-        Text describe;
+        TMP_Text describe;
 
         [SerializeField]
         RectTransform targetWindow;
@@ -30,7 +31,7 @@ namespace View.UI
         [SerializeField]
         List<Button> buttons;
         [SerializeField]
-        List<Text> buttonTexts;
+        List<TMP_Text> buttonTexts;
 
         [SerializeField]
         PlayerInput input;

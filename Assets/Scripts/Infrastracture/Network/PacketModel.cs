@@ -1,5 +1,8 @@
-﻿using Domain.Stage;
+﻿using Domain.Action;
+using Domain.Network;
+using Domain.Stage;
 using Domain.Stage.Object;
+using System;
 using System.Collections.Generic;
 using UseCase.Network;
 
@@ -10,15 +13,23 @@ namespace Infrastructure.Network
         None = 0,
         JoinRequest,
         JoinResponse,
+        JoinPlayerNotifier,
         CreateRoomRequest,
         CreateRoomResponse,
+        SearchRoomRequest,
+        SearchRoomResponse,
+        DisconnectNotifier,
         SyncObjectDataRequest,
         SyncObjectDataResponse,
         InspectObjectRequest,
         InspectObjectResponse,
         ActionRequest,
         ActionResponse,
-        StateUpdate,
+        PositionUpdate,
+        StartVoteRequest,
+        VoteNotifier,
+        VoteChoiceRequest,
+        VoteEndNotifier,
         Error,
     }
 
@@ -46,6 +57,8 @@ namespace Infrastructure.Network
         public bool Success { get; set; }
         public string RoomId { set; get; }
         public string ConnectionId { get; set; }
+        public string PlayerName {  get; set; }
+        public int StageId {  set; get; }
         public List<SyncObjectPacket> SyncData { get; set; }
         public int MaxRiskAmount {  get; set; }
         public int MaxActionPointAmount {  get; set; }
@@ -54,7 +67,6 @@ namespace Infrastructure.Network
     public class JoinRequest
     {
         public string RoomId { get; set; }
-        public int StageId { get; set; }
         public string PlayerId { get; set; }
 
     }
@@ -62,10 +74,34 @@ namespace Infrastructure.Network
     public class JoinResponse
     {
         public bool Success { get; set; }
-        public string PlayerId { get; set; }
         public string RoomId { get; set; }
         public string ConnectionId { get; set; }
+        public string PlayerName { get; set; }
+        public int StageId { set; get; }
+        public List<PlayerSession> Players { get; set; }
         public List<SyncObjectPacket> SyncData { get; set; }
+        public int MaxRiskAmount { get; set; }
+        public int MaxActionPointAmount { get; set; }
+    }
+
+    public class JoinPlayerNotifier
+    {
+        public string JoinedPlayerId { get; set; }
+        public string JoinedPlayerName {  get; set; }
+    }
+
+    public class DisconnectNotifier
+    {
+        public string DisconnectedId { get; set; }
+    }
+    public class SearchRoomRequest
+    {
+        
+    }
+
+    public class SearchRoomResponse
+    {
+        public List<RoomSession> RoomList { get; set; }
     }
 
     public class SyncObjectPacket
@@ -130,16 +166,56 @@ namespace Infrastructure.Network
     {
         public string PlayerId { get; set; }
         public string RoomId { get; set; }
-        public string ObjectId { get; set; }
+        public string ObjectId { get; set; }    //見ているオブジェクトのId
+        public string HeldId {  get; set; }     //手に持っているオブジェクトのId
+        public TargetType Type { get; set; }
         public string SelectedActionLabel { get; set; }
     }
 
     public class ActionResponse
     {
         public ActionResultType Result { get; set; }
+        public TargetType Target { get; set; }
+        public string ActionId { get; set; }
+        public string TargetId {  get; set; }   //見ているオブジェクトのId
+        public string HeldId {  get; set; }     //手に持っているオブジェクトのId
         public SyncObjectPacket SyncData { get; set; }
         public int currentRiskAmount { get; set; }
         public int currentActionPointAmount { get; set; }
         public List<RiskAssessmentHistory> histories { get; set; }
+    }
+
+    public class StartVoteRequest
+    {
+        public string PlayerId { get; set; }
+        public string RoomId { get; set; }
+    }
+
+    public class VoteNotifier
+    {
+        public int Yes {  get; set; }
+        public int No { get; set; }
+        public int Total { get; set; }  
+    }
+
+    public class VoteChoiceRequest
+    {
+        public string PlayerId { get; set; }
+        public string RoomId { get; set; }
+        public VoteChoice Choice { get; set; }
+    }
+
+    public class VoteEndNotifier
+    {
+        public VoteResult Result { get; set; }
+    }
+
+    public class PositionUpdate
+    {
+        public string PlayerId { get; set;}
+        public string RoomId { get; set;}
+        public float X {  get; set; }
+        public float Y { get; set; }
+        public float Z { get; set; }
     }
 }

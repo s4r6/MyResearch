@@ -6,14 +6,15 @@ using Domain.Action;
 using Domain.Player;
 using Domain.Stage;
 using Domain.Stage.Object;
-using UnityEditor.SceneManagement;
+using Presenter.Network;
+using UniRx;
 using UnityEngine;
 using UseCase.Network;
 using View.Player;
 
 namespace UseCase.Player
 {
-    public class RemoteActionUseCase : IActionUseCase
+    public class RemoteActionUseCase : IActionUseCase, IDisposable
     {
         PlayerEntity playerEntity;
         IActionPresenter presenter;
@@ -23,13 +24,16 @@ namespace UseCase.Player
         ActionService actionService;
         
         IPacketSender sender;
+        WebSocketReceiver receiver;
         ISessionRepository sessionRepository;
+        IStageRepository stageRepository;
 
         Action OnCompleteAction;
 
         List<ActionEntity> cashActions;
+        CompositeDisposable _disposables = new();
 
-        public RemoteActionUseCase(PlayerEntity playerEntity, IActionPresenter presenter, PlayerActionExecuter executor, IObjectRepository repository, StageEntity stage, ActionService actionService, IPacketSender sender, ISessionRepository sessionRepository)
+        public RemoteActionUseCase(PlayerEntity playerEntity, IActionPresenter presenter, PlayerActionExecuter executor, IObjectRepository repository, StageEntity stage, ActionService actionService, IPacketSender sender, WebSocketReceiver receiver, ISessionRepository sessionRepository, IStageRepository stageRepository)
         {
             this.playerEntity = playerEntity;
             this.repository = repository;
@@ -37,9 +41,28 @@ namespace UseCase.Player
             this.executor = executor;
             this.stage = stage;
             this.actionService = actionService;
+            
             this.sender = sender;
+            this.receiver = receiver;
+
             this.sessionRepository = sessionRepository;
+            this.stageRepository = stageRepository;
+
+            Bind();
         }
+
+        public bool CanAction(string objectId)
+        {
+            //見ているオブジェクトのEntity取得
+            ObjectEntity target = repository.GetById(objectId);
+            if (target == null) return false;
+
+            //手に持っているオブジェクトのEntity取得
+            ObjectEntity heldItem = repository.GetById(playerEntity.currentCarringObject);
+
+            return actionService.CanAction(target, heldItem);
+        }
+
         public bool TryAction(string objectId, Action onComplete)
         {
             OnCompleteAction = onComplete;
@@ -80,45 +103,74 @@ namespace UseCase.Player
             var actionEntity = cashActions.Find(a => a.label == selectedActionLabel);
             var targetType = actionEntity.target;
 
-            var dto = new ActionResultData
+            var dto = new ActionRequestData
             {
                 PlayerId = playerId,
                 RoomId = roomId,
-                ObjectId = targetType switch
-                {
-                    TargetType.Self => playerEntity.currentLookingObject,
-                    TargetType.HeldItem => playerEntity.currentCarringObject
-                },
+                ObjectId = playerEntity.currentLookingObject,
+                HeldId = playerEntity.currentCarringObject,
+                Type = targetType,
                 SelectedActionLabel = selectedActionLabel
             };
 
-            var result = await sender.SendActionData(dto);
-            if(result == ActionResultType.ShortageActionPoint)
+            await sender.SendActionData(dto);
+
+            //ExecuteAction(actionEntity.id, playerEntity.currentCarringObject, playerEntity.currentLookingObject, targetType, result);
+
+            return;
+        }
+
+        void ExecuteAction(string actionId, string heldId, string lookingId, TargetType type, ActionResultType result)
+        {
+            if (result == ActionResultType.ShortageActionPoint)
             {
                 Debug.LogError("ActionPointが足りません");
                 presenter.OutPutLog();
                 return;
             }
 
-            if(result == ActionResultType.Success)
+            if (result == ActionResultType.Success)
             {
-                switch(targetType)
+                Debug.Log("Action適用");
+                switch (type)
                 {
                     case TargetType.Self:
-                        executor.ActionExecute(actionEntity.id, "", playerEntity.currentLookingObject);
+                        executor.ActionExecute(actionId, "", lookingId);
                         break;
                     case TargetType.HeldItem:
-                        executor.ActionExecute(actionEntity.id, playerEntity.currentCarringObject, playerEntity.currentLookingObject);
+                        executor.ActionExecute(actionId, heldId, lookingId);
                         break;
                 }
             }
 
             OnCompleteAction?.Invoke();
             OnCompleteAction = null;
-
-            return;
         }
 
+        void Bind()
+        {
+            receiver.OnReceiveActionResultData
+                .Subscribe(x =>
+                {
+                    //RepositoryにAction適用後のEntityを保存
+                    repository.Save(x.ObjectData);
+
+                    ExecuteAction(x.ActionId, x.HeldId, x.TargetId, x.Target, x.Result);
+
+                    var stage = stageRepository.GetCurrentStageEntity();
+
+                    var currentRiskAmount = x.currentRiskAmount;
+                    var currentActionPointAmount = x.currentActionPointAmount;
+                    var histories = x.histories;
+
+                    stage.Update(currentRiskAmount, currentActionPointAmount, histories);
+                }).AddTo(_disposables);
+        }
+
+        public void Dispose()
+        {
+            _disposables.Dispose();
+        }
         
     }
 }

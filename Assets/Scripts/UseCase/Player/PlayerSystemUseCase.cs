@@ -1,16 +1,25 @@
 using System;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Domain.Action;
 using Domain.Component;
 using Domain.Game;
 using Domain.Player;
 using Domain.Stage;
+using NUnit.Framework;
 using UniRx;
 using UnityEngine;
 using UseCase.Game;
+using UseCase.Network.DTO;
 using View.Player;
 
 namespace UseCase.Player
 {
+    //操作説明を表示する
+    public interface IActionHintPresenter
+    {
+        void ShowAvailableActions(IEnumerable<ActionHint> hints);
+    }
     public struct ActionHistory
     {
         public string ObjectName { get; }
@@ -38,7 +47,7 @@ namespace UseCase.Player
     public class PlayerSystemUseCase : IDisposable
     {
         InputController input;
-        PlayerMoveController move;
+        IMoveController move;
         IInspectUseCase inspect;
         PlayerCarryUseCase carry;
         IActionUseCase action;
@@ -46,6 +55,7 @@ namespace UseCase.Player
         GameStateManager gameState;
         RaycastController raycast;
         InteractUseCase interact;
+        IActionHintPresenter hintPresenter;
         
 
         CompositeDisposable disposables = new CompositeDisposable();
@@ -53,7 +63,7 @@ namespace UseCase.Player
         public Subject<Unit> OnExitPointInspected = new();
 
         public PlayerSystemUseCase(
-            PlayerMoveController move,
+            IMoveController move,
             IInspectUseCase inspect,
             PlayerEntity model,
             InputController input,
@@ -61,7 +71,8 @@ namespace UseCase.Player
             RaycastController raycast,
             PlayerCarryUseCase carry,
             IActionUseCase action,
-            InteractUseCase interact
+            InteractUseCase interact,
+            IActionHintPresenter hintPresenter
             )
         {
             this.move = move;
@@ -73,6 +84,7 @@ namespace UseCase.Player
             this.carry = carry;
             this.action = action;
             this.interact = interact;
+            this.hintPresenter = hintPresenter;
 
 
             Bind();
@@ -149,11 +161,12 @@ namespace UseCase.Player
             
         }
 
-        public void Update()
+        public async UniTask Update()
         {
+            UpdateAvailableActions();
             if(gameState.Current.IsMoving)
             {
-                TryMove();
+                await TryMove();
                 GetLookingObjectId();
             }
         }
@@ -176,21 +189,16 @@ namespace UseCase.Player
             Dispose();
         }
 
-        public void DoAction()
-        {
-
-        }
-
         private void GetLookingObjectId()
         {
             var name = raycast.TryGetLookedObjectId();
             model.currentLookingObject = name;
         }
 
-        private void TryMove()
+        private async UniTask TryMove()
         {
             var direction = input.GetMoveInput();
-            move.OnMoveInput(direction);
+            await move.OnMoveInput(direction);
         }
 
         private void TryLook()
@@ -199,6 +207,40 @@ namespace UseCase.Player
             move.OnLookInput(delta);
         }
 
+        void UpdateAvailableActions()
+        {
+            var hints = new List<ActionHint>();
+            string objectId = model.currentLookingObject;
+            GamePhase phase = gameState.Current.Phase;
+
+            //MovingPhase
+            if (gameState.Current.IsMoving)
+            {
+                hints.Add(new ActionHint(ActionHintId.Move));
+                hints.Add(new ActionHint(ActionHintId.Document));
+                if (action.CanAction(objectId))
+                    hints.Add(new ActionHint(ActionHintId.Action));
+                if (inspect.CanInspect(objectId))
+                    hints.Add(new ActionHint(ActionHintId.Inspect));
+                if (interact.CanInteract(objectId))
+                    hints.Add(new ActionHint(ActionHintId.Interact));
+            }
+            else if (gameState.Current.IsInspecting)
+            {
+                hints.Add(new ActionHint(ActionHintId.SelectRisk));
+                hints.Add(new ActionHint(ActionHintId.Select));
+                hints.Add(new ActionHint(ActionHintId.Cancel));
+            }
+            else if (gameState.Current.IsSelectingAction) 
+            {
+                hints.Add(new ActionHint(ActionHintId.SelectAction));
+                hints.Add(new ActionHint(ActionHintId.Select));
+                hints.Add(new ActionHint(ActionHintId.Cancel));
+            }
+
+                hintPresenter.ShowAvailableActions(hints);
+            
+        }
         public void Dispose()
         {
             disposables.Dispose();

@@ -1,6 +1,7 @@
 ﻿using System;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ namespace View.UI
         [SerializeField] private Image delayBar; // 暗めの赤（遅れて追従）
         [SerializeField] private float delaySpeed; // 秒で1.0fill分動く速度
         [SerializeField] float waitTime;
-        [SerializeField] Text ValueText;
+        [SerializeField] TMP_Text ValueText;
 
         private Tween currentTween;
 

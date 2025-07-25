@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Codice.Utils;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Foldout = UnityEngine.UIElements.Foldout;
 
 public class ActionFoldoutElement : VisualElement
 {

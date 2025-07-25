@@ -7,6 +7,7 @@ using Infrastructure.Repository;
 using Presenter.Network;
 using UnityEngine;
 using UseCase.Network;
+using UseCase.Title;
 
 public class NetworkTitleEntryPoint : MonoBehaviour
 {
@@ -33,14 +34,15 @@ public class NetworkTitleEntryPoint : MonoBehaviour
         var repository = new RoomRepository(socket);
         var remoteStageRepository = new RemoteStageRepository(socket);
         var remoteObjectRepository = new RemoteObjectRepository(socket);
-        
-
+       
         objectRepositoryHolder.SetRepository(remoteObjectRepository);
         stageRepositoryHolder.SetRepository(remoteStageRepository);
         sessionHolder.SetSession(repository);
 
-        var usecase = new RoomUseCase(repository);
-        presenter = new RoomPresenter(roomView, usecase);        
+        var receiver = new WebSocketReceiver(socket);
+        
+        var usecase = new RoomUseCase(repository, remoteObjectRepository, remoteStageRepository, receiver);
+        //presenter = new RoomPresenter(usecase);        
     }
 
     async void Start()
@@ -48,6 +50,6 @@ public class NetworkTitleEntryPoint : MonoBehaviour
         await UniTask.WaitUntil(() => socket.ConnectionState == NativeWebSocket.WebSocketState.Open);
         Debug.Log("Ú‘±Š®—¹");
 
-        presenter.CreateRoom("testRoom", "testPlayer");
+        //presenter.CreateRoom("testRoom", "testPlayer");
     }
 }

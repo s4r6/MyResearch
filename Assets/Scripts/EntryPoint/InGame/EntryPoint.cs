@@ -14,6 +14,7 @@ using View.Stage;
 using UseCase.Game;
 using Infrastructure.Game;
 using Infrastructure.Network;
+using UseCase.Title;
 
 namespace EntryPoint
 {
