@@ -20,16 +20,24 @@ namespace View.Player
         public Subject<Unit> OnDocumentButtonPressed = new();
         //public PlayerMoveController usecase;
 
+        bool IsFocus = true;
+
         void Start()
         {
             move = input.actions["Move"];
             look = input.actions["Look"];
         }
 
+        //ì¸óÕÇéÛÇØéÊÇÈÇ©ÇÃêÿÇËë÷Ç¶
+        private void OnApplicationFocus(bool focus)
+        {
+            Debug.Log("IsFocus is ;" +  focus);
+            IsFocus = focus;
+        }
 
         public Vector2 GetMoveInput()
         {
-            if (input == null || move == null) return Vector2.zero;
+            if (input == null || move == null || !IsFocus) return Vector2.zero;
 
             Vector2 direction = move.ReadValue<Vector2>();
             return direction;
@@ -37,7 +45,7 @@ namespace View.Player
 
         public Vector2 GetLookInput()
         {
-            if (input == null || look == null) return Vector2.zero;
+            if (input == null || look == null || !IsFocus) return Vector2.zero;
 
             Vector2 delta = look.ReadValue<Vector2>();
             return delta;
@@ -45,37 +53,37 @@ namespace View.Player
 
         public void OnInspect(InputAction.CallbackContext context)
         {
-            if (!context.performed) return;
+            if (!context.performed || !IsFocus) return;
             OnInspectButtonPressed.OnNext(default);
         }
 
         public void OnPickUp(InputAction.CallbackContext context)
         {
-            if (!context.performed) return;
+            if (!context.performed || !IsFocus) return;
             OnPickUpButtonPressed.OnNext(default);
         }
 
         public void OnAction(InputAction.CallbackContext context)
         {
-            if (!context.performed) return;
+            if (!context.performed || !IsFocus) return;
             OnActionButtonPressed.OnNext(default);
         }
 
         public void OnInteract(InputAction.CallbackContext context)
         {
-            if (!context.performed) return;
+            if (!context.performed || !IsFocus) return;
             OnInteractButtonPressed.OnNext(default);
         }
 
         public void OnFinish(InputAction.CallbackContext context)
         {
-            if(!context.performed) return;
+            if(!context.performed || !IsFocus) return;
             OnFinishButtonPressed.OnNext(default);
         }
 
         public void OnDocument(InputAction.CallbackContext context)
         {
-            if (!context.performed) return;
+            if (!context.performed || !IsFocus) return;
             OnDocumentButtonPressed.OnNext(default);
         }
 

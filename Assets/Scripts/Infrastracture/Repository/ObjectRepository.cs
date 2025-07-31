@@ -18,8 +18,13 @@ namespace Infrastructure.Repository
             foreach (var obj in rawObjects)
             {
                 var entity = factory.CreateEntityFromJson((JObject)obj);
-                entities[entity.Id] = entity;
+                Save(entity);
             }
+        }
+
+        public void Save(ObjectEntity entity)
+        {
+            entities[entity.Id] = entity;
         }
 
         public ObjectEntity GetById(string objectId)

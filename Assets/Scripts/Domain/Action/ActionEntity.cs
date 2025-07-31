@@ -13,6 +13,8 @@ namespace Domain.Action
 
         public TargetType target = TargetType.Self;
         public List<string> ObjectAttributes = new();
+
+        public string Explanation;
         public override string ToString()
         {
             return $"ActionEntity: {id}, {riskChange}, {actionPointCost}";

@@ -20,26 +20,28 @@ namespace Domain.Player
             Debug.Log("[CarryUseCase] 初期化完了");
         }
 
-        public bool TryPickUp(string objectId)
+        public bool IsPickable(string objectId)
         {
             var entity = repository.GetById(objectId);
             if (entity == null) return false;
+            return entity.HasComponent<CarryableComponent>();
+        }
 
-            if(entity.HasComponent<CarryableComponent>())
-            {
-                // PlayerEntityにアイテムを保存
-                model.currentCarringObject = objectId;
-                Debug.Log($"[CarryUseCase] モデルにオブジェクト({objectId})を設定");
+        public bool TryPickUp(string objectId)
+        {
+            if (!IsPickable(objectId))
+                return false;
 
-                // Presenterを通じてViewに表示を依頼
-                Debug.Log($"[CarryUseCase] Presenterに処理を委譲");
-                presenter.HoldObject(objectId);
+            // PlayerEntityにアイテムを保存
+            model.currentCarringObject = objectId;
+            Debug.Log($"[CarryUseCase] モデルにオブジェクト({objectId})を設定");
 
-                Debug.Log($"[CarryUseCase] TryPickUp 完了: objectId={objectId}");
-                return true; // 拾うことに成功した場合はtrueを返す
-            }
+            // Presenterを通じてViewに表示を依頼
+            Debug.Log($"[CarryUseCase] Presenterに処理を委譲");
+            presenter.HoldObject(objectId);
 
-            return false;
+            Debug.Log($"[CarryUseCase] TryPickUp 完了: objectId={objectId}");
+            return true; // 拾うことに成功した場合はtrueを返す
             
         }
         

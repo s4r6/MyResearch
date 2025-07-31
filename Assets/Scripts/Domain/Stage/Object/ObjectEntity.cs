@@ -1,24 +1,26 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Domain.Component;
-using NUnit.Framework;
-using UnityEngine;
+
 
 namespace Domain.Stage.Object
 {
     public class ObjectEntity
     {
         public string Id { get; }
+
         private Dictionary<Type, GameComponent> components = new();
+        public int HasConponentNum => components.Count;
 
         public ObjectEntity(string id)
         {
             Id = id;
         }
 
-        public void Add<T>(T component) where T : GameComponent
+        public void Add(GameComponent component)
         {
-            components[typeof(T)] = component;
+            components[component.GetType()] = component;
         }
 
         public bool HasComponent<T>() where T : GameComponent

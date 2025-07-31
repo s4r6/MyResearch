@@ -1,4 +1,6 @@
+using Presenter.Sound;
 using UnityEngine;
+using View.Sound;
 
 namespace View.Stage
 {
@@ -9,6 +11,8 @@ namespace View.Stage
         Vector3 startPosition = new Vector3(-90f, 180f, -180f);
         Vector3 afterPosition = new Vector3(-90f, 180f, -70f);
 
+        [SerializeField]
+        SoundView sound;
 
         // Start is called before the first frame update
         void Start()
@@ -23,10 +27,12 @@ namespace View.Stage
         {
             if (action == "open")
             {
+                sound.PlaySE(AudioId.DoorOpen, 1f);
                 _cashThisTransform.localEulerAngles = afterPosition;
             }
             else if(action == "close")
             {
+                sound.PlaySE(AudioId.DoorClose, 1f);
                 _cashThisTransform.localEulerAngles = startPosition;
             }
             

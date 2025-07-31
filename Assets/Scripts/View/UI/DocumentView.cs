@@ -89,6 +89,7 @@ namespace View.UI
         public void OnBack(InputAction.CallbackContext context)
         {
             if (!context.performed || !gameObject.activeSelf) return;
+            Debug.Log("CloseDocument");
             OnBackEvent?.Invoke();
         }
 

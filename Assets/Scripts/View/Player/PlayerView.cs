@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 
 namespace View.Player
@@ -19,8 +20,8 @@ namespace View.Player
         float SpeedChangeRate = 10.0f;
 
         [Header("Mouse Cursor Settings")]
-        public bool cursorLocked = true;
-        public bool cursorInputForLook = true;
+        public static bool cursorLocked = true;
+        public static bool cursorInputForLook = true;
         void OnApplicationFocus(bool hasFocus)
         {
             SetCursorState(cursorLocked);
@@ -28,6 +29,7 @@ namespace View.Player
 
         void SetCursorState(bool newState)
         {
+            Debug.Log("カーソルロック");
             Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
         }
 

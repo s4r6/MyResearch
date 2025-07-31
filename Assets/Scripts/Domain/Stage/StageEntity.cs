@@ -8,17 +8,19 @@ namespace Domain.Stage
 {
     public struct RiskAssessmentHistory
     {
-        public string ObjectName { get; }
-        public string SelectedRiskLable { get; }
-        public string ExecutedActionLabel { get; }
+        public string ObjectName { get; set; }
+        public string SelectedRiskLabel { get; set; }
+        public string ExecutedActionLabel { get; set; }
 
-        public int RiskChange { get; } // 実行による変化量
-        public int CurrentRisk { get; }
-        public int MaxRisk { get; }
+        public int RiskChange { get; set; } // 実行による変化量
+        public int CurrentRisk { get; set; }
+        public int MaxRisk { get; set; }
 
-        public int ActionCost { get; } // 使用したアクションポイント
-        public int CurrentActionPoint { get; }
-        public int MaxActionPoint { get; }
+        public int ActionCost { get; set; }// 使用したアクションポイント
+        public int CurrentActionPoint { get; set; }
+        public int MaxActionPoint { get; set; }
+
+        public string Explanation { get; set; }
 
         public RiskAssessmentHistory(
             string objectName,
@@ -29,10 +31,11 @@ namespace Domain.Stage
             int maxRisk,
             int actionCost,
             int currentAP,
-            int maxAP)
+            int maxAP,
+            string explanation)
         {
             ObjectName = objectName;
-            SelectedRiskLable = riskLabel;
+            SelectedRiskLabel = riskLabel;
             ExecutedActionLabel = actionLabel;
             RiskChange = riskChange;
             CurrentRisk = currentRisk;
@@ -40,6 +43,7 @@ namespace Domain.Stage
             ActionCost = actionCost;
             CurrentActionPoint = currentAP;
             MaxActionPoint = maxAP;
+           Explanation = explanation;
         }
     }
 
@@ -62,6 +66,17 @@ namespace Domain.Stage
             this.maxActionPoint = maxActionPoint;
             this.currentRiskAmount = maxRiskAmount;
             this.currentActionPointAmount = maxActionPoint;
+        }
+
+        public void Update(int currentRiskAmount, int currentActionPointAmount, List<RiskAssessmentHistory> histories)
+        {
+            this.currentRiskAmount = currentRiskAmount;
+            this.currentActionPointAmount = currentActionPointAmount;
+            this.histories = histories;
+            foreach(var history in this.histories)
+            {
+                Debug.Log(history.SelectedRiskLabel);
+            }
         }
 
         public void CalcRiskAmount(ActionEntity action)
@@ -91,7 +106,7 @@ namespace Domain.Stage
             currentActionPointAmount -= history.ActionCost;
             currentRiskAmount += history.RiskChange;
 
-            var riskAssesmentHis = new RiskAssessmentHistory(history.ObjectName, history.SelectedRiskLable, history.ExecutedActionLabel, history.RiskChange, currentRiskAmount, maxRiskAmount, history.ActionCost, currentActionPointAmount, maxActionPoint);
+            var riskAssesmentHis = new RiskAssessmentHistory(history.ObjectName, history.SelectedRiskLable, history.ExecutedActionLabel, history.RiskChange, currentRiskAmount, maxRiskAmount, history.ActionCost, currentActionPointAmount, maxActionPoint, "");
             AddHistory(riskAssesmentHis);
         }
 

@@ -4,6 +4,7 @@ using DG.Tweening;
 using System;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
+using TMPro;
 
 namespace View.UI
 {
@@ -18,6 +19,8 @@ namespace View.UI
         [SerializeField]
         float duration = 0.5f;
 
+        [SerializeField]
+        CanvasGroup DescriptionGroup;
         CanvasGroup ObjectCanvasGroup;
 
         [SerializeField]
@@ -26,36 +29,40 @@ namespace View.UI
 
 
         [SerializeField]
-        Text ObjectId;
+        TMP_Text ObjectId;
         [SerializeField]
-        Text RiskLabel;
+        TMP_Text RiskLabel;
         [SerializeField]
-        Text ActionLabel;
+        TMP_Text ActionLabel;
         [SerializeField]
-        Text RiskReduce;
+        TMP_Text RiskReduce;
         [SerializeField]
-        Text ActionCost;
+        TMP_Text ActionCost;
+        [SerializeField]
+        TMP_Text Description;
 
 
         void Awake()
         {
-            ObjectDatas.transform.position = outPosition;
+            ObjectDatas.anchoredPosition = outPosition;
             ObjectCanvasGroup = ObjectDatas.GetComponent<CanvasGroup>();
             ActionDatas = ActionResult.GetComponent<CanvasGroup>();
 
+            DescriptionGroup.alpha = 0;
             ObjectCanvasGroup.alpha = 0;
             ActionDatas.alpha = 0;
 
             Hide();
         }
 
-        public void SetText(string name, string risklabel, string actionlabel, string risk, string action)
+        public void SetText(string name, string risklabel, string actionlabel, string risk, string action, string explanation)
         {
             ObjectId.text = name;
             RiskLabel.text = risklabel;
             ActionLabel.text = actionlabel;
             RiskReduce.text = $"リスク減少: {risk}";
-            ActionCost.text = $"アクションポイント: -{action}";
+            ActionCost.text = $"AP: -{action}";
+            Description.text = explanation;
         }
 
         public void Hide()
@@ -74,6 +81,7 @@ namespace View.UI
             // ObjectDatas のスライド＆フェード
             await UniTask.WhenAll(
                 ObjectDatas.DOAnchorPos(inPosition, duration).SetEase(Ease.OutCubic).ToUniTask(),
+                DescriptionGroup.DOFade(1f, duration).SetEase(Ease.OutQuad).ToUniTask(),
                 ObjectCanvasGroup.DOFade(1f, duration).SetEase(Ease.OutQuad).ToUniTask()
             );
 

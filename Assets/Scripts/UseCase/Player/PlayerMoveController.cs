@@ -1,10 +1,12 @@
+using Cysharp.Threading.Tasks;
 using Domain.Player;
 using UnityEngine;
+using UseCase.Network;
 using View.Player;
 
 namespace UseCase.Player
 {
-    public class PlayerMoveController
+    public class PlayerMoveController : IMoveController
     {
         PlayerEntity model;
         PlayerView view;
@@ -21,9 +23,10 @@ namespace UseCase.Player
             model.SetPosition(position);
         }
 
-        public void OnMoveInput(Vector2 direction)
+        public UniTask OnMoveInput(Vector2 direction)
         {
             TryMove(direction);
+            return UniTask.CompletedTask;
         }
 
         void TryRotate(float yaw, float pitch)
@@ -32,12 +35,13 @@ namespace UseCase.Player
             model.SetRotation(rotation);
         }
 
-        public void OnLookInput(Vector2 delta)
+        public UniTask OnLookInput(Vector2 delta)
         {
             float yaw = delta.x * model.lookSensitivity.x;
             float pitch = delta.y * model.lookSensitivity.y;
             
             TryRotate(yaw, pitch);
+            return UniTask.CompletedTask;
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Domain.Game
         SelectAction,
         Settings,
         Document,
+        Vote,
         Result,
     }
     public readonly struct GameState : IEquatable<GameState>
@@ -28,6 +29,7 @@ namespace Domain.Game
         public bool IsSelectingAction => Phase == GamePhase.SelectAction;
         public bool IsSettings => Phase == GamePhase.Settings;
         public bool IsDocument => Phase == GamePhase.Document;
+        public bool IsVote => Phase == GamePhase.Vote;
         public bool IsResult => Phase == GamePhase.Result;
 
         public GameState WithPhase(GamePhase newPhase) => new GameState(newPhase);

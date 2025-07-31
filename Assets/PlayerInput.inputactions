@@ -305,6 +305,39 @@
                     "isPartOfComposite": false
                 },
                 {
+                    "name": "Arrow",
+                    "id": "37ebd6f0-bd56-4332-a28c-73fb28028606",
+                    "path": "2DVector",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Scroll",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "up",
+                    "id": "02520fe0-e5b6-4355-bb14-9eb7b8989b6c",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Scroll",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "down",
+                    "id": "fc372ab6-e99e-4939-8b77-7680d266ae44",
+                    "path": "<Keyboard>/downArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Scroll",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
                     "name": "",
                     "id": "94232880-68c8-41a0-bfd6-3121020fc189",
                     "path": "<Mouse>/leftButton",
@@ -407,7 +440,7 @@
                     "name": "",
                     "id": "26e8dd6d-a6b6-4322-b0cd-ab8fb530e5dd",
                     "path": "<Keyboard>/tab",
-                    "interactions": "",
+                    "interactions": "Press",
                     "processors": "",
                     "groups": "",
                     "action": "CloseDocument",

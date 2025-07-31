@@ -1,31 +1,51 @@
 using Domain.Stage.Object;
 using Domain.Player;
-using UnityEngine;
-using View.Player;
 using View.UI;
 using System.Linq;
 using System;
 using Domain.Component;
-using Unity.VisualScripting;
-using static UnityEngine.EventSystems.EventTrigger;
-using Domain.Action;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
+using System.Collections.Generic;
+using UnityEditor;
 
 namespace UseCase.Player
 {
-    public class PlayerInspectUseCase
+    public struct InspectData
+    {
+        public string DisplayName {  get; set; }
+        public string Description { get; set; }
+        public List<string> ChoiceLabels { get; set; }
+        public string SelectedLabel {  get; set; }
+        public bool IsSelectable {  get; set; }
+    }
+
+    public interface IInspectPresenter
+    {
+        public UniTask StartInspect(InspectData data, Action<string> onEnd);
+    }
+
+    public class PlayerInspectUseCase : IInspectUseCase
     {
         IObjectRepository repository;
-        PlayerEntity model;
-        ObjectInfoView view;
+        PlayerEntity entity;
+        IInspectPresenter presenter;
+        InspectService inspectService;
 
         ObjectEntity currentInspectObject;
 
-        public PlayerInspectUseCase(PlayerEntity model, ObjectInfoView view, IObjectRepository repository)
+        public PlayerInspectUseCase(PlayerEntity entity, IInspectPresenter presenter, InspectService inspectService, IObjectRepository repository)
         {
-            this.model = model;
-            this.view = view;
+            this.entity = entity;
+            this.presenter = presenter;
+            this.inspectService = inspectService;
             this.repository = repository;
+        }
+
+        public bool CanInspect(string objectId)
+        {
+            var entity = repository.GetById(objectId);
+            return inspectService.CanInspect(entity);
         }
 
         Action OnCompleteInspect;
@@ -33,61 +53,45 @@ namespace UseCase.Player
         {
             OnCompleteInspect = onComplete;
 
+            //Entity取得
             ObjectEntity obj = repository.GetById(objectId);
-            if (obj == null)
-                return false;
 
+            //調査可能か確認
+            if (!inspectService.CanInspect(obj)) return false;
 
-            if (!obj.TryGetComponent<InspectableComponent>(out var inspectable)) return false;
+            currentInspectObject = obj;
+
+            //リスク候補を取得
+            var choicable = inspectService.TryGetChoice(obj);
             
-            //Choiceがあれば
-            if(obj.TryGetComponent<ChoicableComponent>(out var choicable))
+            var Inspectable = obj.GetComponent<InspectableComponent>();
+            var dto = new InspectData
             {
-                var choiceLabels = choicable.Choices.Select(x => x.Label).ToList();
-                var index = choiceLabels.FindIndex(x => x == choicable?.SelectedChoice?.Label);
-                index = index < 0 ? 0 : index;
+                DisplayName = Inspectable.DisplayName,
+                Description = Inspectable.Description,
+                ChoiceLabels = choicable?.Choices?.Select(x => x.Label).ToList() ?? null,
+                SelectedLabel = choicable?.SelectedChoice?.Label ?? string.Empty,
+                IsSelectable = !Inspectable.IsActioned
+            };
 
-                if (!inspectable.IsActioned)
-                    view.StartInspect(inspectable.DisplayName, inspectable.Description, index, choiceLabels, result => OnEndInspect(result)).Forget();
-                else
-                    view.DisplayLabels(inspectable.DisplayName, inspectable.Description, index, choiceLabels, result => OnEndInspect(result)).Forget();
+            //調査画面を表示
+            presenter.StartInspect(dto, result => OnEndInspect(result)).Forget();
 
-                currentInspectObject = obj;
-
-
-
-                return true;
-            }
-            else
-            {
-                view.DisplayDescribe(inspectable.DisplayName, inspectable.Description, result => OnEndInspect(result)).Forget();
-                return true;
-            }
-            
+            return true;
         }
         
-        public void OnEndInspect(string? choiceText)
+        public UniTask OnEndInspect(string choiceText)
         {
-            view.EndInspect();
-
-            if (choiceText != null)
+            if (!string.IsNullOrEmpty(choiceText))
             {
-                if (!currentInspectObject.TryGetComponent<InspectableComponent>(out var inspectable)) return;
-                if (!currentInspectObject.TryGetComponent<ChoicableComponent>(out var choicable)) return;
-
-                var choice = choicable.Choices.Find(x => x.Label == choiceText);
-                if(choice == null) return;
-
-                if(!inspectable.IsActioned)
-                    choicable.SelectedChoice = choice;
-
-                if (choicable.SelectedChoice.OverrideActions.Any(a => a.target == TargetType.Self))
-                    currentInspectObject.Add<ActionSelf>(new ActionSelf());
+                inspectService.ApplySelectedChoice(currentInspectObject, choiceText);
             }
 
             OnCompleteInspect?.Invoke();
             OnCompleteInspect = null;
-            return;
+
+            Debug.Log("Inspect終了");
+            return UniTask.CompletedTask;
         }
     }
 }

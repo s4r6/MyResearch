@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Foldout = UnityEngine.UIElements.Foldout;
 
 public class ChoiceFoldoutElement : VisualElement
 {

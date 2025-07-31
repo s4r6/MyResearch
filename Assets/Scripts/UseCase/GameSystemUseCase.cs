@@ -31,11 +31,6 @@ namespace UseCase.GameSystem
         public void StartGame()
         {
             player.StartGame();
-            player.OnActionExecute
-                .Subscribe(x =>
-                {
-                    stage.OnExecuteAction(x);
-                }).AddTo(disposables);
 
             player.OnExitPointInspected
                 .Subscribe(x => 
@@ -46,7 +41,9 @@ namespace UseCase.GameSystem
             input.OnDocumentButtonPressed
                 .Subscribe(_ =>
                 {
-                    Debug.Log("Document");
+                    if (state.Current.IsDocument)
+                        return;
+
                     document.OpenDocument(() =>
                     {
                         state.Set(GamePhase.Moving);

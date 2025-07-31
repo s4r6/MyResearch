@@ -1,22 +1,47 @@
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Component;
+using Domain.Stage;
 using Domain.Stage.Object;
 using UnityEngine;
+using UseCase.Player;
 
 namespace Infrastructure.Repository
 {
     //ステージのデータを保持しておく
-    public class StageRepository
+    public class StageRepository : IStageRepository
     {
+        StageEntity currentStageEntity;
+
         Dictionary<int, int> MaxRiskMap = new();
         Dictionary<int, int> MaxActionPointMap = new();
 
-        public StageRepository(ObjectRepository repository)
+        public StageRepository(IObjectRepository repository)
         {
-            var entities = repository.GetAllEntity();
+            var entities = repository.GetAll();
             MaxRiskMap.Add(1, CalcMaxRiskAmount(entities));
             MaxActionPointMap.Add(1, CalcMaxActionPoint(entities));
+        }
+    
+        public StageEntity CreateStage(int stageNumber)
+        {
+            var maxRiskAmount = GetRiskAmountByStageNumber(1);
+            var maxActionPointAmount = GetActionPointAmountByStageNumber(1);
+            var stage = new StageEntity(maxRiskAmount, maxActionPointAmount);
+
+            Save(stage);
+
+            return stage;
+        }
+
+        public void Save(StageEntity entity)
+        {
+            currentStageEntity = entity;
+        }
+
+        public StageEntity GetCurrentStageEntity()
+        {
+            return currentStageEntity;
         }
 
         public int GetRiskAmountByStageNumber(int stageNumber)
@@ -29,7 +54,7 @@ namespace Infrastructure.Repository
             return MaxActionPointMap[stageNumber];
         }
 
-        int CalcMaxRiskAmount(List<ObjectEntity> entities)
+        int CalcMaxRiskAmount(IReadOnlyList<ObjectEntity> entities)
         {
             int totalMaxRisk = entities
                                    .Where(e => e.HasComponent<ChoicableComponent>())
@@ -47,7 +72,7 @@ namespace Infrastructure.Repository
             return totalMaxRisk;
         }
 
-        int CalcMaxActionPoint(List<ObjectEntity> entities)
+        int CalcMaxActionPoint(IReadOnlyList<ObjectEntity> entities)
         {
             int totalActionPoint = entities
                 .Where(e => e.HasComponent<ChoicableComponent>())
