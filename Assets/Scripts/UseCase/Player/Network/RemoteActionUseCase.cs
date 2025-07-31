@@ -95,7 +95,12 @@ namespace UseCase.Player
             }
 
             if (string.IsNullOrEmpty(selectedActionLabel))
+            {
+                OnCompleteAction?.Invoke();
+                OnCompleteAction = null;
                 return;
+            }
+                
 
             var playerId = playerSession.Id;
             var roomId = roomSession.Id;
@@ -124,12 +129,10 @@ namespace UseCase.Player
         {
             if (result == ActionResultType.ShortageActionPoint)
             {
-                Debug.LogError("ActionPointが足りません");
+                Debug.Log("ActionPointが足りません");
                 presenter.OutPutLog();
-                return;
             }
-
-            if (result == ActionResultType.Success)
+            else if (result == ActionResultType.Success)
             {
                 Debug.Log("Action適用");
                 switch (type)
@@ -153,17 +156,18 @@ namespace UseCase.Player
                 .Subscribe(x =>
                 {
                     //RepositoryにAction適用後のEntityを保存
-                    repository.Save(x.ObjectData);
+                    if (x.Result == ActionResultType.Success) 
+                    {
+                        repository.Save(x.ObjectData);
+                        var stage = stageRepository.GetCurrentStageEntity();
 
+                        var currentRiskAmount = x.currentRiskAmount;
+                        var currentActionPointAmount = x.currentActionPointAmount;
+                        var histories = x.histories;
+
+                        stage.Update(currentRiskAmount, currentActionPointAmount, histories);
+                    }
                     ExecuteAction(x.ActionId, x.HeldId, x.TargetId, x.Target, x.Result);
-
-                    var stage = stageRepository.GetCurrentStageEntity();
-
-                    var currentRiskAmount = x.currentRiskAmount;
-                    var currentActionPointAmount = x.currentActionPointAmount;
-                    var histories = x.histories;
-
-                    stage.Update(currentRiskAmount, currentActionPointAmount, histories);
                 }).AddTo(_disposables);
         }
 

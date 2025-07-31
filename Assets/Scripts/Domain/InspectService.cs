@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Domain.Action;
@@ -8,6 +9,7 @@ namespace Domain.Player
 {
     public class InspectService
     {
+        Dictionary<string, DateTime> FirstInspectTime = new(); 
         public bool CanInspect(ObjectEntity entity)
         {
             if(entity == null) return false;
@@ -22,6 +24,23 @@ namespace Domain.Player
             if (!entity.TryGetComponent<ChoicableComponent>(out var choicable)) return null;
 
             return choicable;
+        }
+
+        public void SetFirstInspectTime(string objectId)
+        {
+            if (!FirstInspectTime.ContainsKey(objectId)) 
+            {
+                FirstInspectTime.Add(objectId, DateTime.UtcNow);
+            }
+        }
+
+        public TimeSpan CalcElapsedInspectTime(string objectId)
+        {
+            if(FirstInspectTime.TryGetValue(objectId, out var dateTime))
+            {
+                return DateTime.UtcNow - dateTime;
+            }
+            return TimeSpan.Zero;
         }
 
         public void ApplySelectedChoice(ObjectEntity entity, string selectedLabel) 

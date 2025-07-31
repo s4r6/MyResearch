@@ -49,7 +49,7 @@ public class TitleEntryPoint : MonoBehaviour
         var titleUseCase = new TitleUseCase(gameModeHolder, modeSelect, single, multi, socket);
         var roomUseCase = new RoomUseCase(sessionRepository, remoteObjectRepository, remoteStageRepository, receiver);
 
-        var presenter = new RoomPresenter(multi, roomUseCase);
+        var presenter = new RoomPresenter(multi, roomUseCase, titleUseCase);
 
         modeSelect.Injection(titleUseCase);
         single.Injection(titleUseCase);

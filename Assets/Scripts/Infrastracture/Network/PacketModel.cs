@@ -30,6 +30,8 @@ namespace Infrastructure.Network
         VoteNotifier,
         VoteChoiceRequest,
         VoteEndNotifier,
+        Ping = 99,
+        Pong = 100,
         Error,
     }
 
@@ -47,16 +49,18 @@ namespace Infrastructure.Network
 
     public class CreateRoomRequest
     {
-        public string RoomId { get; set; }
+        public string RoomName { get; set; }
+        public string PlayerName { get; set; }
         public int StageId { get; set; }
-        public string PlayerId { get; set; }
+
     }
 
     public class CreateRoomResponse
     {
         public bool Success { get; set; }
         public string RoomId { set; get; }
-        public string ConnectionId { get; set; }
+        public string RoomName {  set; get; }
+        public string PlayerId { get; set; }
         public string PlayerName {  get; set; }
         public int StageId {  set; get; }
         public List<SyncObjectPacket> SyncData { get; set; }
@@ -67,15 +71,15 @@ namespace Infrastructure.Network
     public class JoinRequest
     {
         public string RoomId { get; set; }
-        public string PlayerId { get; set; }
-
+        public string PlayerName { get; set; }
     }
 
     public class JoinResponse
     {
         public bool Success { get; set; }
         public string RoomId { get; set; }
-        public string ConnectionId { get; set; }
+        public string RoomName { set; get; }
+        public string PlayerId { get; set; }
         public string PlayerName { get; set; }
         public int StageId { set; get; }
         public List<PlayerSession> Players { get; set; }
@@ -154,6 +158,7 @@ namespace Infrastructure.Network
         public string RoomId {  get; set; }
         public string ObjectId {  get; set; }
         public string SelectedChoiceLabel {  get; set; }
+        public TimeSpan ElapsedInspectTime { get; set; }
     }
 
     public class InspectObjectResponse
@@ -217,5 +222,15 @@ namespace Infrastructure.Network
         public float X {  get; set; }
         public float Y { get; set; }
         public float Z { get; set; }
+    }
+
+    public class Ping
+    {
+
+    }
+
+    public class Pong
+    {
+        
     }
 }

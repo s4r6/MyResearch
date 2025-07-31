@@ -31,10 +31,10 @@ public static class ObjectSerializer
     {
         if (data == null) return null;
 
-        var objectId = data["objectId"]?.Value<string>();
+        var objectId = data["objectId"]?.Value<string>() ?? string.Empty;
         if (string.IsNullOrEmpty(objectId))
         {
-            Debug.LogWarning("objectId missing in data object.");
+            //Debug.LogWarning("objectId missing in data object.");
             return null;
         }
 

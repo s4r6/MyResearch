@@ -25,7 +25,8 @@ namespace Presenter.Network
                 PlayerId = data.PlayerId,
                 RoomId = data.RoomId,
                 ObjectId = data.ObjectId,
-                SelectedChoiceLabel = data.SelectedChoiceLabel
+                SelectedChoiceLabel = data.SelectedChoiceLabel,
+                ElapsedInspectTime = data.ElapsedTime
             };
 
             var packet = CreatePacket(payload_send, PacketId.InspectObjectRequest);
@@ -69,7 +70,6 @@ namespace Presenter.Network
 
         public async UniTask SendPlayerPosition(PositionSyncData data)
         {
-            Debug.Log("PositionëóêM");
             var payload_send = new PositionUpdate
             {
                 PlayerId = data.PlayerId,

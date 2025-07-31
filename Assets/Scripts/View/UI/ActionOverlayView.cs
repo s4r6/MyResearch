@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using System;
 using View.Player;
 using System.Linq;
+using static UnityEngine.UI.Scrollbar;
 
 namespace View.UI
 {
@@ -40,6 +41,7 @@ namespace View.UI
         public Action OnBackKeyPressed;
         public Action<ActionDirection> OnActionDirectionChanged;
         public Action OnSubmitKeyPressed;
+        public Action<int> OnScrollEvent;
 
         //--------------------------------------------------------------------------------
         // VIEW 初期化
@@ -149,6 +151,21 @@ namespace View.UI
                 dir = stick.x > 0 ? ActionDirection.Right : ActionDirection.Left;
 
             OnActionDirectionChanged?.Invoke(dir);
+        }
+
+        int lastFrame = -1;
+        public void OnScroll(InputAction.CallbackContext context)
+        {
+            if (Time.frameCount == lastFrame && !gameObject.activeSelf) return;
+
+            var vec = context.ReadValue<Vector2>();
+            var delta = (int)vec.y;
+
+            if (delta == 0)
+                return;
+
+            lastFrame = Time.frameCount;
+            OnScrollEvent?.Invoke(delta);
         }
 
         public void OnSubmit(InputAction.CallbackContext context)

@@ -15,7 +15,6 @@ namespace View.Player
             {
                 Destroy(obj.gameObject);
             }
-
         }
 
         public void OffMonitor(string objectId)
@@ -23,14 +22,23 @@ namespace View.Player
             var obj = GameObject.Find(objectId);
             if (obj != null)
             {
-                obj.GetComponent<Monitor>().TurnOff();
+                obj.GetComponent<Monitor>()?.TurnOff();
+            }
+        }
+
+        public void PlaceObject(string placeObjectId, string objectId)
+        {
+            var obj = GameObject.Find(objectId);
+            if (obj != null) 
+            {
+                var placer = obj.GetComponent<ObjectPlacer>();
+                placer?.PlaceObject(placeObjectId);
             }
         }
 
         //--------------------PRESENTER--------------------
         public void ActionExecute(string actionId, string heldId, string lookingId) 
         {
-            Debug.Log("“K—p‚·‚éAction:"+ actionId);
             switch(actionId)
             {
                 case "ShredderUse":
@@ -45,9 +53,12 @@ namespace View.Player
                 case "StoreCabinet":
                     DestroyObject(heldId);
                     break;
-                case "PlaceCamera":
+                case "DigitizeDocument":
+                    DestroyObject(lookingId);
                     break;
-                    
+                case "PlaceCamera":
+                    PlaceObject("Camera", lookingId);
+                    break;
             }
         }
     }

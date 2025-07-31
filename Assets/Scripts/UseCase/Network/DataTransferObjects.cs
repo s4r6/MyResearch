@@ -26,8 +26,9 @@ namespace UseCase.Network.DTO
 
     public class SearchRoomOutputData
     {
-        //RoomId,PlayerNum
-        public List<(string, int)> RoomDatas { get; set; }
+        public List<RoomSession> Added { get; set; }
+        public List<RoomSession> Removed { get; set; }
+        public List<RoomSession> Updated { get; set; }
     }
 
     public class JoinRoomInputData
@@ -61,7 +62,9 @@ namespace UseCase.Network.DTO
         //汎用
         Cancel,
         Select,
-        
+        PickUp,
+        ChangePage,
+        EndGame,
     }
 
     public class ActionHint

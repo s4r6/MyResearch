@@ -61,6 +61,8 @@ namespace UseCase.Player.Network
                 IsSelectable = !Inspectable.IsActioned
             };
 
+            if(dto.ChoiceLabels.Count >= 1)
+                inspectService.SetFirstInspectTime(objectId);
             presenter.StartInspect(dto, async result => await OnEndInspect(result)).Forget();
 
             return true;
@@ -91,6 +93,7 @@ namespace UseCase.Player.Network
                 RoomId = roomId,
                 ObjectId = currentInspectObject.Id,
                 SelectedChoiceLabel = choiceText,
+                ElapsedTime = inspectService.CalcElapsedInspectTime(currentInspectObject.Id)
             };
 
             var IsSuccess = await sender.SendInspectData(dto);

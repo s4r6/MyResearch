@@ -111,7 +111,7 @@ namespace UseCase.Network
             receiver.OnReceiveDisconnectData
                 .Subscribe(x =>
                 {
-
+                    OnDisconnectPlayer(x.DisconnectedId);
                 }).AddTo(_disposables);
         }
 

@@ -58,11 +58,12 @@ namespace View.UI
 
         public void SetChoices(List<string> texts)
         {
+
             for (int i = 0; i < texts.Count; i++)
             {
                 //Debug.Log($"Lable:{texts[i]}, i:{i}");
-                buttonTexts[i].text = texts[i];
-            }
+                buttonTexts[i].text = texts[i];                
+            }            
         }
 
         public async UniTask AnimateShowWindow()
@@ -72,25 +73,45 @@ namespace View.UI
 
             await targetWindow.DOScale(Vector3.one, duration)
                 .SetEase(Ease.OutBack).ToUniTask();
+
+            //Cursor.lockState = CursorLockMode.None;
         }
 
         public void AnimateHideWindow()
         {
+            //Cursor.lockState = CursorLockMode.Locked;
+
             targetWindow.DOScale(Vector3.zero, duration)
                 .SetEase(Ease.OutBack)
                 .OnComplete(() => targetWindow.gameObject.SetActive(false));
         }
 
-        public void HighlightButton(int index)
+        public void HighlightButton(int index, bool IsSelectable = true)
         {
-            for (int i = 0; i < buttons.Count; i++) 
+            if (IsSelectable)
             {
-                var colors = buttons[i].colors;
-                colors.selectedColor = (i == index) ? selectedColor : normalColor;
-                buttons[i].colors = colors;
+                for (int i = 0; i < buttons.Count; i++)
+                {
+                    var colors = buttons[i].colors;
+                    colors.normalColor = (i == index) ? selectedColor : normalColor;
+                    buttonTexts[i].color = Color.white;
+                    buttons[i].colors = colors;
+                }
             }
+            else
+            {
+                for (int i = 0; i < buttons.Count; i++)
+                {
+                    var colors = buttons[i].colors;
+                    colors.normalColor = (i == index) ? selectedColor : normalColor;
+                    buttonTexts[i].color = (i == index) ? Color.red : Color.gray;
+                    buttons[i].colors = colors;
+                    
+                }
+            }
+            
 
-            EventSystem.current.SetSelectedGameObject(buttons[index].gameObject);
+            //EventSystem.current.SetSelectedGameObject(buttons[index].gameObject);
         }
 
         public string GetButtonLabel(int index)
@@ -110,7 +131,7 @@ namespace View.UI
                 Debug.Log("何もしない");
                 // SubmitEventが無ければ、イベントを無視し、選択状態を維持する
                 // EventSystemによる"デフォーカス"を防ぐ
-                EventSystem.current.SetSelectedGameObject(EventSystem.current.currentSelectedGameObject);
+                //EventSystem.current.SetSelectedGameObject(EventSystem.current.currentSelectedGameObject);
             }
             
         }
@@ -133,6 +154,14 @@ namespace View.UI
                 return;
 
             lastFrame = Time.frameCount;
+            OnScrollEvent?.Invoke(delta);
+        }
+
+        public void OnArrow(InputAction.CallbackContext context)
+        {
+            if (!context.performed || !gameObject.activeSelf) return;
+
+            int delta = (int)context.ReadValue<Vector2>().y;
             OnScrollEvent?.Invoke(delta);
         }
 

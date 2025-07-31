@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Domain.Game;
 using UniRx;
 using Unity.VisualScripting.Dependencies.NCalc;
@@ -59,12 +60,31 @@ namespace UseCase.GameSystem
 
                     state.Set(GamePhase.Document);
                 }).AddTo(disposables);
+
+            vote.OnVotePassed
+                .Subscribe(_ =>
+                {
+                    EndGame();
+                }).AddTo(disposables);
+
+            vote.OnVoteFailed
+                .Subscribe(x =>
+                {
+                    FailedVote();
+                }).AddTo(disposables);
+
+            vote.OnVoteUpdated
+                .Where(_ => !state.Current.IsVote)
+                .Subscribe(_ =>
+                {
+                    state.Set(GamePhase.Vote);
+                }).AddTo(disposables);
         }
 
         public void OnVoteEvent()
         {
             state.Set(GamePhase.Vote);
-            vote.StartVote();
+            vote.StartVote().Forget();
         }
 
         public void EndGame()

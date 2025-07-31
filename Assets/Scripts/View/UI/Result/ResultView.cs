@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Domain.Stage;
 using NUnit.Framework;
 using UnityEngine;
+using View.Player;
 
 namespace View.UI
 {
@@ -36,6 +37,11 @@ namespace View.UI
         {
             Debug.Log("表示");
             this.gameObject.SetActive(true);
+
+            Debug.Log("CursorLocked = false");
+            PlayerView.cursorLocked = false;
+            Cursor.lockState = CursorLockMode.None;    // カーソル自由
+            Cursor.visible = true;                     // カーソル表示
         }
 
         public async UniTask ShowResult(List<RiskAssessmentHistory> histories)

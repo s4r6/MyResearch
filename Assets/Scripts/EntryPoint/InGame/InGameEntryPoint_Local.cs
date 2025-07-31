@@ -45,6 +45,8 @@ public class InGameEntryPoint_Local : MonoBehaviour
     DocumentView documentView;
     [SerializeField]
     ActionHintUI hintUI;
+    [SerializeField]
+    GameObject Reticle;
 
     //Sound
     [SerializeField]
@@ -91,7 +93,7 @@ public class InGameEntryPoint_Local : MonoBehaviour
         var document = new DocumentUseCase(documentView, new DocumentEntity());
 
         var hintPresenter = new ActionHintPresenter(hintUI);
-        usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact), hintPresenter);
+        usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact), hintPresenter, Reticle);
 
 
         var gameSystem = new GameSystemUseCase(usecase, new StageSystemUseCase(stage, resultView), gameState, document, input);

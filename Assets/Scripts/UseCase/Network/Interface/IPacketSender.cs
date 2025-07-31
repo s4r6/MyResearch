@@ -16,6 +16,7 @@ namespace UseCase.Network
         public string RoomId { get; set; }
         public string ObjectId { get; set; }
         public string SelectedChoiceLabel { get; set; }
+        public TimeSpan ElapsedTime { get; set; }
     }
 
     public struct ActionRequestData

@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Presenter.Sound;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UseCase.Title;
@@ -9,6 +10,9 @@ namespace View.Title
 {
     public class ModeSelectView : MonoBehaviour, IModeSelectView
     {
+        [SerializeField]
+        TMP_Text warningText;
+
         [SerializeField]
         InputField playerNameField;
         [SerializeField]
@@ -28,9 +32,19 @@ namespace View.Title
             multiPlayerButton.onClick.AddListener(() => OnMultiPlayerButtonPressed().Forget());
         }
 
+        void Start()
+        {
+            warningText.gameObject.SetActive(false);
+        }
+
         public void Injection(TitleUseCase usecase)
         {
             this.usecase = usecase;
+        }
+
+        public void WarningInputName()
+        {
+            warningText.gameObject.SetActive(true);
         }
 
         void OnSinglePlayerButtonPressed()
@@ -52,6 +66,7 @@ namespace View.Title
 
         public void Activate()
         {
+            warningText.gameObject.SetActive(false);
             gameObject.SetActive(true);
         }
 

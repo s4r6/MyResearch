@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
 using Domain.Network;
 using Infrastracture.Network;
@@ -6,9 +7,11 @@ using Infrastructure.Game;
 using Presenter.Network;
 using Presenter.Sound;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UseCase.Network;
+using View.Title;
 
 namespace UseCase.Title
 {
@@ -22,6 +25,7 @@ namespace UseCase.Title
 
     public interface IModeSelectView
     {
+        void WarningInputName();
         void Activate();
         void DeActivate();
     }
@@ -43,7 +47,7 @@ namespace UseCase.Title
 
         IWebSocketService socket;
 
-        string cashPlayerName;
+        string cashPlayerName = string.Empty;
 
         public TitleUseCase(GameModeHolder gameMode, IModeSelectView modeSelect, ISinglePlayerView single, IMultiPlayerView multi, IWebSocketService socket)
         {
@@ -58,6 +62,13 @@ namespace UseCase.Title
 
         public async UniTask ChangeGameMode(GameMode mode)
         {
+            if(gameMode.CurrentMode == GameMode.ModeSelect && cashPlayerName == string.Empty)
+            {
+                Debug.Log("åxçê");
+                modeSelect.WarningInputName();
+                return;
+            }
+
             CurrentModeViewDeActivate(gameMode.CurrentMode);
 
             gameMode.SetMode(mode);
@@ -82,7 +93,7 @@ namespace UseCase.Title
             }
         }
 
-        void CurrentModeViewDeActivate(GameMode mode)
+        async Task CurrentModeViewDeActivate(GameMode mode)
         {
             switch(mode)
             {
@@ -93,6 +104,10 @@ namespace UseCase.Title
                     single.DeActivate();
                     break;
                 case GameMode.Multi:
+                    if(socket.IsConnected)
+                    {
+                        await socket.Close();
+                    }
                     multi.DeActivate();
                     break;
                 default:

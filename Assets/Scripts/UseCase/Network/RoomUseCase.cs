@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Domain.Network;
 using Domain.Stage;
@@ -9,12 +10,27 @@ using UseCase.Player;
 
 namespace UseCase.Network
 {
+    class RoomDiffResult
+    {
+        public List<RoomSession> Added { get; }
+        public List<RoomSession> Removed { get; }
+        public List<RoomSession> Updated { get; }
+
+        public RoomDiffResult(List<RoomSession> added, List<RoomSession> removed, List<RoomSession> updated)
+        {
+            Added = added;
+            Removed = removed;
+            Updated = updated;
+        }
+    }
     public class RoomUseCase : IDisposable
     {
         private readonly ISessionRepository sessionRepository;
         readonly IObjectRepository objectRepository;
         readonly IStageRepository stageRepository;
         readonly IPacketReceiver receiver;
+
+        List<RoomSession> lastRooms = new();
 
         CompositeDisposable _disposables = new();
 
@@ -38,11 +54,11 @@ namespace UseCase.Network
         public void OnReceiveCreateResult(CreateRoomResult result)
         {
             //自身のSessionを作成
-            var player = new PlayerSession(result.ConnectionId, result.Name);
+            var player = new PlayerSession(result.PlayerId, result.PlayerName);
             sessionRepository.SavePlayerSession(player);
 
             //Roomを作成
-            var room = new RoomSession(result.RoomId, new List<PlayerSession> { player }, result.StageId);
+            var room = new RoomSession(result.RoomId, result.RoomName, new List<PlayerSession> { player }, result.StageId);
             sessionRepository.SaveRoomSession(room);
 
             //StageEntityを作成
@@ -60,7 +76,7 @@ namespace UseCase.Network
                 Success = true,
                 RoomId = result.RoomId,
                 StageId = result.StageId,
-                ConnectionId = result.ConnectionId
+                ConnectionId = result.PlayerId
             };
 
             OnCompleteCreate?.Invoke(roomData);
@@ -76,11 +92,11 @@ namespace UseCase.Network
         public void OnReceiveJoinResult(JoinRoomResult result)
         {
             //自身のSessionを作成
-            var player = new PlayerSession(result.ConnectionId, result.Name);
+            var player = new PlayerSession(result.PlayerId, result.PlayerName);
             sessionRepository.SavePlayerSession(player);
 
             //Roomを作成
-            var room = new RoomSession(result.RoomId, result.Players, result.StageId);
+            var room = new RoomSession(result.RoomId, result.RoomName, result.Players, result.StageId);
             sessionRepository.SaveRoomSession(room);
 
             //StageEntityを作成
@@ -104,18 +120,35 @@ namespace UseCase.Network
 
         public async UniTask Search(Action<SearchRoomOutputData> OnComplete)
         {
-            var roomList = await sessionRepository.Search();
+            var newRooms = await sessionRepository.Search();
 
-            var roomDatas = new List<(string, int)>();
-            foreach (var room in roomList)
-            {
-                roomDatas.Add((room.Id, room.Players.Count));
-            }
+            var diff = CalcDiff(lastRooms, newRooms);
+            lastRooms = newRooms;
+
             var result = new SearchRoomOutputData
             {
-                RoomDatas = roomDatas
+                Added = diff.Added,
+                Removed = diff.Removed,
+                Updated = diff.Updated,
             };
+
             OnComplete?.Invoke(result);
+        }
+
+        RoomDiffResult CalcDiff(List<RoomSession> oldList, List<RoomSession> newList)
+        {
+            var oldMap = oldList.ToDictionary(r => r.Id);
+            var newMap = newList.ToDictionary(r => r.Id);
+
+            var added = newList.Where(r => !oldMap.ContainsKey(r.Id)).ToList();
+            var removed = oldList.Where(r => !newMap.ContainsKey(r.Id)).ToList();
+
+            // 更新判定：存在するが内容が変わった
+            var updated = newList
+                .Where(r => oldMap.ContainsKey(r.Id) && !r.Equals(oldMap[r.Id]))
+                .ToList();
+
+            return new RoomDiffResult(added, removed, updated);
         }
 
         void Bind()

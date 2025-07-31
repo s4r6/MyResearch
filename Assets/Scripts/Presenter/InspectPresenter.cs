@@ -68,16 +68,18 @@ namespace Presenter.Player
             else
                 view.HideButtons();
 
-            //Viewの表示アニメーション
-            await view.AnimateShowWindow();
-            sound.PlaySE(AudioId.WindowOpen, 1f);
-
             if (data.ChoiceLabels != null)
             {
                 //選択肢のハイライト表示
                 currentIndex = CalculateIndex(data.SelectedLabel, data.ChoiceLabels);
-                view.HighlightButton(currentIndex);
+                view.HighlightButton(currentIndex, data.IsSelectable);
             }
+
+            //Viewの表示アニメーション
+            await view.AnimateShowWindow();
+            sound.PlaySE(AudioId.WindowOpen, 1f);
+
+            
         }
 
         /*public async UniTask DisplayLabels(string name, string describe, int selectedIndex, List<string> ChoiceTexts, Action<string> onEnd)

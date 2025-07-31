@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 
 
 namespace View.Player
@@ -28,6 +29,7 @@ namespace View.Player
 
         void SetCursorState(bool newState)
         {
+            Debug.Log("カーソルロック");
             Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
         }
 

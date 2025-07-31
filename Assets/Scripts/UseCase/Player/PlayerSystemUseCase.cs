@@ -1,15 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Domain.Action;
-using Domain.Component;
 using Domain.Game;
 using Domain.Player;
-using Domain.Stage;
-using NUnit.Framework;
 using UniRx;
 using UnityEngine;
-using UseCase.Game;
 using UseCase.Network.DTO;
 using View.Player;
 
@@ -56,13 +51,14 @@ namespace UseCase.Player
         RaycastController raycast;
         InteractUseCase interact;
         IActionHintPresenter hintPresenter;
-        
+
+        GameObject Reticle;
 
         CompositeDisposable disposables = new CompositeDisposable();
 
         public Subject<Unit> OnExitPointInspected = new();
 
-        public PlayerSystemUseCase(
+        public PlayerSystemUseCase(   
             IMoveController move,
             IInspectUseCase inspect,
             PlayerEntity model,
@@ -73,7 +69,8 @@ namespace UseCase.Player
             IActionUseCase action,
             InteractUseCase interact,
             IActionHintPresenter hintPresenter
-            )
+,
+            GameObject reticle)
         {
             this.move = move;
             this.inspect = inspect;
@@ -88,6 +85,7 @@ namespace UseCase.Player
 
 
             Bind();
+            Reticle = reticle;
         }
 
         private void Bind()
@@ -95,13 +93,15 @@ namespace UseCase.Player
             input.OnInspectButtonPressed
                 .Subscribe(_ =>
                 {
+                    if (!gameState.Current.IsMoving)
+                        return;
 
                     var objectId = model.currentLookingObject;
-                    if (objectId == "DoorOutside")
+                    /*if (objectId == "DoorOutside")
                     {
                         OnExitPointInspected.OnNext(default);
                         return;
-                    }
+                    }*/
 
                     var result = inspect.TryInspect(objectId, () =>
                     {
@@ -117,6 +117,8 @@ namespace UseCase.Player
             input.OnPickUpButtonPressed
                 .Subscribe(_ =>
                 {
+                    if (!gameState.Current.IsMoving)
+                        return;
 
                     if (string.IsNullOrEmpty(model.currentCarringObject))
                     {
@@ -132,6 +134,9 @@ namespace UseCase.Player
             input.OnActionButtonPressed
                 .Subscribe(_ =>
                 {
+                    if (!gameState.Current.IsMoving)
+                        return;
+
                     var objectId = model.currentLookingObject;
                     var result = action.TryAction(objectId, () =>
                     {
@@ -148,6 +153,9 @@ namespace UseCase.Player
             input.OnInteractButtonPressed
                 .Subscribe(_ => 
                 {
+                    if (!gameState.Current.IsMoving)
+                        return;
+
                     var objectId = model.currentLookingObject;
                     interact.TryInteract(objectId);
                 }).AddTo(disposables);
@@ -155,10 +163,24 @@ namespace UseCase.Player
             input.OnFinishButtonPressed
                 .Subscribe(_ =>
                 {
+                    if (!gameState.Current.IsMoving)
+                        return;
+
                     OnExitPointInspected.OnNext(default);
                 }).AddTo(disposables);
 
-            
+            gameState.OnChangeState
+                .Subscribe(x =>
+                {
+                    if(x == GamePhase.Moving)
+                    {
+                        Reticle.SetActive(true);
+                    }
+                    else
+                    {
+                        Reticle.SetActive(false);
+                    }
+                }).AddTo(disposables);
         }
 
         public async UniTask Update()
@@ -189,6 +211,7 @@ namespace UseCase.Player
             Dispose();
         }
 
+
         private void GetLookingObjectId()
         {
             var name = raycast.TryGetLookedObjectId();
@@ -216,6 +239,7 @@ namespace UseCase.Player
             //MovingPhase
             if (gameState.Current.IsMoving)
             {
+                hints.Add(new ActionHint(ActionHintId.EndGame));
                 hints.Add(new ActionHint(ActionHintId.Move));
                 hints.Add(new ActionHint(ActionHintId.Document));
                 if (action.CanAction(objectId))
@@ -224,6 +248,8 @@ namespace UseCase.Player
                     hints.Add(new ActionHint(ActionHintId.Inspect));
                 if (interact.CanInteract(objectId))
                     hints.Add(new ActionHint(ActionHintId.Interact));
+                if (carry.IsPickable(objectId))
+                    hints.Add(new ActionHint(ActionHintId.PickUp));
             }
             else if (gameState.Current.IsInspecting)
             {
@@ -236,6 +262,10 @@ namespace UseCase.Player
                 hints.Add(new ActionHint(ActionHintId.SelectAction));
                 hints.Add(new ActionHint(ActionHintId.Select));
                 hints.Add(new ActionHint(ActionHintId.Cancel));
+            }
+            else if(gameState.Current.IsDocument)
+            {
+                hints.Add(new ActionHint(ActionHintId.ChangePage));
             }
 
                 hintPresenter.ShowAvailableActions(hints);

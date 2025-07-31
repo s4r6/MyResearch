@@ -13,8 +13,9 @@ public struct CreateRoomResult
 {
     public bool Success {  get; set; }
     public string RoomId {  get; set; }
-    public string ConnectionId {  get; set; }
-    public string Name { get; set; }
+    public string RoomName {  get; set; }
+    public string PlayerId {  get; set; }
+    public string PlayerName { get; set; }
     public int StageId {  get; set; }
     public List<ObjectEntity> ObjectData { get; set; }
     public int MaxRiskAmount {  get; set; }
@@ -25,8 +26,9 @@ public struct JoinRoomResult
 {
     public bool Success { get; set; }
     public string RoomId { get; set; }
-    public string ConnectionId { get; set; }
-    public string Name { get; set; }
+    public string RoomName { get; set; }
+    public string PlayerId { get; set; }
+    public string PlayerName { get; set; }
     public int StageId { get; set; }
     public List<PlayerSession> Players { get; set; }
     public List<ObjectEntity> ObjectData { get; set; }
