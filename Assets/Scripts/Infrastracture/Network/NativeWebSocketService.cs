@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UniRx;
 using UnityEngine;
+using Ping = Infrastructure.Network.Ping;
+using Pong = Infrastructure.Network.Pong;
 
 namespace Infrastracture.Network
 {
@@ -38,14 +40,15 @@ namespace Infrastracture.Network
             else
                 _socket = new WebSocket("wss://150.59.175.170:443/ws"); 
 #else
-            //_socket = new WebSocket("ws://localhost:5001/ws"); // ← ローカルテスト用
-            _socket = new WebSocket("wss://150.59.175.170/ws");
+            _socket = new WebSocket("ws://localhost:5001/ws"); // ← ローカルテスト用
+            //_socket = new WebSocket("wss://150.59.175.170/ws");
 #endif
 
             _socket.OnOpen += () =>
             {
                 Debug.Log("Connection opened");
                 Debug.Log(IsConnected);
+                StartPingLoop();
             };
 
             _socket.OnError += (e) =>
@@ -83,10 +86,15 @@ namespace Infrastracture.Network
         public async UniTask Connect(string url = "ws://localhost:5001/ws")
         {
 #if UNITY_EDITOR
-            await _socket.Connect();
+            _socket.Connect();
 #else
             await _socket.Connect();
 #endif
+        }
+
+        public async UniTask Close()
+        {
+            await _socket.Close();
         }
 
 #if !UNITY_WEBGL || UNITY_EDITOR
@@ -97,6 +105,8 @@ namespace Infrastracture.Network
         {
             var json = JsonConvert.SerializeObject(data);
 
+            if(data.PacketId != PacketId.PositionUpdate)
+                Debug.Log("Sended JSON: " + json);
             await _socket.SendText(json);
         }
 
@@ -110,6 +120,23 @@ namespace Infrastracture.Network
             var responseJson = await tcs.Task;
 
             return responseJson;
+        }
+
+        public async void StartPingLoop()
+        {
+            var ping = new PacketModel<Ping>()
+            {
+                PacketId = PacketId.Ping,
+                Payload = new Ping { }
+            };
+            var json = JsonConvert.SerializeObject(ping);
+
+            while (_socket.State == WebSocketState.Open)
+            {
+                Debug.Log("送信Ping");
+                await _socket.SendText(json);
+                await UniTask.Delay(TimeSpan.FromSeconds(15));
+            }
         }
     }
 }

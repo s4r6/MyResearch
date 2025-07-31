@@ -10,18 +10,20 @@ public class RoomInfoSetter : MonoBehaviour
     Button self;
 
     string roomId;
+    string roomName;
     public Action<string> OnPressedEvent;
-    public void SetInfo(string id, int count, Action<string> onPressed)
+    public void SetInfo(string id, string name, int count, Action<string> onPressed)
     {
         OnPressedEvent = onPressed;
+        roomName = name;
         roomId = id;
-        buttonText.text = $"RoomId:{id}, PlayerNum:{count}";
+        buttonText.text = $"RoomId:{name}, PlayerNum:{count}";
     }
 
     public void OnPressed()
     {
-
         OnPressedEvent?.Invoke(roomId);
+        OnPressedEvent = null;
     }
 
     public void OnDestroy()

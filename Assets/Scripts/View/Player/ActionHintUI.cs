@@ -28,6 +28,12 @@ namespace View.Player
         GameObject Cancel;
         [SerializeField]
         GameObject Interact;
+        [SerializeField]
+        GameObject PickUp;
+        [SerializeField]
+        GameObject EndGame;
+        [SerializeField]
+        GameObject ChangePage;
 
         [SerializeField] float spacing = 30f;
         [SerializeField] RectTransform KeyConfigSpace;
@@ -47,6 +53,9 @@ namespace View.Player
                 { ActionHintId.Cancel, Cancel },
                 { ActionHintId.SelectRisk, SelectRisk },
                 { ActionHintId.SelectAction, SelectAction },
+                { ActionHintId.PickUp, PickUp },
+                { ActionHintId.EndGame, EndGame },
+                { ActionHintId.ChangePage, ChangePage },
             };
         }
 

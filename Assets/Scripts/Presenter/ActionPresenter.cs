@@ -23,14 +23,18 @@ namespace Presenter.Player
             this.inputController = inputController;
         }
 
+        int actionNum = 0;
         public void StartSelectAction(int remainingActionPoint, int maxActionPoint, List<(string, int)> actions, string targetObjectId, Action<string> onEnd)
         {
+            actionNum = actions.Count;
+
             OnEndActionView = onEnd;
 
             //コールバック登録
             view.OnBackKeyPressed += OnCancelSelectAction;
             view.OnActionDirectionChanged += HandleActionDirection;
             view.OnSubmitKeyPressed += OnActionSelected;
+            view.OnScrollEvent += HandleScrollEvent;
 
             //UI入力を有効化
             EnableUIInput();
@@ -48,6 +52,7 @@ namespace Presenter.Player
             view.OnBackKeyPressed -= OnCancelSelectAction;
             view.OnActionDirectionChanged -= HandleActionDirection;
             view.OnSubmitKeyPressed -= OnActionSelected;
+            view.OnScrollEvent -= HandleScrollEvent;
 
             OnEndActionView = null;
         }
@@ -101,6 +106,14 @@ namespace Presenter.Player
             }
         }
 
+        void HandleScrollEvent(int delta)
+        {
+            int max = actionNum;
+            currentIndex = Mathf.Clamp(currentIndex - delta, 0, max - 1);
+            view.UpdateCallOutHighlights(currentIndex);
+
+            
+        }
 
         void EnableUIInput()
         {

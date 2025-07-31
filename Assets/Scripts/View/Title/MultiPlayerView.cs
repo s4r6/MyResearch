@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UseCase.Stage;
 using UseCase.Title;
 using View.Sound;
 
@@ -27,6 +28,9 @@ namespace View.Title
         Button joinRoomButton;
 
         [SerializeField]
+        Button backButton;
+
+        [SerializeField]
         SoundView sound;
 
         RoomPresenter presenter;
@@ -37,6 +41,7 @@ namespace View.Title
 
         private void Awake()
         {
+            backButton.onClick.AddListener(OnBackButtonPressed);
             createRoomButton.onClick.AddListener(DisplayCreateRoomTab);
             joinRoomButton.onClick.AddListener(DisplayJoinRoomTab);
         }
@@ -53,6 +58,11 @@ namespace View.Title
             joinRoomTab.gameObject.SetActive(false);
         }
 
+        void OnBackButtonPressed()
+        {
+            sound.PlaySE(AudioId.ButtonClick, 1f);
+            presenter.OnBack();
+        }
         public void SetPlayerName(string name)
         {
             PlayerName.text = name;
@@ -63,6 +73,13 @@ namespace View.Title
         {
             Debug.Log("Tab表示");
             sound.PlaySE(AudioId.ButtonClick, 1f);
+
+            //joinRoomTabが表示中なら非表示にする
+            if(joinRoomTab.gameObject.activeSelf)
+            {
+                joinRoomTab.gameObject.SetActive(false);
+            
+            }
             createRoomTab.gameObject.SetActive(true);
             createRoomTab.createButton.onClick.AddListener(OnCreate);
         }
@@ -72,9 +89,18 @@ namespace View.Title
         {
             Debug.Log("JoinTab表示");
             sound.PlaySE(AudioId.ButtonClick, 1f);
+
+            //createRoomTab
+            if (createRoomTab.gameObject.activeSelf)
+            {
+                createRoomTab.gameObject.SetActive(false);
+
+            }
             joinRoomTab.gameObject.SetActive(true);
             joinRoomTab.searchButton.onClick.AddListener(OnSearch);
         }
+
+
 
         //Createボタンが押されたとき
         void OnCreate()
@@ -93,12 +119,16 @@ namespace View.Title
             sound.PlaySE(AudioId.ButtonClick, 1f);
             presenter.SearchRoom();
         }
-
-        public void DisplayRoomList(List<(string, int)> rooms) => joinRoomTab.DisplayRoomList(rooms, (roomId) => { presenter.JoinRoom(roomId); });
+        
+        public void AddRoomList(List<(string, string, int)> rooms) => joinRoomTab.AddRoomList(rooms, (roomId) => { presenter.JoinRoom(roomId); });
+        public void DestroyRoomList(List<string> roomNames) => joinRoomTab.DestroyRoomList(roomNames);
+        public void UpdateRoomList(List<(string, string, int)> roomDatas) => joinRoomTab.UpdateRoomList(roomDatas);
 
         public void TransitionInGame(int stageId)
         {
             SceneManager.LoadScene("Stage" + stageId);
         }
+
+        
     }
 }

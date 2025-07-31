@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using Cysharp.Threading.Tasks;
+using System.Linq;
 using UseCase.Network;
 using UseCase.Network.DTO;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
+using UseCase.Title;
 
 namespace Presenter.Network
 {
@@ -15,18 +17,22 @@ namespace Presenter.Network
         void TransitionInGame(int stageId);
 
         void SetPlayerName(string name);
-        void DisplayRoomList(List<(string, int)> rooms);
+        void AddRoomList(List<(string, string, int)> roomDatas);
+        void DestroyRoomList(List<string> roomNames);
+        void UpdateRoomList(List<(string, string, int)> roomDatas); 
     }
 
     public class RoomPresenter
     {
-        RoomUseCase usecase; 
+        RoomUseCase usecase;
+        TitleUseCase titleUseCase;
         IMultiPlayerView view;
 
-        public RoomPresenter(IMultiPlayerView view, RoomUseCase usecase) 
+        public RoomPresenter(IMultiPlayerView view, RoomUseCase usecase, TitleUseCase titleUseCase) 
         { 
             this.view = view;
             this.usecase = usecase;
+            this.titleUseCase = titleUseCase;
         }
 
         public void CreateRoom(string roomId, string name, int stageId = 1)
@@ -61,9 +67,30 @@ namespace Presenter.Network
             view.TransitionInGame(output.StageId);
         }
 
+        public void OnBack()
+        {
+            titleUseCase.ChangeGameMode(GameMode.ModeSelect);
+        }
+
         public void OnCompleteSearch(SearchRoomOutputData output)
         {
-            view.DisplayRoomList(output.RoomDatas);
+            var removedRoomNames = output.Removed.Select(r =>
+            {
+                return r.Name;
+            }).ToList();
+            view.DestroyRoomList(removedRoomNames);
+
+            var updatedRoomDatas = output.Updated.Select(r => 
+            {
+                return (r.Id, r.Name, r.Players.Count);
+            }).ToList();
+            view.UpdateRoomList(updatedRoomDatas);
+
+            var addedRoomDatas = output.Added.Select(r =>
+            {
+                return (r.Id, r.Name, r.Players.Count);
+            }).ToList();
+            view.AddRoomList(addedRoomDatas);
         }
 
         public void OnCompleteJoin(JoinRoomOutputData output)

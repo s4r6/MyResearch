@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 using Domain.Network;
 using Infrastracture.Network;
+using Infrastracture.Repository;
 using Infrastructure.Network;
 using UseCase.Network;
 
@@ -24,16 +25,16 @@ namespace Infrastracture.Repository
             this.server = server;
         }
 
-        public async UniTask Create(string roomId, string playerName, int stageId)
+        public async UniTask Create(string roomName, string playerName, int stageId)
         {
             var packet = new PacketModel<CreateRoomRequest>
             {
                 PacketId = PacketId.CreateRoomRequest,
                 Payload = new CreateRoomRequest
                 {
-                    RoomId = roomId,
+                    RoomName = roomName,
                     StageId = stageId,
-                    PlayerId = playerName
+                    PlayerName = playerName
                 }
             };
 
@@ -48,7 +49,7 @@ namespace Infrastracture.Repository
                 Payload = new JoinRequest
                 {
                     RoomId = roomId,
-                    PlayerId = playerName
+                    PlayerName = playerName
                 }
             };
 
@@ -71,6 +72,7 @@ namespace Infrastracture.Repository
             }
 
             var roomList = payload["RoomList"].ToObject<List<RoomSession>>();
+
             return roomList;
         }
 
@@ -108,5 +110,9 @@ namespace Infrastracture.Repository
         {
             SelfPlayerSession = new PlayerSession(id, name);
         }
+
+
+
+        
     }
 }

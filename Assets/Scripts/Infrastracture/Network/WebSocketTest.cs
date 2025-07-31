@@ -41,7 +41,7 @@ public class WebSocketTest : MonoBehaviour
             if (packetId == PacketId.JoinResponse)
             {
                 var response = JsonConvert.DeserializeObject<PacketModel<JoinResponse>>(message);
-                Debug.Log($"[JoinResponse] Success: {response.Payload.Success}, PlayerId: {response.Payload.ConnectionId}");
+                Debug.Log($"[JoinResponse] Success: {response.Payload.Success}, PlayerId: {response.Payload.PlayerId}");
             }
         };
 

@@ -17,5 +17,6 @@ namespace Infrastracture.Network
         Subject<(PacketId, JObject)> OnMessage { get; }
         UniTask Send<T>(PacketModel<T> data);
         UniTask<JObject> SendAndReceive<TRequest>(PacketModel<TRequest> data, PacketId responseId);
+        UniTask Close();
     }
 }

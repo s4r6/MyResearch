@@ -65,7 +65,6 @@ public class RemotePlayerMoveController : IMoveController
                 frameCounter = 0;
                 lastSentPosition = position;
                 lastSentTime = Time.time;
-                Debug.Log("çXêV");
                 try
                 {
                     await sender.SendPlayerPosition(new PositionSyncData

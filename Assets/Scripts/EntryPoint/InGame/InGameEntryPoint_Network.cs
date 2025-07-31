@@ -57,6 +57,8 @@ public class InGameEntryPoint_Network : MonoBehaviour
     ActionHintUI hintUI;
     [SerializeField]
     VoteView voteView;
+    [SerializeField]
+    GameObject reticle;
 
     //Sound
     [SerializeField]
@@ -104,15 +106,15 @@ public class InGameEntryPoint_Network : MonoBehaviour
         var document = new DocumentUseCase(documentView, new DocumentEntity());
 
         var hintPresenter = new ActionHintPresenter(hintUI);
-        usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact), hintPresenter);
+        usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact), hintPresenter, reticle);
 
         var remotePlayerRepository = new RemotePlayerRepository();
         var syncUseCase = new RemotePlayerSyncUseCase(remotePlayerRepository, remotePlayerFactory, session, receiver);
 
-        
-        var voteUseCase = new VoteUseCase(sender, receiver, session);
+        var votePresenter = new VotePresenter(voteView);
+        var voteUseCase = new VoteUseCase(sender, receiver, session, votePresenter);
         var gameSystem = new RemoteGameSystemUseCase(usecase, new StageSystemUseCase(stage, resultView), gameState, document, input, voteUseCase, session, sender, receiver);
-        var votePresenter = new VotePresenter(voteUseCase, gameSystem, voteView);
+        
         voteView.Inject(votePresenter);
 
         gameSystem.StartGame();

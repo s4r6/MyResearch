@@ -62,7 +62,9 @@ namespace Presenter.Network
             {
                 Success = data.Success,
                 RoomId = data.RoomId,
-                ConnectionId = data.ConnectionId,
+                RoomName = data.RoomName,
+                PlayerId = data.PlayerId,
+                PlayerName = data.PlayerName,
                 StageId = data.StageId,
                 ObjectData = entities,
                 MaxRiskAmount = data.MaxRiskAmount,
@@ -78,8 +80,9 @@ namespace Presenter.Network
             {
                 Success = data.Success,
                 RoomId = data.RoomId,
-                ConnectionId = data.ConnectionId,
-                Name = data.PlayerName,
+                RoomName = data.RoomName,
+                PlayerId = data.PlayerId,
+                PlayerName = data.PlayerName,
                 StageId = data.StageId,
                 Players = data.Players,
                 ObjectData = entities,
@@ -200,13 +203,16 @@ namespace Presenter.Network
 
                     // SyncDataを分離
                     var syncDataToken = payload["SyncData"];
-                    payload.Remove("SyncData");
+                    List<ObjectEntity> entities = new();
+                    if(syncDataToken != null && syncDataToken.Type != JTokenType.Null)
+                    {
+                        payload.Remove("SyncData");
+                        // SyncDataからエンティティ生成
+                        entities = ObjectSerializer.ToEntities(syncDataToken);
+                    }
 
                     // 本体をデシリアライズ
                     var data = payload.ToObject<JoinResponse>();
-
-                    // SyncDataからエンティティ生成
-                    var entities = ObjectSerializer.ToEntities(syncDataToken);
 
                     // ハンドリング
                     OnReceiveJoinResponsePacket(data, entities);
@@ -225,14 +231,16 @@ namespace Presenter.Network
 
                     // SyncDataを分離
                     var syncDataToken = payload["SyncData"];
-                    payload.Remove("SyncData");
+                    ObjectEntity entity = null;
+                    if (syncDataToken != null && syncDataToken.Type != JTokenType.Null)
+                    {
+                        payload.Remove("SyncData");
+                        // SyncDataからエンティティ生成
+                        entity = ObjectSerializer.ToEntity(syncDataToken);
+                    }
 
                     // 本体をデシリアライズ
                     var data = payload.ToObject<ActionResponse>();
-
-                    // SyncDataからエンティティ生成
-                    var entity = ObjectSerializer.ToEntity(syncDataToken);
-
 
                     // ハンドリング
                     OnReceiveActionResponsePacket(data, entity);

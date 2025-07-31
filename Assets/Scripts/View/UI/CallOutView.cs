@@ -1,3 +1,4 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -5,9 +6,9 @@ namespace View.UI
 {
     public class CallOutView : MonoBehaviour
     {
-        [SerializeField] public Text labelText;       // または TextMeshProUGUI
+        [SerializeField] public TMP_Text labelText;       // または TextMeshProUGUI
         [SerializeField] private Image underLine;
-        [SerializeField] Text CostText;
+        [SerializeField] TMP_Text CostText;
 
         private bool isActive = false;
         private Color cachedColor;

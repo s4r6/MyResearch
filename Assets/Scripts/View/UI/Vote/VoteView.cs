@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using Presenter.Vote;
+using TMPro;
+using Unity.VisualScripting.Antlr3.Runtime.Tree;
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.UI;
@@ -18,6 +21,11 @@ namespace View.UI
         Button YesButton;
         [SerializeField]
         Button NoButton;
+        /*[SerializeField]
+        Button CancelButton;*/
+
+        [SerializeField]
+        TMP_Text Message;
 
         List<Image> images = new();
 
@@ -28,25 +36,60 @@ namespace View.UI
             this.presenter = presenter;
         }
 
+
+        Action<bool> OnSelect;
         void Start()
         {
-            YesButton.onClick.AddListener(() => { presenter?.OnChoice(true); });
-            NoButton.onClick.AddListener(() => { presenter?.OnChoice(false); });
+            YesButton.onClick.AddListener(() => {
+                OnSelect?.Invoke(true); 
+                OnSelect = null;
+            });
+
+            NoButton.onClick.AddListener(() => { 
+                OnSelect?.Invoke(false); 
+                OnSelect = null;
+            });
 
             Hide();
         }
 
-        public void Display()
+        public void Display(Action<bool> onSelect)
         {
+            OnSelect = onSelect;
+
             this.gameObject.SetActive(true);
             PlayerView.cursorLocked = false;
             Cursor.lockState = CursorLockMode.None;
+
+            Message.text = "èIóπÇµÇ‹Ç∑Ç©ÅH";
+            Message.gameObject.SetActive(true);
+        }
+
+        public void DisplayWaitingUI()
+        {
+            Message.gameObject.SetActive(false);
+            YesButton.gameObject.SetActive(false);
+            NoButton.gameObject.SetActive(false);
+
+            //CancelButton.gameObject.SetActive(true);
         }
 
         public void Hide()
         {
             PlayerView.cursorLocked = true;
             Cursor.lockState = CursorLockMode.Locked;
+
+            Message.gameObject.SetActive(true);
+            YesButton.gameObject.SetActive(true);
+            NoButton.gameObject.SetActive(true);
+
+            //CancelButton.gameObject.SetActive(false);
+
+            foreach(var img in images)
+            {
+                Destroy(img.gameObject);
+            }
+            images.Clear();
             gameObject.SetActive(false);
         }
 

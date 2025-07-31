@@ -7,12 +7,14 @@ namespace Domain.Network
     public class RoomSession
     {
         public string Id { get; }
+        public string Name { get; }
         public List<PlayerSession> Players;
         public int StageId {  get; }
 
-        public RoomSession(string id, List<PlayerSession> players, int stageId) 
+        public RoomSession(string id, string name, List<PlayerSession> players, int stageId) 
         { 
             Id = id; 
+            Name = name;
             Players = players;
             StageId = stageId;
         }
