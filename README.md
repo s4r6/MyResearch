@@ -11,7 +11,7 @@
 複数のプレイヤーが同一の仮想空間で学習を行えるよう、**WebSocketを利用したマルチプレイ**機能を実装しています。  
 
 ゲームサーバーは別リポジトリで管理しています。  
-サーバー側リポジトリ: [https://github.com/s4r6/MyResearch](https://github.com/s4r6/MyResearch)
+サーバー側リポジトリ: [https://github.com/s4r6/GameServer](https://github.com/s4r6/GameServer)
 
 ---
 
