@@ -19,12 +19,25 @@
 - **ビルドターゲット**: WebGL  
 - **アーキテクチャ**: Clean Architectureを参考  
   - 主に以下の4層構造  
-    - View & Infra  
+    - View & Infrastracture
     - Interface Adapter  
     - UseCase  
     - Domain  
-  - 個人開発のため、厳密な分離は行っていない
+  - 開発速度との兼ね合いで一部上記の4層構造を守っていない部分があります
 
 ---
 
-## ディレクトリ構成（例）
+## ディレクトリ構成
+MyResearch/
+└── Assets/
+  ├── Scripts/
+  │ ├──EntryPoint/ # システムのエントリーポイント(DI)
+  │ ├── Domain/ # ゲームのドメインロジック
+  │ ├── UseCase/ # アプリケーションのユースケース
+  │ ├── Presenter/ # Presenterなど
+  │ ├── View/ # Frameworkやライブラリ依存部分のうち画面に関係するもの（UI, GameObject等）
+  | └── Infrastracture/ # Frameworkやライブラリ依存部分のうち画面とは関係ないもの (WebSocket, Serializer等)
+  ├── Scenes/ # Unityシーンデータ
+  └── Resources/ # 各種リソース（JSON, テクスチャなど）
+    └── Prefabs/ # プレハブデータ
+
