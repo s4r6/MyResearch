@@ -28,6 +28,7 @@
 ---
 
 ## ディレクトリ構成
+```
 MyResearch/
 └── Assets/
   ├── Scripts/
@@ -40,4 +41,4 @@ MyResearch/
   ├── Scenes/ # Unityシーンデータ
   └── Resources/ # 各種リソース（JSON, テクスチャなど）
     └── Prefabs/ # プレハブデータ
-
+```
