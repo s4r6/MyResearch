@@ -1,6 +1,9 @@
 # MyResearch
 
 [![Unity](https://img.shields.io/badge/Unity-6000.1.0f1-black?logo=unity)](https://unity.com/)
+[![UniRx](https://img.shields.io/badge/Library-UniRx-blue)](https://github.com/neuecc/UniRx)
+[![UniTask](https://img.shields.io/badge/Library-UniTask-blue)](https://github.com/Cysharp/UniTask)
+[![DoTween](https://img.shields.io/badge/Library-DoTween-blue)](http://dotween.demigiant.com/)
 
 ## プロジェクト概要
 本プロジェクトは、**3D空間上でリスクアセスメントを体験・学習できるゲーム**です。  
