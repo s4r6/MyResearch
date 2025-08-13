@@ -1,7 +1,6 @@
 # MyResearch
 
-[![Unity](https://img.shields.io/badge/Unity-202X.x-black?logo=unity)](https://unity.com/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Unity](https://img.shields.io/badge/Unity-6000.1.0f1-black?logo=unity)](https://unity.com/)
 
 ## プロジェクト概要
 本プロジェクトは、**3D空間上でリスクアセスメントを体験・学習できるゲーム**です。  
