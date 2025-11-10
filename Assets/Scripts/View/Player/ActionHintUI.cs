@@ -100,5 +100,10 @@ namespace View.Player
             }
         }
 
+        public void Disable()
+        {
+            gameObject.SetActive(false);
+        }
+
     }
 }

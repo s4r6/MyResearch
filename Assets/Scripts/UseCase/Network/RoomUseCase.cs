@@ -62,7 +62,7 @@ namespace UseCase.Network
             sessionRepository.SaveRoomSession(room);
 
             //StageEntity‚ğì¬
-            var stage = new StageEntity(result.MaxRiskAmount, result.MaxActionPointAmount);
+            var stage = new StageEntity(result.MaxRiskAmount, result.MaxActionPointAmount, (IStageObjectRepository)objectRepository);
             stageRepository.Save(stage);
             
             //Object‚ğRepository‚É“o˜^
@@ -100,7 +100,7 @@ namespace UseCase.Network
             sessionRepository.SaveRoomSession(room);
 
             //StageEntity‚ğì¬
-            var stage = new StageEntity(result.MaxRiskAmount, result.MaxActionPointAmount);
+            var stage = new StageEntity(result.MaxRiskAmount, result.MaxActionPointAmount, (IStageObjectRepository)objectRepository);
             stageRepository.Save(stage);
 
             //Object‚ğRepository‚É“o˜^

@@ -81,7 +81,7 @@ public struct ActionResultData
     public ObjectEntity ObjectData { get; set; }
     public int currentRiskAmount { get; set; }
     public int currentActionPointAmount { get; set; }
-    public List<RiskAssessmentHistory> histories { get; set; }
+    public List<SurmmaryDetailDTO> histories { get; set; }
 }
 
 public interface IPacketReceiver

@@ -64,7 +64,6 @@ namespace UseCase.Title
         {
             if(gameMode.CurrentMode == GameMode.ModeSelect && cashPlayerName == string.Empty)
             {
-                Debug.Log("åxçê");
                 modeSelect.WarningInputName();
                 return;
             }

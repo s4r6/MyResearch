@@ -66,7 +66,11 @@ namespace View.UI
             frontBar.fillAmount = target;
             delayBar.fillAmount = target;
 
-            ValueText.text = $"{current}/{max}";
+            if(ValueText != null)
+            {
+                ValueText.text = $"{current}/{max}";
+            }
+            
         }
     }
 }

@@ -1,10 +1,16 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using Domain.Stage;
-using NUnit.Framework;
+using UniRx;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using View.Player;
+using DG.Tweening;
+using Domain.Stage;
 
 namespace View.UI
 {
@@ -21,55 +27,123 @@ namespace View.UI
         [SerializeField]
         IndicatorView ActionPointIndicator;
 
-        List<HistroyView> Histories = new();
+        [SerializeField]
+        TMP_Text SelectedRiskNum;
+        [SerializeField]
+        TMP_Text RiskReducedActionNum;
 
+        List<HistroyView> Histories = new();
+        List<GameObject> HistoryButtons = new();
+
+        [SerializeField]
+        DetailWindowManager manager;
+
+        bool IsDisplayCompleted = false;
+        bool IsSkipRequested = false;
         void Awake()
         {
             gameObject.SetActive(false);    
         }
 
-        public void SetHistory(HistroyView view, RiskAssessmentHistory history)
+        public void SetHistory(HistroyView view, SurmmaryDetailDTO detail)
         {
-            view.SetText(history.ObjectName, history.SelectedRiskLabel, history.ExecutedActionLabel, history.RiskChange.ToString(), history.ActionCost.ToString(), history.Explanation);
+            view.SetText(detail.DisplayName, detail.RiskLabel, detail.ActionLabel, detail.RiskChange.ToString(), detail.ActionCost.ToString());
         }
 
         public void Display()
         {
-            Debug.Log("表示");
             this.gameObject.SetActive(true);
 
-            Debug.Log("CursorLocked = false");
             PlayerView.cursorLocked = false;
             Cursor.lockState = CursorLockMode.None;    // カーソル自由
             Cursor.visible = true;                     // カーソル表示
         }
 
-        public async UniTask ShowResult(List<RiskAssessmentHistory> histories)
+        public void Skip()
         {
-            foreach(RiskAssessmentHistory history in histories)
+            IsSkipRequested = true;
+        }
+
+        public async UniTask ShowResult(SurmmaryDTO surmmary)
+        {
+            foreach (var action in surmmary.Actions)
             {
                 //各Historyを作成&テキストの適用
                 var hist = Instantiate(HistoryViewPrefab, ParentTransform);
                 var view = hist.GetComponent<HistroyView>();
+
+                HistoryButtons.Add(hist);
                 Histories.Add(view);
-                SetHistory(view, history);
+                SetHistory(view, action);
 
-                //アニメーションしながら表示
-                await view.Display();
+                hist.GetComponent<Button>().onClick.AddListener(() => ShowDetailPage(view.GetId(), action));
 
-                //表示が終わったら
-                await UniTask.WhenAll(
-                    RiskIndicator.SetValueAsync(history.CurrentRisk, history.MaxRisk),
-                    ActionPointIndicator.SetValueAsync(history.CurrentActionPoint, history.MaxActionPoint)
-                );
+                surmmary.CurrentRisk += action.RiskChange;
+                surmmary.CurrentActionPoint -= action.ActionCost;
+
+                if(IsSkipRequested)
+                {
+                    view.SkipAnimation();
+
+                    RiskIndicator.SetValue(surmmary.CurrentRisk, surmmary.MaxRisk);
+                    ActionPointIndicator.SetValue(surmmary.CurrentActionPoint, surmmary.MaxActionPoint);
+                }
+                else
+                {
+                    //アニメーションしながら表示
+                    await view.Display();
+
+                    //表示が終わったら
+                    await UniTask.WhenAll(
+                        RiskIndicator.SetValueAsync(surmmary.CurrentRisk, surmmary.MaxRisk),
+                        ActionPointIndicator.SetValueAsync(surmmary.CurrentActionPoint, surmmary.MaxActionPoint)
+                    );
+                }
+            }
+
+            IsDisplayCompleted = true;
+        }
+
+        public void FocusToElement(string elementId, SurmmaryDetailDTO data)
+        {
+            foreach (var element in Histories)
+            {
+
+                if (element.GetId() != elementId)
+                    continue; 
+
+                manager.DisplayDetail(data);
+
+                manager.onClosed
+                    .Take(1)
+                    .Subscribe(_ => gameObject.SetActive(true));
+
+                gameObject.SetActive(false);
             }
         }
 
         //-------------------PRESENTER------------------------
-        public void ShowResultWindow(List<RiskAssessmentHistory> histories)
+        public void ShowResultWindow(SurmmaryDTO surmmary)
         {
             Display();
-            ShowResult(histories).Forget();
+            SelectedRiskNum.text = $"{surmmary.FindRiskNum} / {surmmary.MaxRiskNum}";
+            RiskReducedActionNum.text = $"{surmmary.ExecuteCorrectActionNum} / {surmmary.MaxCorrectActionNum}";
+            ShowResult(surmmary).Forget();
+        }
+
+        public void ShowDetailPage(string elementId, SurmmaryDetailDTO data)
+        {
+            if(!IsDisplayCompleted)
+            {
+                Skip();
+            }
+            else
+            {
+                FocusToElement(elementId, data);
+            }
+                
         }
     }
+
+    
 }

@@ -54,7 +54,7 @@ public class InGameEntryPoint_Local : MonoBehaviour
 
 
     PlayerSystemUseCase usecase;
-    IObjectRepository repository;
+    ObjectRepository repository;
     StageEntity stage;
 
     bool IsActive = false;
@@ -67,7 +67,7 @@ public class InGameEntryPoint_Local : MonoBehaviour
         var entityFactory = new EntityFactory();
         repository = new ObjectRepository(entityFactory);
         var stageRepository = new StageRepository(repository);
-        stage = stageRepository.CreateStage(1);
+        stage = stageRepository.CreateStage(1, repository);
 
         var soundPresenter = new SoundPresenter(sound);
 

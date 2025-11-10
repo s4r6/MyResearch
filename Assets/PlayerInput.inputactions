@@ -481,6 +481,56 @@
                     "isPartOfComposite": true
                 }
             ]
+        },
+        {
+            "name": "Result",
+            "id": "9bb3575f-86da-4904-86a6-1120447cb398",
+            "actions": [
+                {
+                    "name": "PageChange",
+                    "type": "Button",
+                    "id": "a1725407-3405-4727-9b8d-b0579dfe8a98",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "AD",
+                    "id": "b806f978-6cf0-4395-9e6e-166a19ac04e9",
+                    "path": "1DAxis",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PageChange",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "161e1ada-9314-4b61-90aa-a63a68c0b2e6",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PageChange",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "64539f73-cd19-4492-a313-aa6dd1665627",
+                    "path": "<Keyboard>/d",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "PageChange",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                }
+            ]
         }
     ],
     "controlSchemes": []

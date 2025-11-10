@@ -23,11 +23,11 @@ namespace Infrastructure.Repository
             MaxActionPointMap.Add(1, CalcMaxActionPoint(entities));
         }
     
-        public StageEntity CreateStage(int stageNumber)
+        public StageEntity CreateStage(int stageNumber, IStageObjectRepository repository)
         {
             var maxRiskAmount = GetRiskAmountByStageNumber(1);
             var maxActionPointAmount = GetActionPointAmountByStageNumber(1);
-            var stage = new StageEntity(maxRiskAmount, maxActionPointAmount);
+            var stage = new StageEntity(maxRiskAmount, maxActionPointAmount, repository);
 
             Save(stage);
 

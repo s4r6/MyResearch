@@ -5,6 +5,7 @@ using Domain.Network;
 using Domain.Stage;
 using Infrastracture.Network;
 using Infrastructure.Network;
+using Infrastructure.Repository;
 using UniRx;
 using UnityEngine;
 using UseCase.Network;
@@ -14,11 +15,13 @@ namespace Infrastracture.Repository
     public class RemoteStageRepository : IStageRepository
     {
         IWebSocketService server;
+        RemoteObjectRepository repository;
 
         StageEntity currentStageEntity;
 
-        public RemoteStageRepository(IWebSocketService server)
+        public RemoteStageRepository(IWebSocketService server, RemoteObjectRepository objectRepository)
         {
+            repository = objectRepository;
             this.server = server;
             Bind();
         }
@@ -33,7 +36,7 @@ namespace Infrastracture.Repository
             currentStageEntity = stage;
         }
 
-        public StageEntity CreateStage(int stageNumber)
+        public StageEntity CreateStage(int stageNumber, IStageObjectRepository repository)
         {
             //currentStageEntity = new StageEntity(MaxRiskMap[stageNumber], MaxRiskMap[stageNumber]);
             return currentStageEntity;
@@ -41,7 +44,7 @@ namespace Infrastracture.Repository
 
         void Bind()
         {
-            server.OnMessage
+            /*server.OnMessage
                 .Where(tuple => tuple.Item1 == PacketId.JoinResponse)
                 .Subscribe(tuple =>
                 {
@@ -52,8 +55,8 @@ namespace Infrastracture.Repository
                     Debug.Log($"Current Risk Amount: {riskAmount}");
                     Debug.Log($"Current Action Point Amount: {actionPointAmount}");
 
-                    currentStageEntity = new StageEntity(riskAmount, actionPointAmount);
-                });
+                    currentStageEntity = new StageEntity(riskAmount, actionPointAmount, repository);
+                });*/
 
             /*server.OnMessage
                 .Where(tuple => tuple.Item1 == PacketId.ActionResponse)

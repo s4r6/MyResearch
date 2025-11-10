@@ -2,81 +2,115 @@ using System.Collections.Generic;
 using UnityEngine;
 using Domain.Stage.Object;
 using Domain.Action;
-using UseCase.Player; // InspectableObjectの参照
+using UseCase.Player;
+using System;
+using UniRx;
+using Unity.Collections;
+using System.Linq;
+using Domain.Component;
 
 namespace Domain.Stage
 {
-    public struct RiskAssessmentHistory
+    public struct SurmmaryDTO
     {
-        public string ObjectName { get; set; }
-        public string SelectedRiskLabel { get; set; }
-        public string ExecutedActionLabel { get; set; }
+        public TimeSpan time;
+        public int FindRiskNum;                     //発見した潜在リスクの数
+        public int MaxRiskNum;                      //潜在リスクの最大数
+        public int ExecuteCorrectActionNum;         //実行したリスクが減少する行動の数
+        public int MaxCorrectActionNum;             //リスクが減少する行動の最大数
+        public int CurrentRisk;
+        public int MaxRisk;
+        public int CurrentActionPoint;
+        public int MaxActionPoint;
 
-        public int RiskChange { get; set; } // 実行による変化量
-        public int CurrentRisk { get; set; }
-        public int MaxRisk { get; set; }
-
-        public int ActionCost { get; set; }// 使用したアクションポイント
-        public int CurrentActionPoint { get; set; }
-        public int MaxActionPoint { get; set; }
-
-        public string Explanation { get; set; }
-
-        public RiskAssessmentHistory(
-            string objectName,
-            string riskLabel,
-            string actionLabel,
-            int riskChange,
-            int currentRisk,
-            int maxRisk,
-            int actionCost,
-            int currentAP,
-            int maxAP,
-            string explanation)
-        {
-            ObjectName = objectName;
-            SelectedRiskLabel = riskLabel;
-            ExecutedActionLabel = actionLabel;
-            RiskChange = riskChange;
-            CurrentRisk = currentRisk;
-            MaxRisk = maxRisk;
-            ActionCost = actionCost;
-            CurrentActionPoint = currentAP;
-            MaxActionPoint = maxAP;
-           Explanation = explanation;
-        }
+        public List<SurmmaryDetailDTO> Actions;     //実行した対応策
     }
 
+    public struct SurmmaryDetailDTO
+    {
+        public string DisplayName;  //オブジェクトの表示名
+        public string RiskLabel;    //選択したリスク名
+        public string ActionLabel;  //実行した対応策名
+        public int RiskChange;
+        public int ActionCost;
+        public string Explanation;  //解説
+        public string Description;     //状況説明
+
+        public List<string> RiskLabels;
+        //DisplayName, <RiskChange, ActionCost>
+        public List<(string label, (int, int))> ActionLabels;
+    }
+
+    public interface IStageObjectRepository
+    {
+        IReadOnlyList<ObjectEntity> GetAll();
+    }
 
     public class StageEntity
     {
+        readonly IStageObjectRepository repository;
         private readonly int maxRiskAmount;
         public readonly int maxActionPoint;
         private int currentRiskAmount;
         private int currentActionPointAmount;
 
         //----------------------リザルト表示用--------------------------
-        public List<RiskAssessmentHistory> histories = new();
+        public SurmmaryDTO surmmary;
+        public List<SurmmaryDetailDTO> histories = new();
 
         public event System.Action OnEndStage;
 
-        public StageEntity(int maxRiskAmount, int maxActionPoint)
+        public StageEntity(int maxRiskAmount, int maxActionPoint, IStageObjectRepository repository)
         {
+            this.repository = repository;
             this.maxRiskAmount = maxRiskAmount;
             this.maxActionPoint = maxActionPoint;
             this.currentRiskAmount = maxRiskAmount;
             this.currentActionPointAmount = maxActionPoint;
         }
 
-        public void Update(int currentRiskAmount, int currentActionPointAmount, List<RiskAssessmentHistory> histories)
+        public void Update(int currentRiskAmount, int currentActionPointAmount, List<SurmmaryDetailDTO> histories)
         {
             this.currentRiskAmount = currentRiskAmount;
             this.currentActionPointAmount = currentActionPointAmount;
             this.histories = histories;
-            foreach(var history in this.histories)
+        }
+
+        public SurmmaryDTO CreateSurmmary()
+        {
+            if (repository == null) return new SurmmaryDTO();
+
+            var objects = repository.GetAll();
+            var findRiskNum = histories.Count(history => history.RiskChange < 0);
+            var maxRiskNum = objects.Count(obj =>
             {
-                Debug.Log(history.SelectedRiskLabel);
-            }
+                if (obj.TryGetComponent<ChoicableComponent>(out var choicable))
+                {
+                    var hasRisk = choicable.Choices.Any(choice => choice.OverrideActions.Any(action => action.riskChange < 0));
+                    return hasRisk;
+                }
+                else
+                {
+                    return false;
+                }
+            });
+            var executeCorrectActionNum = histories.Count(history => history.RiskChange < 0);
+            var maxCorrectActionNum = 0;
+
+            return new SurmmaryDTO
+            {
+                time = TimeSpan.Zero,
+                FindRiskNum = findRiskNum,
+                MaxRiskNum = maxRiskNum,
+                ExecuteCorrectActionNum = executeCorrectActionNum,
+                MaxCorrectActionNum = maxCorrectActionNum,
+                CurrentRisk = currentRiskAmount,
+                MaxRisk = maxRiskAmount,
+                CurrentActionPoint = currentActionPointAmount,
+                MaxActionPoint = maxActionPoint,
+
+                Actions = histories
+            };
         }
 
         public void CalcRiskAmount(ActionEntity action)
@@ -106,11 +140,23 @@ namespace Domain.Stage
             currentActionPointAmount -= history.ActionCost;
             currentRiskAmount += history.RiskChange;
 
-            var riskAssesmentHis = new RiskAssessmentHistory(history.ObjectName, history.SelectedRiskLable, history.ExecutedActionLabel, history.RiskChange, currentRiskAmount, maxRiskAmount, history.ActionCost, currentActionPointAmount, maxActionPoint, "");
-            AddHistory(riskAssesmentHis);
+            var detailDTO = new SurmmaryDetailDTO()
+            {
+                DisplayName = history.DisplayName,
+                Explanation = history.Explanation,
+                RiskLabel = history.SelectedRiskLable,
+                ActionLabel = history.ExecutedActionLabel,
+                RiskChange = history.RiskChange,
+                ActionCost = history.ActionCost,
+                RiskLabels = history.RiskLabels,
+                ActionLabels = history.Actions.Select(action => (action.label, (action.riskChange, action.actionPointCost))).ToList(),
+                Description = history.Description,
+            };
+
+            AddHistory(detailDTO);
         }
 
-        void AddHistory(RiskAssessmentHistory history)
+        void AddHistory(SurmmaryDetailDTO history)
         {
             histories.Add(history);
         }

@@ -16,16 +16,9 @@ namespace UseCase.Stage
             this.view = view;
         }
 
-        public void OnExecuteAction(ActionHistory history)
-        {
-            stage.OnExecuteAction(history);
-        }
-
         public void OnExitStage()
         {
-            Debug.Log("ActionPointAmount;" + stage.GetActionPoint());
-            Debug.Log("RiskAmount:" + stage.GetRiskAmount());
-            view.ShowResultWindow(stage.histories);
+            view.ShowResultWindow(stage.CreateSurmmary());
         }
     }
 }
