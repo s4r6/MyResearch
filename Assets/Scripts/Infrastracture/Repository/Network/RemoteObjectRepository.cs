@@ -8,11 +8,12 @@ using UseCase.Player;
 using System.Linq;
 using Presenter.Network;
 using UnityEngine;
+using Domain.Stage;
 
 
 namespace Infrastructure.Repository
 {
-    public class RemoteObjectRepository : IObjectRepository
+    public class RemoteObjectRepository : IObjectRepository, IStageObjectRepository
     {
         IWebSocketService server;
         Dictionary<string, ObjectEntity> entities = new();

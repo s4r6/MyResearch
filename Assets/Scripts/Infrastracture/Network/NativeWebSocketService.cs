@@ -16,7 +16,7 @@ namespace Infrastracture.Network
 {
     public class NativeWebSocketService : MonoBehaviour, IWebSocketService
     {
-        bool IsRemote = true;
+        bool IsRemote = false;
         private WebSocket _socket;
         
         Subject<(PacketId, JObject)> OnReceiveMessage = new Subject<(PacketId, JObject)>();
@@ -36,7 +36,7 @@ namespace Infrastracture.Network
 
 #if UNITY_WEBGL && !UNITY_EDITOR
             if(!IsRemote)
-                _socket = new WebSocket("wss://192.168.174.114:443/ws"); // ← 本番用
+                _socket = new WebSocket("wss://192.168.174.114:443/ws");
             else
                 _socket = new WebSocket("wss://150.59.175.170:443/ws"); 
 #else

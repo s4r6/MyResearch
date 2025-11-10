@@ -74,7 +74,6 @@ namespace Domain.Action
         //選択したアクションを適用
         public bool ApplyAction(List<ActionEntity> actions, string selectedActionLabel, ObjectEntity entity, StageEntity stage)
         {
-            
             var selectedAction = actions.Find(a => a.label == selectedActionLabel);
             if(selectedAction == null)
             {
@@ -96,7 +95,19 @@ namespace Domain.Action
                 return false;
             }
             var selectedRiskLabel = choicable.SelectedChoice.Label;
-            var history = new ActionHistory(entity.Id, selectedRiskLabel, selectedActionLabel, selectedAction.riskChange, selectedAction.actionPointCost);
+
+            var history = new ActionHistory()
+            {
+                DisplayName = entity.GetComponent<InspectableComponent>().DisplayName,
+                Explanation = selectedAction.Explanation,
+                Description = entity.GetComponent<InspectableComponent>().Description,
+                SelectedRiskLable = selectedRiskLabel,
+                ExecutedActionLabel = selectedActionLabel,
+                RiskChange = selectedAction.riskChange,
+                ActionCost = selectedAction.actionPointCost,
+                RiskLabels = choicable.Choices.Select(choice => choice.Label).ToList(),
+                Actions = choicable.SelectedChoice.OverrideActions
+            };
             //アクションをStageに適用して履歴を保存
             stage.OnExecuteAction(history);
 

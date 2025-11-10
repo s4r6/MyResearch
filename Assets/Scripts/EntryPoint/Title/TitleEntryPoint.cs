@@ -37,8 +37,9 @@ public class TitleEntryPoint : MonoBehaviour
     {
         
         var sessionRepository = new RoomRepository(socket);
-        var remoteStageRepository = new RemoteStageRepository(socket);
         var remoteObjectRepository = new RemoteObjectRepository(socket);
+        var remoteStageRepository = new RemoteStageRepository(socket, remoteObjectRepository);
+        
         var receiver = new WebSocketReceiver(socket);
 
         objectRepositoryHolder.SetRepository(remoteObjectRepository);

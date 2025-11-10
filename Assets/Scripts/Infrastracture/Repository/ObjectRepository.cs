@@ -1,3 +1,4 @@
+using Domain.Stage;
 using Domain.Stage.Object;
 using Infrastructure.Factory;
 using Newtonsoft.Json.Linq;
@@ -8,7 +9,7 @@ using UseCase.Player;
 
 namespace Infrastructure.Repository
 {
-    public class ObjectRepository : IObjectRepository
+    public class ObjectRepository : IObjectRepository, IStageObjectRepository
     {
         private readonly Dictionary<string, ObjectEntity> entities = new();
 

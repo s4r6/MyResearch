@@ -8,6 +8,7 @@ namespace Presenter.Player
     public interface IActionHintView
     {
         void ShowHintList(IEnumerable<ActionHint> hints);
+        void Disable();
     }
     public class ActionHintPresenter : IActionHintPresenter
     {
@@ -21,6 +22,11 @@ namespace Presenter.Player
         public void ShowAvailableActions(IEnumerable<ActionHint> hints)
         {
             _view.ShowHintList(hints);
+        }
+
+        public void DisableInputGuide()
+        {
+            _view.Disable();
         }
     }
 }

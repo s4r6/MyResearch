@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Domain.Action;
 using Domain.Game;
 using Domain.Player;
 using UniRx;
@@ -13,32 +14,22 @@ namespace UseCase.Player
     //操作説明を表示する
     public interface IActionHintPresenter
     {
+        void DisableInputGuide();
         void ShowAvailableActions(IEnumerable<ActionHint> hints);
     }
     public struct ActionHistory
     {
-        public string ObjectName { get; }
-        public string SelectedRiskLable { get; }
-        public string ExecutedActionLabel { get; }
-
-        public int RiskChange { get; } // 実行による変化量
-
-        public int ActionCost { get; } // 使用したアクションポイント
-
-        public ActionHistory(
-            string objectName,
-            string riskLabel,
-            string actionLabel,
-            int riskChange,
-            int actionCost)
-        {
-            ObjectName = objectName;
-            SelectedRiskLable = riskLabel;
-            ExecutedActionLabel = actionLabel;
-            RiskChange = riskChange;
-            ActionCost = actionCost;
-        }
+        public string DisplayName;
+        public string Explanation;
+        public string Description;
+        public string SelectedRiskLable;
+        public string ExecutedActionLabel;
+        public int RiskChange; // 実行による変化量
+        public int ActionCost; // 使用したアクションポイント
+        public List<string> RiskLabels;
+        public List<ActionEntity> Actions;
     }
+
     public class PlayerSystemUseCase : IDisposable
     {
         InputController input;
@@ -185,7 +176,15 @@ namespace UseCase.Player
 
         public async UniTask Update()
         {
-            UpdateAvailableActions();
+            if(gameState.Current.IsResult)
+            {
+                hintPresenter.DisableInputGuide();
+            }
+            else
+            {
+                UpdateAvailableActions();
+            }
+                
             if(gameState.Current.IsMoving)
             {
                 await TryMove();
@@ -269,7 +268,6 @@ namespace UseCase.Player
             }
 
                 hintPresenter.ShowAvailableActions(hints);
-            
         }
         public void Dispose()
         {

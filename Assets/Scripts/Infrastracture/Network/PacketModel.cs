@@ -187,7 +187,7 @@ namespace Infrastructure.Network
         public SyncObjectPacket SyncData { get; set; }
         public int currentRiskAmount { get; set; }
         public int currentActionPointAmount { get; set; }
-        public List<RiskAssessmentHistory> histories { get; set; }
+        public List<SurmmaryDetailDTO> histories { get; set; }
     }
 
     public class StartVoteRequest

@@ -32,9 +32,9 @@ public class NetworkTitleEntryPoint : MonoBehaviour
         gameMode.SetMode(GameMode.Multi);
 
         var repository = new RoomRepository(socket);
-        var remoteStageRepository = new RemoteStageRepository(socket);
         var remoteObjectRepository = new RemoteObjectRepository(socket);
-       
+        var remoteStageRepository = new RemoteStageRepository(socket, remoteObjectRepository);
+
         objectRepositoryHolder.SetRepository(remoteObjectRepository);
         stageRepositoryHolder.SetRepository(remoteStageRepository);
         sessionHolder.SetSession(repository);

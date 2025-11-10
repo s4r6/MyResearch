@@ -5,6 +5,9 @@ using System;
 using Cysharp.Threading.Tasks;
 using System.Threading.Tasks;
 using TMPro;
+using UseCase.Player;
+using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace View.UI
 {
@@ -19,27 +22,25 @@ namespace View.UI
         [SerializeField]
         float duration = 0.5f;
 
-        [SerializeField]
-        CanvasGroup DescriptionGroup;
         CanvasGroup ObjectCanvasGroup;
 
         [SerializeField]
         GameObject ActionResult;
         CanvasGroup ActionDatas;
 
+        [SerializeField]
+        GameObject ObjectDataObj;
 
         [SerializeField]
-        TMP_Text ObjectId;
+        TMP_Text DisplayName;
         [SerializeField]
         TMP_Text RiskLabel;
         [SerializeField]
         TMP_Text ActionLabel;
         [SerializeField]
-        TMP_Text RiskReduce;
+        TMP_Text RiskChange;
         [SerializeField]
         TMP_Text ActionCost;
-        [SerializeField]
-        TMP_Text Description;
 
 
         void Awake()
@@ -48,22 +49,35 @@ namespace View.UI
             ObjectCanvasGroup = ObjectDatas.GetComponent<CanvasGroup>();
             ActionDatas = ActionResult.GetComponent<CanvasGroup>();
 
-            DescriptionGroup.alpha = 0;
             ObjectCanvasGroup.alpha = 0;
             ActionDatas.alpha = 0;
 
             Hide();
         }
 
-        public void SetText(string name, string risklabel, string actionlabel, string risk, string action, string explanation)
+        public void SetText(string name, string risklabel, string actionlabel, string risk, string action)
         {
-            ObjectId.text = name;
+            DisplayName.text = name;
             RiskLabel.text = risklabel;
             ActionLabel.text = actionlabel;
-            RiskReduce.text = $"リスク減少: {risk}";
+            RiskChange.text = $"リスク減少: {risk}";
             ActionCost.text = $"AP: -{action}";
-            Description.text = explanation;
         }
+
+        public List<string> GetTextDatas()
+        {
+            List<string> datas = new();
+            datas.Add(DisplayName.text);
+            datas.Add(RiskLabel.text);
+            datas.Add(ActionLabel.text);
+            datas.Add(RiskChange.text);
+            datas.Add(ActionCost.text);
+            
+
+            return datas;   
+        }
+
+        public string GetId() => DisplayName.text;
 
         public void Hide()
         {
@@ -81,12 +95,26 @@ namespace View.UI
             // ObjectDatas のスライド＆フェード
             await UniTask.WhenAll(
                 ObjectDatas.DOAnchorPos(inPosition, duration).SetEase(Ease.OutCubic).ToUniTask(),
-                DescriptionGroup.DOFade(1f, duration).SetEase(Ease.OutQuad).ToUniTask(),
                 ObjectCanvasGroup.DOFade(1f, duration).SetEase(Ease.OutQuad).ToUniTask()
             );
 
             // ActionImage のフェードイン
             await ActionDatas.DOFade(1f, duration).SetEase(Ease.OutQuad).ToUniTask();
+        }
+
+        public void SkipAnimation()
+        {
+            // アニメを全部終わった状態にする
+            // ここでは「最終値を直接セット」でもいいし、DOTweenのCompleteでもいい
+            ObjectDatas.anchoredPosition = inPosition;
+            ObjectCanvasGroup.alpha = 1f;
+            ActionDatas.alpha = 1f;
+
+            DOTween.Kill(ObjectDatas);
+            DOTween.Kill(ObjectCanvasGroup);
+            DOTween.Kill(ActionDatas);
+
+            gameObject.SetActive(true);
         }
     }
 }

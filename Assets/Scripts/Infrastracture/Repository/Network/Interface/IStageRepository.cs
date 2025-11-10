@@ -5,5 +5,5 @@ public interface IStageRepository
 {
     void Save(StageEntity stage);
     StageEntity GetCurrentStageEntity();
-    StageEntity CreateStage(int stageNumber);
+    StageEntity CreateStage(int stageNumber, IStageObjectRepository repository);
 }
