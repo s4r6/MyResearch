@@ -8,7 +8,7 @@ namespace View.Title
 {
     public class CreateRoomTab : MonoBehaviour
     {
-        public InputField password;
+        public InputField roomName;
         public Button createButton;
         public int StageId = 1;
 

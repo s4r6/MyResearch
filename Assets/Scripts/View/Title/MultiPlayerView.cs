@@ -107,9 +107,9 @@ namespace View.Title
         {
             Debug.Log("Create");
             sound.PlaySE(AudioId.ButtonClick, 1f);
-            var roomId = createRoomTab.password.text;
+            var roomName = createRoomTab.roomName.text;
             var stageId = createRoomTab.StageId;
-            presenter.CreateRoom(roomId, PlayerName.text, stageId);
+            presenter.CreateRoom(roomName, PlayerName.text, stageId);
         }
 
         //Searchƒ{ƒ^ƒ“‚ª‰Ÿ‚³‚ê‚½‚Æ‚«
@@ -120,7 +120,8 @@ namespace View.Title
             presenter.SearchRoom();
         }
         
-        public void AddRoomList(List<(string, string, int)> rooms) => joinRoomTab.AddRoomList(rooms, (roomId) => { presenter.JoinRoom(roomId); });
+        //Id, Name, PlayerCount
+        public void AddRoomList(List<(string, string, int)> rooms) => joinRoomTab.AddRoomList(rooms, (roomId) => { presenter.JoinRoom(roomId, PlayerName.text); });
         public void DestroyRoomList(List<string> roomNames) => joinRoomTab.DestroyRoomList(roomNames);
         public void UpdateRoomList(List<(string, string, int)> roomDatas) => joinRoomTab.UpdateRoomList(roomDatas);
 

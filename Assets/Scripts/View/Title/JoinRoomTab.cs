@@ -60,9 +60,9 @@ namespace View.Title
             }
         }
 
-        public void OnSelectRoom(string roomId)
+        public void OnSelectRoom(string roomName)
         {
-            SelectRoomEvent?.Invoke(roomId);
+            SelectRoomEvent?.Invoke(roomName);
             SelectRoomEvent = null;
         }
 

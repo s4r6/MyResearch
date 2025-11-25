@@ -10,7 +10,7 @@ namespace UseCase.Network.DTO
 {
     public class CreateRoomInputData
     {
-        public string RoomId { get; set; }
+        public string RoomName { get; set; }
         public string PlayerName {  get; set; }
         public int StageId {  get; set; }
     }
@@ -33,9 +33,8 @@ namespace UseCase.Network.DTO
 
     public class JoinRoomInputData
     {
-        public string PlayerId { get; set; }
+        public string RoomName { get; set; }
         public string PlayerName { get; set; }
-        public string RoomId { get; set; }
     }
 
     public class JoinRoomOutputData

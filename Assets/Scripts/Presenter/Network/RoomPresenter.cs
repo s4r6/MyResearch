@@ -35,11 +35,11 @@ namespace Presenter.Network
             this.titleUseCase = titleUseCase;
         }
 
-        public void CreateRoom(string roomId, string name, int stageId = 1)
+        public void CreateRoom(string roomName, string name, int stageId = 1)
         {
             var dto = new CreateRoomInputData
             {
-                RoomId = roomId,
+                RoomName = roomName,
                 PlayerName = name,
                 StageId = stageId,
             };
@@ -52,11 +52,12 @@ namespace Presenter.Network
             usecase.Search((result) => OnCompleteSearch(result)).Forget();
         }
 
-        public void JoinRoom(string roomId)
+        public void JoinRoom(string roomName, string name)
         {
             var dto = new JoinRoomInputData
             {
-                RoomId = roomId
+                RoomName = roomName,
+                PlayerName = name,
             };
 
             usecase.Join(dto, (result) => OnCompleteJoin(result)).Forget();

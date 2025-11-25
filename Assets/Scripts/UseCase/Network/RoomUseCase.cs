@@ -48,7 +48,7 @@ namespace UseCase.Network
         public async UniTask Create(CreateRoomInputData input, Action<CreateRoomOutputData> OnComplete)
         {
             OnCompleteCreate = OnComplete;
-            await sessionRepository.Create(input.RoomId, input.PlayerName, input.StageId);
+            await sessionRepository.Create(input.RoomName, input.PlayerName, input.StageId);
         }
 
         public void OnReceiveCreateResult(CreateRoomResult result)
@@ -86,7 +86,7 @@ namespace UseCase.Network
         public async UniTask Join(JoinRoomInputData input, Action<JoinRoomOutputData> OnComplete)
         {
             OnCompleteJoin = OnComplete;
-            await sessionRepository.Join(input.RoomId, input.PlayerName);
+            await sessionRepository.Join(input.RoomName, input.PlayerName);
         }
 
         public void OnReceiveJoinResult(JoinRoomResult result)
