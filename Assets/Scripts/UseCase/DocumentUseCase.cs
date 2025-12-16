@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using Domain.Game;
+using Mono.Cecil.Cil;
 using UnityEngine;
 using View.UI;
 
@@ -12,6 +13,7 @@ namespace UseCase.Game
         DocumentEntity entity;
 
         Action OnComplete;
+        
         public DocumentUseCase(DocumentView view, DocumentEntity entity)
         {
             this.view = view;
@@ -25,8 +27,11 @@ namespace UseCase.Game
             OnComplete = onComplete;
 
             entity.Open();
+
             view.DisplayDocument(() => CloseDocument());
         }
+
+        
 
         public void CloseDocument()
         {

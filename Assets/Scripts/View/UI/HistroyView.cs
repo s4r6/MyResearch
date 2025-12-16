@@ -93,13 +93,19 @@ namespace View.UI
         async UniTask AnimationAsync()
         {
             // ObjectDatas のスライド＆フェード
-            await UniTask.WhenAll(
-                ObjectDatas.DOAnchorPos(inPosition, duration).SetEase(Ease.OutCubic).ToUniTask(),
-                ObjectCanvasGroup.DOFade(1f, duration).SetEase(Ease.OutQuad).ToUniTask()
-            );
+            await Task.WhenAll(
+                    ObjectDatas
+                        .DOAnchorPos(inPosition, duration)
+                        .SetEase(Ease.OutCubic)
+                        .AsyncWaitForCompletion(),
+                    ObjectCanvasGroup
+                        .DOFade(1f, duration)
+                        .SetEase(Ease.OutQuad)
+                        .AsyncWaitForCompletion()
+                );
 
             // ActionImage のフェードイン
-            await ActionDatas.DOFade(1f, duration).SetEase(Ease.OutQuad).ToUniTask();
+            await ActionDatas.DOFade(1f, duration).SetEase(Ease.OutQuad).AsyncWaitForCompletion();
         }
 
         public void SkipAnimation()

@@ -6,60 +6,54 @@ using System;
 using Domain.Game;
 using View.Player;
 using UseCase.Game;
+using Presenter.Tutorial;
+using Cysharp.Threading.Tasks;
+using View.UI;
 
 namespace UseCase.GameSystem
 {
+    public enum TutorialStepId
+    {
+        Explain_Game,
+        Explain_Document,
+    }
+
     public class GameSystemUseCase : IDisposable
     {
-        PlayerSystemUseCase player;
-        StageSystemUseCase stage;
-        GameStateManager state;
-        DocumentUseCase document;
+        ResultView view;
         InputController input;
 
-        CompositeDisposable disposables = new CompositeDisposable();
+        GameEntity game;
 
-        public GameSystemUseCase(PlayerSystemUseCase player, StageSystemUseCase stage, GameStateManager state, DocumentUseCase document, InputController input)
+        CompositeDisposable disposables = new CompositeDisposable();
+        public Subject<Unit> OnStartGame = new();
+        public Subject<Unit> OnEndGame = new();
+
+        public GameSystemUseCase(ResultView view, GameEntity entity, InputController input)
         {
-            this.player = player;
-            this.stage = stage;
-            this.state = state;
-            this.document = document;
+            this.view = view;
+            this.game = entity;
             this.input = input;
         }
 
-        public void StartGame()
+        public async UniTask StartGame()
         {
-            player.StartGame();
-
-            player.OnExitPointInspected
+            input.OnFinishButtonPressed
                 .Subscribe(x => 
                 { 
                     EndGame();
+                    OnEndGame.OnNext(default);
                 }).AddTo(disposables);
 
-            input.OnDocumentButtonPressed
-                .Subscribe(_ =>
-                {
-                    if (state.Current.IsDocument)
-                        return;
-
-                    document.OpenDocument(() =>
-                    {
-                        state.Set(GamePhase.Moving);
-                    });
-                    
-                    state.Set(GamePhase.Document);
-                }).AddTo(disposables);
+            OnStartGame.OnNext(default);
         }
+
+
 
         public void EndGame()
         {
-            player.EndGame();
-            Debug.Log("ÉQÅ[ÉÄèIóπ");
-            state.Set(GamePhase.Result);
-            stage.OnExitStage();
-            Dispose();
+            var result = game.EndGame();
+            view.ShowResultWindow(result.surmmary);
         }
 
         public void Dispose()

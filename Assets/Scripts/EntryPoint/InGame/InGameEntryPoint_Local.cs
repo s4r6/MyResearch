@@ -59,6 +59,8 @@ public class InGameEntryPoint_Local : MonoBehaviour
 
     bool IsActive = false;
 
+    GameSystemUseCase gameSystem;
+
     public void Entry()
     {
         var gameMode = FindFirstObjectByType<GameModeHolder>();
@@ -95,8 +97,8 @@ public class InGameEntryPoint_Local : MonoBehaviour
         var hintPresenter = new ActionHintPresenter(hintUI);
         usecase = new PlayerSystemUseCase(move, inspect, model, input, gameState, raycast, carry, action, new InteractUseCase(repository, interact), hintPresenter, Reticle);
 
-
-        var gameSystem = new GameSystemUseCase(usecase, new StageSystemUseCase(stage, resultView), gameState, document, input);
+        var gameEntity = new GameEntity(stage, gameState);
+        gameSystem = new GameSystemUseCase(resultView, gameEntity, input);
 
         gameSystem.StartGame();
 
@@ -117,5 +119,11 @@ public class InGameEntryPoint_Local : MonoBehaviour
     void LateUpdate()
     {
         usecase?.LateUpdate();
+    }
+
+    private void OnDestroy()
+    {
+        usecase.Dispose();  //PlayerSystem‚ÌŒã•Ð•t‚¯
+        gameSystem.Dispose();
     }
 }

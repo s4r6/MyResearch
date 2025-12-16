@@ -483,6 +483,54 @@
             ]
         },
         {
+            "name": "Tutorial",
+            "id": "75b1e964-1a06-4748-9665-b37a62af6d76",
+            "actions": [
+                {
+                    "name": "Close",
+                    "type": "Button",
+                    "id": "94e64a68-2d59-4b70-a7ab-280247e98d0a",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Next",
+                    "type": "Button",
+                    "id": "1b3cacf6-27f9-484b-925b-1c8183d5c008",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Press",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "7db9ce53-c2bc-4ff4-b191-7a82568cea67",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Close",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ee514427-e019-4e81-a83a-ac91cbfc7e0d",
+                    "path": "<Keyboard>/enter",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Next",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
             "name": "Result",
             "id": "9bb3575f-86da-4904-86a6-1120447cb398",
             "actions": [

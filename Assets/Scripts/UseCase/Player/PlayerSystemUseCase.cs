@@ -4,6 +4,7 @@ using Cysharp.Threading.Tasks;
 using Domain.Action;
 using Domain.Game;
 using Domain.Player;
+using Mono.Cecil.Cil;
 using UniRx;
 using UnityEngine;
 using UseCase.Network.DTO;
@@ -48,7 +49,8 @@ namespace UseCase.Player
         CompositeDisposable disposables = new CompositeDisposable();
 
         public Subject<Unit> OnExitPointInspected = new();
-
+        Subject<Unit> OnDocumentEvent = new();
+        public IObservable<Unit> OnDocumentOpened => OnDocumentEvent;
         public PlayerSystemUseCase(   
             IMoveController move,
             IInspectUseCase inspect,
@@ -88,11 +90,6 @@ namespace UseCase.Player
                         return;
 
                     var objectId = model.currentLookingObject;
-                    /*if (objectId == "DoorOutside")
-                    {
-                        OnExitPointInspected.OnNext(default);
-                        return;
-                    }*/
 
                     var result = inspect.TryInspect(objectId, () =>
                     {
@@ -103,6 +100,12 @@ namespace UseCase.Player
                     {
                         gameState.Set(GamePhase.Inspecting);
                     }
+                }).AddTo(disposables);
+
+            input.OnDocumentButtonPressed
+                .Subscribe(_ =>
+                {
+                    OnDocumentEvent.OnNext(default);
                 }).AddTo(disposables);
 
             input.OnPickUpButtonPressed
