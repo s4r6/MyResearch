@@ -31,7 +31,6 @@ namespace View.Player
         //“ü—Í‚ğó‚¯æ‚é‚©‚ÌØ‚è‘Ö‚¦
         private void OnApplicationFocus(bool focus)
         {
-            Debug.Log("IsFocus is ;" +  focus);
             IsFocus = focus;
         }
 

@@ -9,10 +9,8 @@ using System;
 using View.Player;
 using Domain.Component;
 using Domain.Stage;
-using Unity.VisualScripting;
-using static UnityEngine.GraphicsBuffer;
 using Cysharp.Threading.Tasks;
-
+using UniRx;
 
 namespace UseCase.Player
 {
@@ -35,6 +33,11 @@ namespace UseCase.Player
         Action OnCompleteAction;
 
         List<ActionEntity> cashActions;
+
+        Subject<Unit> onAction = new();
+        Subject<Unit> onOpened = new();
+        public IObservable<Unit> OnActionExecuted => onAction;
+        public IObservable<Unit> OnActionListOpened => onOpened;
 
         public PlayerActionUseCase(PlayerEntity playerEntity, IActionPresenter presenter, PlayerActionExecuter executor, IObjectRepository repository, StageEntity stage, ActionService actionService)
         {
@@ -77,6 +80,8 @@ namespace UseCase.Player
             presenter.StartSelectAction(stage.GetActionPoint(), stage.maxActionPoint, actions, objectId, result => OnEndSelectAction(result));
 
             cashActions = availableActions;
+            onOpened.OnNext(default);
+
             return true;
         }
 
@@ -118,6 +123,7 @@ namespace UseCase.Player
                 }
             }
 
+            onAction.OnNext(default);
             OnCompleteAction?.Invoke();
             OnCompleteAction = null;
 

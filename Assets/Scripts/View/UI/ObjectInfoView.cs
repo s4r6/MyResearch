@@ -72,7 +72,7 @@ namespace View.UI
             targetWindow.gameObject.SetActive(true);
 
             await targetWindow.DOScale(Vector3.one, duration)
-                .SetEase(Ease.OutBack).ToUniTask();
+                .SetEase(Ease.OutBack).AsyncWaitForCompletion();
 
             //Cursor.lockState = CursorLockMode.None;
         }

@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using View.Player;
+using UniRx;
 
 namespace View.UI
 {
@@ -37,10 +38,18 @@ namespace View.UI
 
         public Action OnBackEvent;
         public Action<int> OnPageMoveEvent;
+        
 
         private void Awake()
         {
             viewRoot.localScale = Vector3.zero;
+            inputController.OnDocumentButtonPressed
+                .Where(_ => isOpen == false)
+                .Subscribe(_ =>
+                {
+                    DisplayDocument(() => HideDocument().Forget());
+                }).AddTo(this);
+            
             gameObject.SetActive(false);
         }
 
@@ -109,11 +118,14 @@ namespace View.UI
         //------------------------PRESENTER--------------------------------
 
         Action OnCloseDocument;
+        public event Action DocumentClosed;
+        public event Action DocumentOpened;
         int currentIndex = 0;
 
         void OnClose()
         {
             OnCloseDocument?.Invoke();
+            DocumentClosed?.Invoke();
         }
 
         void MovePage(int delta)
@@ -123,7 +135,7 @@ namespace View.UI
             UpdatePage(currentIndex);
         }
 
-        public void DisplayDocument(Action onCloseDocument)
+        public void DisplayDocument(Action onCloseDocument = null)
         {
             OnCloseDocument = onCloseDocument;
 
@@ -131,7 +143,14 @@ namespace View.UI
             OnPageMoveEvent += MovePage;
 
             OpenAsync().Forget();
+            OnDocumentOpened();
             EnableUIInput();
+        }
+
+        // DocumentUseCase などからイベントを受け取る
+        public void OnDocumentOpened()
+        {
+            DocumentOpened?.Invoke();
         }
 
         public async UniTask HideDocument()

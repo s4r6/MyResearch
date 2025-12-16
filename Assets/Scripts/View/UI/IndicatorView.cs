@@ -50,7 +50,7 @@ namespace View.UI
             currentTween = delayBar.DOFillAmount(target, duration)
                 .SetEase(Ease.OutCubic);
 
-            await currentTween.ToUniTask();
+            await currentTween.AsyncWaitForCompletion();
         }
 
         public void SetValue(int current, int max)

@@ -29,7 +29,6 @@ namespace View.Player
 
         void SetCursorState(bool newState)
         {
-            Debug.Log("カーソルロック");
             Cursor.lockState = newState ? CursorLockMode.Locked : CursorLockMode.None;
         }
 
