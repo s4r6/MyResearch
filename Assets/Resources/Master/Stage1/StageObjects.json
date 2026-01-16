@@ -174,7 +174,7 @@
             "ObjectAttributes": [
               "Storable"
             ],
-            "Explanation": "この付箋には8桁の英数字が書かれており、パスワードの可能性があります。このような書類を保管しておく行為は、リスクを温存することになり、リスクの低減・対処にはなりえません。定められた場所以外に保管すると、情報混入や誤廃棄のリスクが残り、リスクの低減効果は低いです。"
+            "Explanation": "この付箋には8桁の英数字が書かれており、パスワードの可能性があります。明確な決まり・場所がないのに書類を保管しておく行為は、リスクを温存することになり、リスクの低減・対処にはなりえません。定められた場所以外に保管すると、情報混入や誤廃棄のリスクが残り、リスクの低減効果は低いです。"
           },
           {
             "id": "ShredderUse",
@@ -192,7 +192,17 @@
       {
         "Label": "特にリスクはない",
         "RiskId": "NoRisk",
-        "OverrideActions": [],
+        "OverrideActions": [
+          {
+            "id": "None",
+            "label": "",
+            "riskChange": 0,
+            "ActionPointCost": 0,
+            "target": "None",
+            "ObjectAttributes": [],
+            "Explanation": "この付箋には8桁の英数字が書かれており、パスワードの可能性があります。放置すればなりすましや不正利用につながるリスクがあるため、『特にリスクはない』という判断は不適切です。"
+          }
+        ],
         "Explanation": "この付箋には8桁の英数字が書かれており、パスワードの可能性があります。放置すればなりすましや不正利用につながるリスクがあるため、『特にリスクはない』という判断は不適切です。"
       }
     ]
@@ -200,7 +210,7 @@
   {
     "ObjectId": "BookCaseSet02",
     "DisplayName": "文書庫２",
-    "Description": "鍵による施錠管理が可能であるが、在室時は開放されている。背表紙の色などで分類され、赤色の本は持ち出し禁止とされている。地震対策でL字金具で固定されている。",
+    "Description": "背表紙の色などで分類され、赤色の本は持ち出し禁止とされている。地震対策でL字金具で固定されている。",
     "Choices": [
       {
         "Label": "地震による本棚の転倒時の文書散乱・紛失のリスク",
@@ -251,8 +261,8 @@
         ]
       },
       {
-        "Label": "鍵のかけ忘れリスク",
-        "RiskId": "ForgetLock",
+        "Label": "盗難のリスク",
+        "RiskId": "TheftRisk",
         "OverrideActions": [
           {
             "id": "AutoLock",
@@ -271,13 +281,32 @@
             "target": "Self",
             "ObjectAttributes": [],
             "Explanation": "物理鍵での管理はシンプルで導入コストが低いですが、鍵の紛失や複製のリスクがあり、入退室記録が残らないため抑止効果は限定的です。"
+          },
+          {
+            "id": "PlaceCamera",
+            "label": "監視カメラの設置",
+            "riskChange": 0,
+            "ActionPointCost": 4,
+            "target": "Self",
+            "ObjectAttributes": [],
+            "Explanation": "この部屋内にはすでに文書庫を映すカメラが設置されているため、効果は限定的です。"
           }
         ]
       },
       {
         "Label": "特にリスクはない",
         "RiskId": "NoRisk",
-        "OverrideActions": [],
+        "OverrideActions": [
+          {
+            "id": "None",
+            "label": "",
+            "riskChange": 0,
+            "ActionPointCost": 0,
+            "target": "None",
+            "ObjectAttributes": [],
+            "Explanation": "文書庫は在室時に施錠されず開放されており、内部不正や施錠忘れによる情報漏えいのリスクが存在します。したがって『特にリスクはない』という判断は不適切です。"
+          }
+        ],
         "Explanation": "文書庫は在室時に施錠されず開放されており、内部不正や施錠忘れによる情報漏えいのリスクが存在します。したがって『特にリスクはない』という判断は不適切です。"
       }
     ]
@@ -366,10 +395,20 @@
         ]
       },
       {
-	"Label": "特にリスクはない",
+	      "Label": "特にリスクはない",
         "RiskId": "NoRisk",
-        "OverrideActions": [],
-        "Explanation": "文書庫は在室時に施錠されず開放されており、内部不正や施錠忘れによる情報漏えいのリスクが存在します。したがって『特にリスクはない』という判断は不適切です。"
+        "OverrideActions": [
+          {
+            "id": "None",
+            "label": "",
+            "riskChange": 0,
+            "ActionPointCost": 0,
+            "target": "None",
+            "ObjectAttributes": [],
+            "Explanation": ""
+          }
+        ],
+        "Explanation": ""
       }
     ]
   },
@@ -453,8 +492,18 @@
       {
         "Label": "特にリスクはない",
         "RiskId": "NoRisk",
-        "OverrideActions": [],
-	"Explanation" : "物理鍵による手動での施錠は鍵の施錠忘れのリスクがあり、『特にリスクはない』という判断は不適切です。"
+        "OverrideActions": [
+          {
+            "id": "None",
+            "label": "",
+            "riskChange": 0,
+            "ActionPointCost": 0,
+            "target": "None",
+            "ObjectAttributes": [],
+            "Explanation": "物理鍵による手動での施錠は鍵の施錠忘れのリスクがあり、『特にリスクはない』という判断は不適切です。"
+          }
+        ],
+	      "Explanation" : "物理鍵による手動での施錠は鍵の施錠忘れのリスクがあり、『特にリスクはない』という判断は不適切です。"
       }
     ]
   },
@@ -529,7 +578,18 @@
       {
         "Label": "特にリスクはない",
         "RiskId": "NoRisk",
-        "OverrideActions": []
+        "OverrideActions": [
+          {
+            "id": "None",
+            "label": "",
+            "riskChange": 0,
+            "ActionPointCost": 0,
+            "target": "None",
+            "ObjectAttributes": [],
+            "Explanation": ""
+          }
+        ],
+        "Explanation": ""
       }
     ]
   },

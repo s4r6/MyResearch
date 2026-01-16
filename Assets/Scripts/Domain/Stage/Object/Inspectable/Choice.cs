@@ -11,5 +11,6 @@ namespace Domain.Stage.Object
         public bool IsCorrect { get; set; } = true;
 
         public List<ActionEntity> OverrideActions { get; set; } = new();
+        public string Explanation { get; set; } = null;
     }
 }

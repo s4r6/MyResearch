@@ -30,6 +30,10 @@ namespace View.UI
         [SerializeField]
         InputController inputController;
 
+        [SerializeField]
+        Text InputGuide;
+
+
         private bool isOpen = false;
         private Tweener currentTween;
 
@@ -49,6 +53,11 @@ namespace View.UI
                 {
                     DisplayDocument(() => HideDocument().Forget());
                 }).AddTo(this);
+
+            if(InputGuide != null)
+            {
+                InputGuide.gameObject.SetActive(false);
+            }
             
             gameObject.SetActive(false);
         }
@@ -56,6 +65,22 @@ namespace View.UI
         public void InitializePages(Sprite[] pageSprites)
         {
             pages = pageSprites;
+        }
+
+        public void DisplayGuide()
+        {
+            if (InputGuide != null)
+            {
+                InputGuide.gameObject.SetActive(true);
+            }
+        }
+
+        public void HideGuide()
+        {
+            if (InputGuide != null)
+            {
+                InputGuide.gameObject.SetActive(false);
+            }
         }
 
         public async UniTask OpenAsync()
@@ -132,6 +157,15 @@ namespace View.UI
         {
             int max = pages.Length;
             currentIndex = Mathf.Clamp(currentIndex + delta, 0, max - 1);
+            if (currentIndex == 0)
+            {
+                DisplayGuide();
+            }
+            else
+            {
+                HideGuide();
+            }
+
             UpdatePage(currentIndex);
         }
 
@@ -143,6 +177,15 @@ namespace View.UI
             OnPageMoveEvent += MovePage;
 
             OpenAsync().Forget();
+            if(currentIndex == 0)
+            {
+                DisplayGuide();
+            }
+            else
+            {
+                HideGuide();
+            }
+
             OnDocumentOpened();
             EnableUIInput();
         }

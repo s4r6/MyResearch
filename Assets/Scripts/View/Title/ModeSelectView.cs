@@ -19,6 +19,8 @@ namespace View.Title
         Button singlePlayerButton;
         [SerializeField]
         Button multiPlayerButton;
+        [SerializeField]
+        Button tutorialButton;
 
         [SerializeField]
         SoundView sound;
@@ -30,6 +32,7 @@ namespace View.Title
             playerNameField.onEndEdit.AddListener(OnEndEdit);
             singlePlayerButton.onClick.AddListener(OnSinglePlayerButtonPressed);
             multiPlayerButton.onClick.AddListener(() => OnMultiPlayerButtonPressed().Forget());
+            tutorialButton.onClick.AddListener(OnTutorialButtonPressed);
         }
 
         void Start()
@@ -45,6 +48,12 @@ namespace View.Title
         public void WarningInputName()
         {
             warningText.gameObject.SetActive(true);
+        }
+
+        void OnTutorialButtonPressed()
+        {
+            sound.PlaySE(AudioId.ButtonClick, 1f);
+            usecase.ChangeGameMode(GameMode.Tutorial).Forget();
         }
 
         void OnSinglePlayerButtonPressed()

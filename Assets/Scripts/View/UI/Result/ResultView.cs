@@ -127,7 +127,7 @@ namespace View.UI
         {
             Display();
             SelectedRiskNum.text = $"{surmmary.FindRiskNum} / {surmmary.MaxRiskNum}";
-            RiskReducedActionNum.text = $"{surmmary.ExecuteCorrectActionNum} / {surmmary.MaxCorrectActionNum}";
+            //RiskReducedActionNum.text = $"{surmmary.ExecuteCorrectActionNum} / {surmmary.MaxCorrectActionNum}";
             ShowResult(surmmary).Forget();
         }
 
