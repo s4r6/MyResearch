@@ -19,6 +19,7 @@ namespace UseCase.Title
     {
         None,
         ModeSelect,
+        Tutorial,
         Solo,
         Multi
     }
@@ -62,7 +63,7 @@ namespace UseCase.Title
 
         public async UniTask ChangeGameMode(GameMode mode)
         {
-            if(gameMode.CurrentMode == GameMode.ModeSelect && cashPlayerName == string.Empty)
+            if(gameMode.CurrentMode == GameMode.ModeSelect && cashPlayerName == string.Empty && mode != GameMode.Tutorial)
             {
                 modeSelect.WarningInputName();
                 return;
@@ -120,6 +121,9 @@ namespace UseCase.Title
             {
                 case GameMode.ModeSelect:
                     modeSelect.Activate();
+                    break;
+                case GameMode.Tutorial:
+                    SceneManager.LoadScene("Tutorial");
                     break;
                 case GameMode.Solo:
                     single.SetPlayerName(cashPlayerName);

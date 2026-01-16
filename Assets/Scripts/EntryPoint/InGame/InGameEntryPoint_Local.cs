@@ -66,8 +66,8 @@ public class InGameEntryPoint_Local : MonoBehaviour
         var gameMode = FindFirstObjectByType<GameModeHolder>();
 
 
-        var entityFactory = new EntityFactory();
-        repository = new ObjectRepository(entityFactory);
+        var entityFactory = new EntityFactory("Master/Stage1/");
+        repository = new ObjectRepository(entityFactory, "Master/Stage1/");
         var stageRepository = new StageRepository(repository);
         stage = stageRepository.CreateStage(1, repository);
 
@@ -123,7 +123,7 @@ public class InGameEntryPoint_Local : MonoBehaviour
 
     private void OnDestroy()
     {
-        usecase.Dispose();  //PlayerSystem‚ÌŒã•Ð•t‚¯
-        gameSystem.Dispose();
+        usecase?.Dispose();  //PlayerSystem‚ÌŒã•Ð•t‚¯
+        gameSystem?.Dispose();
     }
 }

@@ -95,8 +95,8 @@ public class EntoryPoint_Tutorial : MonoBehaviour
         var tutorialPhase = new TutorialPhaseState();
         var gameMode = FindFirstObjectByType<GameModeHolder>();
 
-        var entityFactory = new EntityFactory();
-        repository = new ObjectRepository(entityFactory);
+        var entityFactory = new EntityFactory("Master/Tutorial/");
+        repository = new ObjectRepository(entityFactory, "Master/Tutorial/");
         var stageRepository = new StageRepository(repository);
         stage = stageRepository.CreateStage(1, repository);
 

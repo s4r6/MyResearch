@@ -1,0 +1,34 @@
+[
+  {
+    "ObjectId": "PCSet01",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "Memo",
+    "Components": ["Inspectable", "Carryable"]
+  },
+  {
+    "ObjectId": "Shredder",
+    "Components": ["Inspectable", "ActionHeld"]
+  },
+  {
+    "ObjectId": "TrashBin",
+    "Components": ["Inspectable", "ActionHeld"]
+  },
+  {
+    "ObjectId": "BookCaseSet02",
+    "Components": ["Inspectable"]
+  },
+  {
+    "ObjectId": "DoorInside",
+    "Components": ["Inspectable", "Door"]
+  },
+  {
+    "ObjectId": "LockCabine",
+    "Components": ["Inspectable", "ActionHeld"]
+  },
+  {
+    "ObjectId": "MonitaringCamera",
+    "Components": ["Inspectable"]
+  }
+]

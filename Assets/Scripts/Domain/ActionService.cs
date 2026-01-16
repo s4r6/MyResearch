@@ -116,7 +116,7 @@ namespace Domain.Action
 
         public bool CanApplyAction(ActionEntity action, StageEntity stage)
         {
-            return stage.GetActionPoint() > action.actionPointCost;
+            return stage.GetActionPoint() >= action.actionPointCost;
         }
 
         void SetActionFlag(ObjectEntity entity)

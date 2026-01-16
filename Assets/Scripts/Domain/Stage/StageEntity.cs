@@ -58,6 +58,7 @@ namespace Domain.Stage
         public SurmmaryDTO surmmary;
         public List<SurmmaryDetailDTO> histories = new();
 
+
         public event System.Action OnEndStage;
 
         public StageEntity(int maxRiskAmount, int maxActionPoint, IStageObjectRepository repository)
@@ -81,7 +82,34 @@ namespace Domain.Stage
             if (repository == null) return new SurmmaryDTO();
 
             var objects = repository.GetAll();
+
+            foreach (var obj in objects)
+            {
+                obj.TryGetComponent<ChoicableComponent>(out var choicable);
+                if (choicable != null && choicable.SelectedChoice != null && choicable.SelectedChoice.RiskId == "NoRisk")
+                {
+                    obj.TryGetComponent<InspectableComponent>(out var inspectable);
+                    var detailDTO = new SurmmaryDetailDTO()
+                    {
+                        DisplayName = inspectable.DisplayName,
+                        Explanation = choicable.SelectedChoice.Explanation,
+                        RiskLabel = choicable.SelectedChoice.Label,
+                        ActionLabel = "",
+                        RiskChange = 0,
+                        ActionCost = 0,
+                        RiskLabels = choicable.Choices.Select(choice => choice.Label).ToList(),
+                        ActionLabels = new(),
+                        Description = inspectable.Description,
+                    };
+
+                    AddHistory(detailDTO);
+                }
+            }
+
             var findRiskNum = histories.Count(history => history.RiskChange < 0);
+            
+            
+
             var maxRiskNum = objects.Count(obj =>
             {
                 if (obj.TryGetComponent<ChoicableComponent>(out var choicable))
@@ -95,7 +123,7 @@ namespace Domain.Stage
                 }
             });
             var executeCorrectActionNum = histories.Count(history => history.RiskChange < 0);
-            var maxCorrectActionNum = 0;
+            var maxCorrectActionNum = objects.Count;
 
             return new SurmmaryDTO
             {
@@ -104,9 +132,9 @@ namespace Domain.Stage
                 MaxRiskNum = maxRiskNum,
                 ExecuteCorrectActionNum = executeCorrectActionNum,
                 MaxCorrectActionNum = maxCorrectActionNum,
-                CurrentRisk = currentRiskAmount,
+                CurrentRisk = maxRiskAmount,
                 MaxRisk = maxRiskAmount,
-                CurrentActionPoint = currentActionPointAmount,
+                CurrentActionPoint = maxActionPoint,
                 MaxActionPoint = maxActionPoint,
 
                 Actions = histories

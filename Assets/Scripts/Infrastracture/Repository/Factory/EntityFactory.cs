@@ -20,11 +20,11 @@ namespace Infrastructure.Factory
         private readonly Dictionary<string, JObject> actionHeldMap;
         private readonly HashSet<string> carryableSet;
 
-        public EntityFactory()
+        public EntityFactory(string basePath = "Master/")
         {
-            inspectableMap = LoadAsMap("Master/StageObjects");
-            actionHeldMap = LoadAsMap("Master/ActionHeldComponents");
-            carryableSet = LoadList("Master/CarryableObjects");
+            inspectableMap = LoadAsMap(basePath + "StageObjects");
+            actionHeldMap = LoadAsMap(basePath + "ActionHeldComponents");
+            carryableSet = LoadList(basePath + "CarryableObjects");
         }
 
         public ObjectEntity CreateEntityFromJson(JObject json)
@@ -43,11 +43,12 @@ namespace Infrastructure.Factory
                 };
 
                 var choices = ChoiceFactory.FromJsonArray((JArray)inspectJson["Choices"]);
+                var noRisk = choices.Find(choice => choice.RiskId == "NoRisk");
                 if(choices.Count > 0)
                 {
                     var choicable = new ChoicableComponent
                     {
-                        Choices = choices
+                        Choices = choices,
                     };
                     entity.Add(choicable);
                 }

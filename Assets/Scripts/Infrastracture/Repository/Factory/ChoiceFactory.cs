@@ -17,7 +17,8 @@ namespace Infrastructure.Repository
                 Label = json["Label"]?.ToString(),
                 RiskId = json["RiskId"]?.ToString(),
                 IsCorrect = json["IsCorrect"]?.ToObject<bool>() ?? true,
-                OverrideActions = ParseOverrideActions(json["OverrideActions"])
+                OverrideActions = ParseOverrideActions(json["OverrideActions"]),
+                Explanation = json["Explanation"]?.ToString() ?? ""
             };
 
             return choice;
@@ -27,6 +28,8 @@ namespace Infrastructure.Repository
         {
             return array.Select(token => FromJson((JObject)token)).ToList();
         }
+
+
 
         private static List<ActionEntity> ParseOverrideActions(JToken token)
         {

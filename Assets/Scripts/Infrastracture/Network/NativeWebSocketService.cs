@@ -16,7 +16,7 @@ namespace Infrastracture.Network
 {
     public class NativeWebSocketService : MonoBehaviour, IWebSocketService
     {
-        bool IsRemote = false;
+        bool IsRemote = true;
         private WebSocket _socket;
         
         Subject<(PacketId, JObject)> OnReceiveMessage = new Subject<(PacketId, JObject)>();
